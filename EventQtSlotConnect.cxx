@@ -1,7 +1,5 @@
 #include "EventQtSlotConnect.h"
 
-#include "VoronoiSkeletonTool.h"
-
 #include <vtkGenericDataObjectReader.h>
 
 #include <vtkPolyDataMapper.h>
@@ -29,13 +27,9 @@
 #include <vtkPropPicker.h>
 #include <vtkRenderWindowInteractor.h>
 
-#include <QtGui>
 
 #include <vtkDelaunay3D.h>
 #include <sstream> 
-
-
-
 
 // Handle mouse events
 class MouseInteractorStyle2 : public vtkInteractorStyleTrackballCamera
@@ -101,10 +95,16 @@ EventQtSlotConnect::EventQtSlotConnect()
 
   this->Connections = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
+  this->cmrep_progressBar->setMinimum(0);
+  this->cmrep_progressBar->setMaximum(0);
+  this->cmrep_progressBar->hide();
+
   createActions();
   createMenus();
 
+  this->connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slot_finished()));
   this->connect(this->cmrepVskel, SIGNAL(clicked()), this, SLOT(executeCmrepVskel()));
+
 
 /////////////////////////////////////////////////////
 /*  // Sphere
@@ -132,6 +132,15 @@ EventQtSlotConnect::EventQtSlotConnect()
 };
 
 
+int EventQtSlotConnect::geteValue(){
+	return this->eParameter->value();
+}
+
+void EventQtSlotConnect::slot_finished(){
+	readVTK(VTKfilename);
+	this->cmrep_progressBar->hide();
+}
+
 void EventQtSlotConnect::slot_position(double x, double y, double z)
 {
 	textEdit->append("Position");
@@ -156,8 +165,6 @@ void EventQtSlotConnect::save(){
 
 void EventQtSlotConnect::executeCmrepVskel(){
 
-	//textEdit;
-	//std::cout<<"eparameter is " << this->eParameter->value()<< std::endl;
 	std::vector <char *> parameters;
 	parameters.push_back("cmrep_vskel");
 	
@@ -258,12 +265,8 @@ void EventQtSlotConnect::executeCmrepVskel(){
 		parameters.push_back(temp);
 		delete temp;
 	}
-
-
-
 	
 	char *command[3];
-	//command[0] = "cmreop_vskel";
 	command[1] = new char[VTKfilename.length() + 1];
 	strcpy(command[1], VTKfilename.c_str());
 	parameters.push_back(command[1]);
@@ -278,9 +281,17 @@ void EventQtSlotConnect::executeCmrepVskel(){
 	std::cout<<"parameter"<<std::endl;
 	for(int i = 0; i < parameters.size(); i++)
 		std::cout<<parameters[i]<<std::endl;*/
-	VoronoiSkeletonTool v;
-	v.execute(parameters.size(), parameters);
-	readVTK(outputNameSkel);
+	this->cmrep_progressBar->show();
+	QFuture<void> future = QtConcurrent::run(&this->v, &VoronoiSkeletonTool::execute, parameters.size(), parameters);
+	//&VoronoiSkeletonTool::execute(parameters.size(), parameters);
+	this->FutureWatcher.setFuture(future);
+
+	/*this->ProgressDialog->setMinimum(0);
+	this->ProgressDialog->setMaximum(0);
+	this->ProgressDialog->setWindowModality(Qt::WindowModal);
+	this->ProgressDialog->exec();
+	*///v.execute(parameters.size(), parameters);
+	VTKfilename = outputNameSkel;
 }
 
 void EventQtSlotConnect::createActions(){
