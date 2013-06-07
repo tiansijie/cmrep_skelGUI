@@ -1,0 +1,251 @@
+The system is: Windows - 6.2 - AMD64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: CompilerIdC, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:32 PM.
+1>InitializeBuildStatus:
+1>  Creating "Debug\CompilerIdC.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  CMakeCCompilerId.c
+1>Link:
+1>  CompilerIdC.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\2.8.11\CompilerIdC\.\CompilerIdC.exe
+1>PostBuildEvent:
+1>  CMAKE_C_COMPILER=D:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "Debug\CompilerIdC.unsuccessfulbuild".
+1>  Touching "Debug\CompilerIdC.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.22
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj.user"
+
+The C compiler identification is MSVC, found in "D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/2.8.11/CompilerIdC/CompilerIdC.exe"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: CompilerIdCXX, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:34 PM.
+1>InitializeBuildStatus:
+1>  Creating "Debug\CompilerIdCXX.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  CMakeCXXCompilerId.cpp
+1>Link:
+1>  CompilerIdCXX.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\2.8.11\CompilerIdCXX\.\CompilerIdCXX.exe
+1>PostBuildEvent:
+1>  CMAKE_CXX_COMPILER=D:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "Debug\CompilerIdCXX.unsuccessfulbuild".
+1>  Touching "Debug\CompilerIdCXX.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.24
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj.user"
+
+The CXX compiler identification is MSVC, found in "D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/2.8.11/CompilerIdCXX/CompilerIdCXX.exe"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp
+
+Run Build Command:D:\PROGRA~2\MICROS~1.0\Common7\IDE\devenv.com CMAKE_TRY_COMPILE.sln /build Debug /project cmTryCompileExec667191557
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: cmTryCompileExec667191557, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:36 PM.
+1>PrepareForBuild:
+1>  Creating directory "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\".
+1>InitializeBuildStatus:
+1>  Creating "cmTryCompileExec667191557.dir\Debug\cmTryCompileExec667191557.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+1>  Copyright (C) Microsoft Corporation.  All rights reserved.
+1>  
+1>  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec667191557.dir\Debug\\" /Fd"D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec667191557.pdb" /Gd /TC /analyze- /errorReport:prompt testCCompiler.c
+1>  
+1>  testCCompiler.c
+1>LinkEmbedManifest:
+1>  cmTryCompileExec667191557.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec667191557.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "cmTryCompileExec667191557.dir\Debug\cmTryCompileExec667191557.unsuccessfulbuild".
+1>  Touching "cmTryCompileExec667191557.dir\Debug\cmTryCompileExec667191557.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.54
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp
+
+Run Build Command:D:\PROGRA~2\MICROS~1.0\Common7\IDE\devenv.com CMAKE_TRY_COMPILE.sln /build Debug /project cmTryCompileExec1790680366
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: cmTryCompileExec1790680366, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:38 PM.
+1>PrepareForBuild:
+1>  Creating directory "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\".
+1>InitializeBuildStatus:
+1>  Creating "cmTryCompileExec1790680366.dir\Debug\cmTryCompileExec1790680366.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+1>  Copyright (C) Microsoft Corporation.  All rights reserved.
+1>  
+1>  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1790680366.dir\Debug\\" /Fd"D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1790680366.pdb" /Gd /TC /analyze- /errorReport:prompt "C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCCompilerABI.c"
+1>  
+1>  CMakeCCompilerABI.c
+1>LinkEmbedManifest:
+1>  cmTryCompileExec1790680366.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1790680366.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "cmTryCompileExec1790680366.dir\Debug\cmTryCompileExec1790680366.unsuccessfulbuild".
+1>  Touching "cmTryCompileExec1790680366.dir\Debug\cmTryCompileExec1790680366.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.62
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp
+
+Run Build Command:D:\PROGRA~2\MICROS~1.0\Common7\IDE\devenv.com CMAKE_TRY_COMPILE.sln /build Debug /project cmTryCompileExec2500788639
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: cmTryCompileExec2500788639, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:41 PM.
+1>PrepareForBuild:
+1>  Creating directory "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\".
+1>InitializeBuildStatus:
+1>  Creating "cmTryCompileExec2500788639.dir\Debug\cmTryCompileExec2500788639.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+1>  Copyright (C) Microsoft Corporation.  All rights reserved.
+1>  
+1>  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"cmTryCompileExec2500788639.dir\Debug\\" /Fd"D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2500788639.pdb" /Gd /TP /analyze- /errorReport:prompt testCXXCompiler.cxx
+1>  
+1>  testCXXCompiler.cxx
+1>LinkEmbedManifest:
+1>  cmTryCompileExec2500788639.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2500788639.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "cmTryCompileExec2500788639.dir\Debug\cmTryCompileExec2500788639.unsuccessfulbuild".
+1>  Touching "cmTryCompileExec2500788639.dir\Debug\cmTryCompileExec2500788639.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.56
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp
+
+Run Build Command:D:\PROGRA~2\MICROS~1.0\Common7\IDE\devenv.com CMAKE_TRY_COMPILE.sln /build Debug /project cmTryCompileExec2483977460
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: cmTryCompileExec2483977460, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:43 PM.
+1>PrepareForBuild:
+1>  Creating directory "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\".
+1>InitializeBuildStatus:
+1>  Creating "cmTryCompileExec2483977460.dir\Debug\cmTryCompileExec2483977460.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+1>  Copyright (C) Microsoft Corporation.  All rights reserved.
+1>  
+1>  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"cmTryCompileExec2483977460.dir\Debug\\" /Fd"D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2483977460.pdb" /Gd /TP /analyze- /errorReport:prompt "C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeCXXCompilerABI.cpp"
+1>  
+1>  CMakeCXXCompilerABI.cpp
+1>LinkEmbedManifest:
+1>  cmTryCompileExec2483977460.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2483977460.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "cmTryCompileExec2483977460.dir\Debug\cmTryCompileExec2483977460.unsuccessfulbuild".
+1>  Touching "cmTryCompileExec2483977460.dir\Debug\cmTryCompileExec2483977460.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.59
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+
+Determining if the Q_WS_WIN exist passed with the following output:
+Change Dir: D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp
+
+Run Build Command:D:\PROGRA~2\MICROS~1.0\Common7\IDE\devenv.com CMAKE_TRY_COMPILE.sln /build Debug /project cmTryCompileExec4143983209
+
+Microsoft (R) Visual Studio Version 10.0.40219.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+1>------ Build started: Project: cmTryCompileExec4143983209, Configuration: Debug Win32 ------
+1>Build started 6/6/2013 1:19:48 PM.
+1>PrepareForBuild:
+1>  Creating directory "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\".
+1>InitializeBuildStatus:
+1>  Creating "cmTryCompileExec4143983209.dir\Debug\cmTryCompileExec4143983209.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+1>  Copyright (C) Microsoft Corporation.  All rights reserved.
+1>  
+1>  cl /c /ID:/Qt/4.8.4/include /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"cmTryCompileExec4143983209.dir\Debug\\" /Fd"D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4143983209.pdb" /Gd /TP /analyze- /errorReport:prompt CheckSymbolExists.cxx
+1>  
+1>  CheckSymbolExists.cxx
+1>LinkEmbedManifest:
+1>  cmTryCompileExec4143983209.vcxproj -> D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4143983209.exe
+1>FinalizeBuildStatus:
+1>  Deleting file "cmTryCompileExec4143983209.dir\Debug\cmTryCompileExec4143983209.unsuccessfulbuild".
+1>  Touching "cmTryCompileExec4143983209.dir\Debug\cmTryCompileExec4143983209.lastbuildstate".
+1>
+1>Build succeeded.
+1>
+1>Time Elapsed 00:00:00.76
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+
+File D:/VTK/tutoral/EventQtSlotConnect/EventQtSlotConnect/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <QtCore/qglobal.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef Q_WS_WIN
+  return ((int*)(&Q_WS_WIN))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+

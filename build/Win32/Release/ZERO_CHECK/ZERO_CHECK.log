@@ -1,0 +1,12 @@
+﻿Build started 6/6/2013 5:56:34 PM.
+     1>Project "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\ZERO_CHECK.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Win32\Release\ZERO_CHECK\ZERO_CHECK.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       FinalizeBuildStatus:
+         Deleting file "Win32\Release\ZERO_CHECK\ZERO_CHECK.unsuccessfulbuild".
+         Touching "Win32\Release\ZERO_CHECK\ZERO_CHECK.lastbuildstate".
+     1>Done Building Project "D:\VTK\tutoral\EventQtSlotConnect\EventQtSlotConnect\build\ZERO_CHECK.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.14
