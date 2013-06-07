@@ -293,7 +293,8 @@ int usage()
   
 
 //int main(int argc, char *argv[])
-int VoronoiSkeletonTool::execute(int argc, char *argv[])
+//int VoronoiSkeletonTool::execute(int argc, char *argv[])
+int VoronoiSkeletonTool::execute(int argc, std::vector <char*> argv)
 {
 
   // Command line arguments

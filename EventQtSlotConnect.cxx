@@ -32,6 +32,7 @@
 #include <QtGui>
 
 #include <vtkDelaunay3D.h>
+#include <sstream> 
 
 
 
@@ -154,18 +155,131 @@ void EventQtSlotConnect::save(){
 }
 
 void EventQtSlotConnect::executeCmrepVskel(){
-	VoronoiSkeletonTool v;
+
+	//textEdit;
+	//std::cout<<"eparameter is " << this->eParameter->value()<< std::endl;
+	std::vector <char *> parameters;
+	parameters.push_back("cmrep_vskel");
+	
+	QString pathTextQ = this->pathParameter->text();
+	std::string pathText = pathTextQ.toStdString();
+	if(!pathText.empty()){
+		parameters.push_back("-Q");
+		char *temp = new char;
+		strcpy(temp, pathText.c_str());
+		parameters.push_back(temp);
+	}
+	
+	int evalue = this->eParameter->value();
+	if(evalue != 0){
+		parameters.push_back("-e");
+		char *temp = new char;
+		itoa(evalue, temp, 10);
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	double pvalue = this->pParameter->value();
+	if(pvalue != 0.0){
+		parameters.push_back("-p");
+		char *temp = new char;
+		std::stringstream ss;
+		ss << pvalue;
+		std::string tempS = ss.str();
+		strcpy(temp, tempS.c_str());
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	int cvalue = this->cParameter->value();
+	if(cvalue != 0){
+		parameters.push_back("-c");
+		char *temp = new char;
+		itoa(cvalue, temp, 10);
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	int tvalue = this->tParameter->value();
+	if(tvalue != 0){
+		parameters.push_back("-t");
+		char *temp = new char;
+		itoa(tvalue, temp, 10);
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	QString stextQ = this->sParameter->text();
+	std::string stext = stextQ.toStdString();
+	if(!stext.empty()){
+		parameters.push_back("-s");
+		char *temp = new char;
+		strcpy(temp, stext.c_str());
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	QString RtextQ = this->RParameter->text();
+	std::string Rtext = RtextQ.toStdString();
+	if(!Rtext.empty()){
+		parameters.push_back("-R");
+		char *temp = new char;
+		strcpy(temp, Rtext.c_str());
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	QString TtextQ = this->TParameter->text();
+	std::string Ttext = TtextQ.toStdString();
+	if(!Ttext.empty()){
+		parameters.push_back("-T");
+		char *temp = new char;
+		strcpy(temp, Ttext.c_str());
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	QString ItextQ = this->IParameter->text();
+	std::string Itext = ItextQ.toStdString();
+	if(!Itext.empty()){
+		parameters.push_back("-I");
+		char *temp = new char;
+		strcpy(temp, Itext.c_str());
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+	QString qtextQ = this->qParameter->text();
+	std::string qtext = qtextQ.toStdString();
+	if(!qtext.empty()){
+		parameters.push_back("-q");
+		char *temp = new char;
+		strcpy(temp, qtext.c_str());
+		parameters.push_back(temp);
+		delete temp;
+	}
+
+
+
+	
 	char *command[3];
-	command[0] = "cmreop_vskel";
+	//command[0] = "cmreop_vskel";
 	command[1] = new char[VTKfilename.length() + 1];
 	strcpy(command[1], VTKfilename.c_str());
+	parameters.push_back(command[1]);
 
 	std::string outputNameSkel =  VTKfilename;
 	outputNameSkel = outputNameSkel.substr(0, outputNameSkel.length() - 4) + "_Skel.vtk";
 	command[2] = new char [outputNameSkel.length() + 1];
 	strcpy(command[2], outputNameSkel.c_str());
+	parameters.push_back(command[2]);
 
-	v.execute(3, command);
+/*
+	std::cout<<"parameter"<<std::endl;
+	for(int i = 0; i < parameters.size(); i++)
+		std::cout<<parameters[i]<<std::endl;*/
+	VoronoiSkeletonTool v;
+	v.execute(parameters.size(), parameters);
 	readVTK(outputNameSkel);
 }
 

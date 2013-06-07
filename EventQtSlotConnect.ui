@@ -39,8 +39,8 @@
    <widget class="QTextEdit" name="textEdit">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>600</y>
+      <x>20</x>
+      <y>530</y>
       <width>301</width>
       <height>51</height>
      </rect>
@@ -130,7 +130,7 @@
        <string>t</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox">
+     <widget class="QSpinBox" name="eParameter">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -140,7 +140,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QDoubleSpinBox" name="doubleSpinBox">
+     <widget class="QDoubleSpinBox" name="pParameter">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -150,7 +150,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox_2">
+     <widget class="QSpinBox" name="cParameter">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -160,7 +160,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox_3">
+     <widget class="QSpinBox" name="tParameter">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -235,7 +235,7 @@
        <string>s</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="sParameter">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -258,7 +258,7 @@
        <string>R</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_2">
+     <widget class="QLineEdit" name="RParameter">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -281,7 +281,7 @@
        <string>T</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_3">
+     <widget class="QLineEdit" name="TParameter">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -304,7 +304,7 @@
        <string>I</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_4">
+     <widget class="QLineEdit" name="IParameter">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -327,7 +327,7 @@
        <string>q</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_5">
+     <widget class="QLineEdit" name="qParameter">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -363,7 +363,7 @@
        <string>Path</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_6">
+     <widget class="QLineEdit" name="pathParameter">
       <property name="geometry">
        <rect>
         <x>50</x>
