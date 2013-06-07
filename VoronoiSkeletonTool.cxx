@@ -8,7 +8,7 @@
 #include <algorithm>
 
 #include "VoronoiSkeletonTool.h"
-//#include <SparseMatrix.h>
+#include "SparseMatrix.h"
 
 #include <vtkDijkstraGraphGeodesicPath.h>
 #include <vtkSelectEnclosedPoints.h>
@@ -709,7 +709,7 @@ int VoronoiSkeletonTool::execute(int argc, char *argv[])
   // Write the skeleton out
   WriteVTKData(skelfinal, fnOutput);
 
-  /*// Generate thickness map
+  // Generate thickness map
   if(fnOutThickness.length())
     {
     // Initialize thickness array
@@ -809,7 +809,7 @@ int VoronoiSkeletonTool::execute(int argc, char *argv[])
         // Set thickness, depth
         itthick.Set(t);
         itdepth.Set(d / t);
-        / *
+        /*
           {
           cout << "Index: " << rit.GetIndex() << endl;
           cout << "Point: " << p << endl;
@@ -818,7 +818,7 @@ int VoronoiSkeletonTool::execute(int argc, char *argv[])
           cout << "Matching cell: " << cellid << endl;
           cout << "Corr.Point: " << xs[0] << " " << xs[1] << " " << xs[2] << endl;
           }
-        * /
+        */
         }
       }
 
@@ -952,6 +952,6 @@ int VoronoiSkeletonTool::execute(int argc, char *argv[])
     delete xLandmarks;
     delete row_index;
     delete col_index;
-    }*/
+    }
 }
 
