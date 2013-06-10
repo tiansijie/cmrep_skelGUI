@@ -34,8 +34,6 @@ public:
 
   void readVTK(std::string filename);
 
-  int geteValue();
-
 public slots:
   void slot_clicked(vtkObject*, unsigned long, void*, void*);
   void slot_position(double x, double y, double z);

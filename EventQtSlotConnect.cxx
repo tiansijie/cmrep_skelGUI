@@ -26,6 +26,10 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkPropPicker.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkPointPicker.h>
+#include <vtkVertexGlyphFilter.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
 
 
 #include <vtkDelaunay3D.h>
@@ -39,12 +43,14 @@ public:
 	vtkTypeMacro(MouseInteractorStyle2, vtkInteractorStyleTrackballCamera);
 
 	double posX, posY, posZ;
+	struct PickPoint{
+		double p[3];
+	};
+	std::vector<PickPoint>pickPoints;
 
 	virtual void OnLeftButtonDown()
 	{
-		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
-
-		if( this->GetInteractor()->GetControlKey() ){
+		if( this->Interactor->GetControlKey() ){
 			int* clickPos = this->GetInteractor()->GetEventPosition();
 			// Pick from this location.
 			vtkSmartPointer<vtkPropPicker>  picker =
@@ -58,13 +64,81 @@ public:
 				<< pos[0] << " " << pos[1]
 			<< " " << pos[2] << std::endl;
 
+
 			std::cout << "Picked actor: " << picker->GetActor() << std::endl;
+
+			
+
+			//find the first actor
+			vtkSmartPointer<vtkActorCollection> actors = this->GetCurrentRenderer()->GetActors();
+			vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));
+
+			vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
+			double minDistance = DBL_MAX;
+			double finalPos[3];
+			for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
+				double p[3];
+				vtkdata->GetPoint(i,p);
+				double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
+				if(dist < minDistance){
+					minDistance = dist;
+					finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
+				}
+			}
+			PickPoint temp;
+			temp.p[0] = finalPos[0];temp.p[1] = finalPos[1]; temp.p[2] = finalPos[2];
+			pickPoints.push_back(temp);
+			std::cout << "Pick position (final position) is: "
+				<< finalPos[0] << " " << finalPos[1]
+			<< " " << finalPos[2] << std::endl;
+
+			if(pickPoints.size() >= 2){
+				vtkSmartPointer<vtkPoints> pts =
+					vtkSmartPointer<vtkPoints>::New();
+				for(int i = 0; i < pickPoints.size(); i++){
+					pts->InsertNextPoint(pickPoints[i].p);
+				}
+				vtkSmartPointer<vtkPolyLine> polyLine = 
+					vtkSmartPointer<vtkPolyLine>::New();
+				polyLine->GetPointIds()->SetNumberOfIds(pickPoints.size());
+				for(unsigned int i = 0; i < pickPoints.size(); i++){
+					polyLine->GetPointIds()->SetId(i,i);
+				}
+				// Create a cell array to store the lines in and add the lines to it
+				vtkSmartPointer<vtkCellArray> cells = 
+					vtkSmartPointer<vtkCellArray>::New();
+				cells->InsertNextCell(polyLine);
+
+				// Create a polydata to store everything in
+				vtkSmartPointer<vtkPolyData> polyData = 
+					vtkSmartPointer<vtkPolyData>::New();
+
+				// Add the points to the dataset
+				polyData->SetPoints(pts);
+
+				// Add the lines to the dataset
+				polyData->SetLines(cells);
+
+				// Setup actor and mapper
+				vtkSmartPointer<vtkPolyDataMapper> mapper = 
+					vtkSmartPointer<vtkPolyDataMapper>::New();
+#if VTK_MAJOR_VERSION <= 5
+				mapper->SetInput(polyData);
+#else
+				mapper->SetInputData(polyData);
+#endif
+				vtkSmartPointer<vtkActor> actor = 
+					vtkSmartPointer<vtkActor>::New();
+				actor->SetMapper(mapper);
+				this->GetDefaultRenderer()->AddActor(actor);
+			}
+
 
 			//Create a sphere
 			vtkSmartPointer<vtkSphereSource> sphereSource =
 				vtkSmartPointer<vtkSphereSource>::New();
-			sphereSource->SetCenter(pos[0], pos[1], pos[2]);
-			sphereSource->SetRadius(1.0);
+			sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
+			sphereSource->SetRadius(0.2);
 
 			//Create a mapper and actor
 			vtkSmartPointer<vtkPolyDataMapper> mapper =
@@ -76,14 +150,13 @@ public:
 			actor->SetMapper(mapper);
 			actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
 
-			//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 			this->GetDefaultRenderer()->AddActor(actor);
 			// Forward events
 		
 		}
+		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
 	}
 private:
-
 };
 
 vtkStandardNewMacro(MouseInteractorStyle2);
@@ -104,37 +177,7 @@ EventQtSlotConnect::EventQtSlotConnect()
 
   this->connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slot_finished()));
   this->connect(this->cmrepVskel, SIGNAL(clicked()), this, SLOT(executeCmrepVskel()));
-
-
-/////////////////////////////////////////////////////
-/*  // Sphere
-  vtkSmartPointer<vtkSphereSource> sphereSource =
-    vtkSmartPointer<vtkSphereSource>::New();
-  sphereSource->Update();
-  vtkSmartPointer<vtkPolyDataMapper> sphereMapper =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
-  sphereMapper->SetInputConnection(sphereSource->GetOutputPort());
-
-  vtkSmartPointer<vtkActor> sphereActor =
-    vtkSmartPointer<vtkActor>::New();
-  sphereActor->SetMapper(sphereMapper);
-
-  // VTK Renderer
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  renderer->AddActor(sphereActor);*/
-/////////////////////////////////////////////////////
-
-
-//vtkSmartPointer<vtkPlaneSource> planeSource =
-//		vtkSmartPointer<vtkPlaneSource>::New();
-//	planeSource->Update();
 };
-
-
-int EventQtSlotConnect::geteValue(){
-	return this->eParameter->value();
-}
 
 void EventQtSlotConnect::slot_finished(){
 	readVTK(VTKfilename);
@@ -283,14 +326,13 @@ void EventQtSlotConnect::executeCmrepVskel(){
 		std::cout<<parameters[i]<<std::endl;*/
 	this->cmrep_progressBar->show();
 	QFuture<void> future = QtConcurrent::run(&this->v, &VoronoiSkeletonTool::execute, parameters.size(), parameters);
-	//&VoronoiSkeletonTool::execute(parameters.size(), parameters);
 	this->FutureWatcher.setFuture(future);
-
 	/*this->ProgressDialog->setMinimum(0);
 	this->ProgressDialog->setMaximum(0);
 	this->ProgressDialog->setWindowModality(Qt::WindowModal);
-	this->ProgressDialog->exec();
-	*///v.execute(parameters.size(), parameters);
+	this->ProgressDialog->exec();*/
+	//v.execute(parameters.size(), parameters);
+
 	VTKfilename = outputNameSkel;
 }
 
@@ -319,6 +361,9 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	//vtkPolyData* polydata = planeSource->GetOutput();
     vtkPolyData* polydata =  reader->GetPolyDataOutput();
 
+
+	vtkIdType;
+	std::cout<< polydata->GetNumberOfPoints() <<std::endl;
   
 	// Create a mapper
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
@@ -355,6 +400,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	vtkSmartPointer<MouseInteractorStyle2> style =
 		vtkSmartPointer<MouseInteractorStyle2>::New();
 	style->SetDefaultRenderer(renderer);
+	
 
 	this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle( style );
 	this->qvtkWidget->GetRenderWindow()->AddRenderer(renderer);
