@@ -41,6 +41,9 @@ public slots:
   void save();
   void executeCmrepVskel();
   void slot_finished();
+  void vertexChecked();
+  void branchChecked();
+  void surfaceChecked();
 
 private:
 

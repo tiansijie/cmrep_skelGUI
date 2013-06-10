@@ -30,10 +30,15 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
+#include <vtkDoubleArray.h>
+#include <vtkCellData.h>
 
 
 #include <vtkDelaunay3D.h>
 #include <sstream> 
+
+double pointColor[3];
+
 
 // Handle mouse events
 class MouseInteractorStyle2 : public vtkInteractorStyleTrackballCamera
@@ -64,13 +69,10 @@ public:
 				<< pos[0] << " " << pos[1]
 			<< " " << pos[2] << std::endl;
 
-
-			std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-
-			
+			std::cout << "Picked actor: " << picker->GetActor() << std::endl;			
 
 			//find the first actor
-			vtkSmartPointer<vtkActorCollection> actors = this->GetCurrentRenderer()->GetActors();
+			vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
 			vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));
 
 			vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
@@ -92,6 +94,7 @@ public:
 				<< finalPos[0] << " " << finalPos[1]
 			<< " " << finalPos[2] << std::endl;
 
+			//draw line if the number of selected points is more than 2
 			if(pickPoints.size() >= 2){
 				vtkSmartPointer<vtkPoints> pts =
 					vtkSmartPointer<vtkPoints>::New();
@@ -109,15 +112,26 @@ public:
 					vtkSmartPointer<vtkCellArray>::New();
 				cells->InsertNextCell(polyLine);
 
+				vtkSmartPointer<vtkUnsignedCharArray> colors = 
+					vtkSmartPointer<vtkUnsignedCharArray>::New();
+				colors->SetNumberOfComponents(pickPoints.size());
+				colors->SetName("Colors");
+				unsigned char red[3] = {0, 0, 255};
+				for(unsigned int i = 0; i < pickPoints.size(); i++){
+					colors->InsertNextTupleValue(red);
+				}
+
 				// Create a polydata to store everything in
-				vtkSmartPointer<vtkPolyData> polyData = 
-					vtkSmartPointer<vtkPolyData>::New();
+				vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
 				// Add the points to the dataset
 				polyData->SetPoints(pts);
 
 				// Add the lines to the dataset
 				polyData->SetLines(cells);
+
+				//set color of line
+				polyData->GetCellData()->AddArray(colors);
 
 				// Setup actor and mapper
 				vtkSmartPointer<vtkPolyDataMapper> mapper = 
@@ -130,6 +144,7 @@ public:
 				vtkSmartPointer<vtkActor> actor = 
 					vtkSmartPointer<vtkActor>::New();
 				actor->SetMapper(mapper);
+				this->GetDefaultRenderer()->GetActors()->GetNumberOfItems();
 				this->GetDefaultRenderer()->AddActor(actor);
 			}
 
@@ -148,11 +163,9 @@ public:
 			vtkSmartPointer<vtkActor> actor =
 				vtkSmartPointer<vtkActor>::New();
 			actor->SetMapper(mapper);
-			actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+			actor->GetProperty()->SetColor(pointColor[0], pointColor[1], pointColor[2]);
 
-			this->GetDefaultRenderer()->AddActor(actor);
-			// Forward events
-		
+			this->GetDefaultRenderer()->AddActor(actor);		
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
 	}
@@ -175,8 +188,13 @@ EventQtSlotConnect::EventQtSlotConnect()
   createActions();
   createMenus();
 
+  pointColor[0] = 1; pointColor[1] = 0; pointColor[2] = 0;
+
   this->connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slot_finished()));
   this->connect(this->cmrepVskel, SIGNAL(clicked()), this, SLOT(executeCmrepVskel()));
+  this->connect(this->radioButtonVertex, SIGNAL(clicked()), this, SLOT(vertexChecked()));
+  this->connect(this->radioButtonBranch, SIGNAL(clicked()), this, SLOT(branchChecked()));
+  this->connect(this->radioButtonSurface, SIGNAL(clicked()), this, SLOT(surfaceChecked()));  
 };
 
 void EventQtSlotConnect::slot_finished(){
@@ -194,6 +212,18 @@ void EventQtSlotConnect::slot_clicked(vtkObject*, unsigned long, void*, void*)
   textEdit->append("Clicked");
 }
 
+void EventQtSlotConnect::vertexChecked(){
+	pointColor[0] = 1; pointColor[1] = 0; pointColor[2] = 0;
+}
+
+void EventQtSlotConnect::branchChecked(){
+	pointColor[0] = 0; pointColor[1] = 1; pointColor[2] = 0;
+}
+
+void EventQtSlotConnect::surfaceChecked(){
+	pointColor[0] = 0; pointColor[1] = 0; pointColor[2] = 1;
+}
+
 void EventQtSlotConnect::open(){
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
 	if (!fileName.isEmpty()) {
@@ -203,7 +233,6 @@ void EventQtSlotConnect::open(){
 }
 
 void EventQtSlotConnect::save(){
-
 }
 
 void EventQtSlotConnect::executeCmrepVskel(){

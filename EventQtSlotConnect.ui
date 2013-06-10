@@ -385,48 +385,22 @@
      </attribute>
     </widget>
    </widget>
-   <widget class="QRadioButton" name="radioButtonVertex">
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>520</y>
-      <width>89</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Vertex</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButtonBranch">
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>540</y>
-      <width>89</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Branch Point</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>570</x>
       <y>499</y>
-      <width>120</width>
-      <height>81</height>
+      <width>211</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="title">
-     <string>GroupBox</string>
+     <string>Point Selection</string>
     </property>
     <widget class="QRadioButton" name="radioButtonSurface">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>60</y>
        <width>89</width>
        <height>16</height>
@@ -434,6 +408,35 @@
      </property>
      <property name="text">
       <string>Surface Point</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonVertex">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>89</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vertex</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonBranch">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>89</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Branch Point</string>
      </property>
     </widget>
    </widget>
@@ -457,8 +460,6 @@
    <zorder>groupBox</zorder>
    <zorder>qvtkWidget</zorder>
    <zorder>textEdit</zorder>
-   <zorder>radioButtonVertex</zorder>
-   <zorder>radioButtonBranch</zorder>
    <zorder>cmrep_progressBar</zorder>
   </widget>
   <action name="actionOpenFile">
