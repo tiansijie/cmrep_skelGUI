@@ -86,17 +86,7 @@ public:
 			// Create a cell array to store the lines in and add the lines to it
 			vtkSmartPointer<vtkCellArray> cells = 
 				vtkSmartPointer<vtkCellArray>::New();
-			cells->InsertNextCell(polyLine);
-
-			vtkSmartPointer<vtkUnsignedCharArray> colors = 
-				vtkSmartPointer<vtkUnsignedCharArray>::New();
-			colors->SetNumberOfComponents(pickPoints.size());
-			std::cout<<"line size "<<pickPoints.size()<<std::endl;
-			colors->SetName("Colors");
-			unsigned char red[3] = {0, 0, 255};
-			for(unsigned int i = 0; i < pickPoints.size(); i++){
-				colors->InsertNextTupleValue(red);
-			}
+			cells->InsertNextCell(polyLine);			
 
 			// Create a polydata to store everything in
 			vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
@@ -106,9 +96,6 @@ public:
 
 			// Add the lines to the dataset
 			polyData->SetLines(cells);
-
-			//set color of line
-			polyData->GetCellData()->AddArray(colors);
 
 			// Setup actor and mapper
 			vtkSmartPointer<vtkPolyDataMapper> mapper = 
@@ -124,6 +111,7 @@ public:
 				this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
 			prePolyLineActor = actor;
 			actor->SetMapper(mapper);
+			actor->GetProperty()->SetColor(0,1,1);
 			this->GetDefaultRenderer()->GetActors()->GetNumberOfItems();
 			this->GetDefaultRenderer()->AddActor(actor);
 		}
@@ -132,6 +120,7 @@ public:
 				this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
 		}
 	}
+
 
 	virtual void OnLeftButtonDown()
 	{		
@@ -175,7 +164,7 @@ public:
 			vtkSmartPointer<vtkSphereSource> sphereSource =
 				vtkSmartPointer<vtkSphereSource>::New();
 			sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
-			sphereSource->SetRadius(0.2);
+			sphereSource->SetRadius(1.0);
 
 			//Create a mapper and actor
 			vtkSmartPointer<vtkPolyDataMapper> mapper =
@@ -194,9 +183,9 @@ public:
 			this->GetDefaultRenderer()->AddActor(actor);
 		}
 
-		if(this->Interactor->GetKeySym() != NULL){
+		if(this->Interactor->GetKeySym() != NULL){//for delete point event
 			std::string key = this->Interactor->GetKeySym();
-			if(key.compare("s") == 0){//for selection event
+			if(key.compare("s") == 0){
 				std::cout<<"are you in"<<std::endl;
 				vtkSmartPointer<vtkActor> pickedActor
 					= vtkSmartPointer<vtkActor>::New();
@@ -288,12 +277,6 @@ void EventQtSlotConnect::branchChecked(){
 void EventQtSlotConnect::surfaceChecked(){
 	acotr_type = 3;
 	pointColor[0] = 0; pointColor[1] = 0; pointColor[2] = 1;
-}
-
-void EventQtSlotConnect::addChecked(){//for interactor style
-}
-
-void EventQtSlotConnect::selectChecked(){//for interactor style
 }
 
 void EventQtSlotConnect::open(){
@@ -502,6 +485,8 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	vtkSmartPointer<MouseInteractorAdd> style =
 		vtkSmartPointer<MouseInteractorAdd>::New();
 	style->SetDefaultRenderer(renderer);	
+
+	pickPointsActors.clear();
 
 	this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle( style );
 	this->qvtkWidget->GetRenderWindow()->AddRenderer(renderer);
