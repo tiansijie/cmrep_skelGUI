@@ -44,6 +44,8 @@ public slots:
   void vertexChecked();
   void branchChecked();
   void surfaceChecked();
+  void addChecked();
+  void selectChecked();
 
 private:
 

@@ -32,20 +32,29 @@
 #include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkCellData.h>
+#include <vtkCleanPolyData.h>
+#include <vtkDataSetMapper.h>
+#include <vtkExtractGeometry.h>
+#include <vtkAreaPicker.h>
+
+#include <vtkInteractorStyleSwitch.h>
 
 
 #include <vtkDelaunay3D.h>
 #include <sstream> 
 
 double pointColor[3];
-
+int acotr_type;
 
 // Handle mouse events
-class MouseInteractorStyle2 : public vtkInteractorStyleTrackballCamera
+class MouseInteractorAdd : public vtkInteractorStyleTrackballCamera
 {
 public:
-	static MouseInteractorStyle2* New();
-	vtkTypeMacro(MouseInteractorStyle2, vtkInteractorStyleTrackballCamera);
+	static MouseInteractorAdd* New();
+	vtkTypeMacro(MouseInteractorAdd, vtkInteractorStyleTrackballCamera);
+
+	MouseInteractorAdd(){
+	}
 
 	double posX, posY, posZ;
 	struct PickPoint{
@@ -53,28 +62,28 @@ public:
 	};
 	std::vector<PickPoint>pickPoints;
 
+	struct ActorType{
+		vtkActor* actor;
+		int type;//1 for vertex, 2 for branch, 3 for surface
+	};	
+	std::vector<ActorType> pickPointsActors;
+
 	virtual void OnLeftButtonDown()
-	{
-		if( this->Interactor->GetControlKey() ){
-			int* clickPos = this->GetInteractor()->GetEventPosition();
-			// Pick from this location.
-			vtkSmartPointer<vtkPropPicker>  picker =
-				vtkSmartPointer<vtkPropPicker>::New();
-			picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
+	{		
+		int* clickPos = this->GetInteractor()->GetEventPosition();
+		// Pick from this location.
+		vtkSmartPointer<vtkPropPicker>  picker =
+			vtkSmartPointer<vtkPropPicker>::New();
+		picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
 
-			double* pos = picker->GetPickPosition();
-			posX = pos[0]; posY = pos[1]; posZ = pos[2];
-			//position = picker->->GetPickPosition();
-			std::cout << "Pick position (world coordinates) is: "
-				<< pos[0] << " " << pos[1]
-			<< " " << pos[2] << std::endl;
+		double* pos = picker->GetPickPosition();
+		posX = pos[0]; posY = pos[1]; posZ = pos[2];				
 
-			std::cout << "Picked actor: " << picker->GetActor() << std::endl;			
-
-			//find the first actor
-			vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
-			vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));
-
+		//find the first actor
+		vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
+		vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));		
+			
+		if( this->Interactor->GetControlKey() ){//for the adding point event
 			vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
 			double minDistance = DBL_MAX;
 			double finalPos[3];
@@ -148,7 +157,6 @@ public:
 				this->GetDefaultRenderer()->AddActor(actor);
 			}
 
-
 			//Create a sphere
 			vtkSmartPointer<vtkSphereSource> sphereSource =
 				vtkSmartPointer<vtkSphereSource>::New();
@@ -164,15 +172,44 @@ public:
 				vtkSmartPointer<vtkActor>::New();
 			actor->SetMapper(mapper);
 			actor->GetProperty()->SetColor(pointColor[0], pointColor[1], pointColor[2]);
+			//store actor in pickpointactors
+			ActorType actorT;
+			actorT.actor = actor;
+			actorT.type = acotr_type;
+			pickPointsActors.push_back(actorT);
+			this->GetDefaultRenderer()->AddActor(actor);
+		}
 
-			this->GetDefaultRenderer()->AddActor(actor);		
+		if(this->Interactor->GetKeySym() != NULL){
+			std::string key = this->Interactor->GetKeySym();
+			if(key.compare("s") == 0){//for selection event
+				std::cout<<"are you in"<<std::endl;
+				vtkSmartPointer<vtkActor> pickedActor
+					= vtkSmartPointer<vtkActor>::New();
+				pickedActor = picker->GetActor();
+				if(pickedActor != NULL && pickedActor != actor0){
+					pickedActor->GetProperty()->SetColor(1,1,0);
+					for(int i = 0; i < pickPointsActors.size(); i++){
+						ActorType at = pickPointsActors[i];
+						if(pickedActor != at.actor){
+							if(at.type == 1)
+								at.actor->GetProperty()->SetColor(1,0,0);
+							else if(at.type == 2)
+								at.actor->GetProperty()->SetColor(0,1,0);
+							else 
+								at.actor->GetProperty()->SetColor(0,0,1);
+						}					
+					}
+					std::cout << "Picked actor: " << picker->GetActor() << std::endl;		
+				}
+			}
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
 	}
+
 private:
 };
-
-vtkStandardNewMacro(MouseInteractorStyle2);
+vtkStandardNewMacro(MouseInteractorAdd);
 
 // Constructor
 EventQtSlotConnect::EventQtSlotConnect()
@@ -188,6 +225,7 @@ EventQtSlotConnect::EventQtSlotConnect()
   createActions();
   createMenus();
 
+  acotr_type = 1;
   pointColor[0] = 1; pointColor[1] = 0; pointColor[2] = 0;
 
   this->connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slot_finished()));
@@ -195,6 +233,9 @@ EventQtSlotConnect::EventQtSlotConnect()
   this->connect(this->radioButtonVertex, SIGNAL(clicked()), this, SLOT(vertexChecked()));
   this->connect(this->radioButtonBranch, SIGNAL(clicked()), this, SLOT(branchChecked()));
   this->connect(this->radioButtonSurface, SIGNAL(clicked()), this, SLOT(surfaceChecked()));  
+
+  //this->connect(this->radioButtonAdd, SIGNAL(clicked()), this, SLOT(addChecked()));
+  //this->connect(this->radioButtonSelect, SIGNAL(clicked()), this, SLOT(selectChecked()));
 };
 
 void EventQtSlotConnect::slot_finished(){
@@ -213,15 +254,24 @@ void EventQtSlotConnect::slot_clicked(vtkObject*, unsigned long, void*, void*)
 }
 
 void EventQtSlotConnect::vertexChecked(){
+	acotr_type = 1;
 	pointColor[0] = 1; pointColor[1] = 0; pointColor[2] = 0;
 }
 
 void EventQtSlotConnect::branchChecked(){
+	acotr_type = 2;
 	pointColor[0] = 0; pointColor[1] = 1; pointColor[2] = 0;
 }
 
 void EventQtSlotConnect::surfaceChecked(){
+	acotr_type = 3;
 	pointColor[0] = 0; pointColor[1] = 0; pointColor[2] = 1;
+}
+
+void EventQtSlotConnect::addChecked(){//for interactor style
+}
+
+void EventQtSlotConnect::selectChecked(){//for interactor style
 }
 
 void EventQtSlotConnect::open(){
@@ -389,10 +439,15 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	// Create a polydata object
 	//vtkPolyData* polydata = planeSource->GetOutput();
     vtkPolyData* polydata =  reader->GetPolyDataOutput();
+	vtkSmartPointer<vtkCleanPolyData> cleanPolyData = 
+		vtkSmartPointer<vtkCleanPolyData>::New();
+	cleanPolyData->SetInputConnection(reader->GetOutputPort());
+	cleanPolyData->Update();
 
-
-	vtkIdType;
 	std::cout<< polydata->GetNumberOfPoints() <<std::endl;
+	std::cout<< cleanPolyData->GetOutput()->GetNumberOfPoints()<<std::endl;
+
+	polydata = cleanPolyData->GetOutput();
   
 	// Create a mapper
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
@@ -413,9 +468,6 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	// A renderer and render window
 	vtkSmartPointer<vtkRenderer> renderer =
 		vtkSmartPointer<vtkRenderer>::New();
-//	vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-//		vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//	renderWindowInteractor->SetRenderWindow( this->qvtkWidget->GetRenderWindow());
 
 	this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetRenderWindow(this->qvtkWidget->GetRenderWindow());
 
@@ -424,17 +476,14 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	renderer->SetBackground ( 0,0,1 );	
 	renderer->ResetCamera();
 
-
-	// Set the custom stype to use for interaction.
-	vtkSmartPointer<MouseInteractorStyle2> style =
-		vtkSmartPointer<MouseInteractorStyle2>::New();
-	style->SetDefaultRenderer(renderer);
-	
+	// Set the custom style to use for interaction.
+	vtkSmartPointer<MouseInteractorAdd> style =
+		vtkSmartPointer<MouseInteractorAdd>::New();
+	style->SetDefaultRenderer(renderer);	
 
 	this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle( style );
 	this->qvtkWidget->GetRenderWindow()->AddRenderer(renderer);
-	this->qvtkWidget->update();
-	
+	this->qvtkWidget->update();	
 
 	this->Connections->Connect(this->qvtkWidget->GetRenderWindow()->GetInteractor(),
 		vtkCommand::LeftButtonPressEvent,
