@@ -46,6 +46,12 @@
 double pointColor[3];
 int acotr_type;
 
+struct ActorType{
+	vtkActor* actor;
+	int type;//1 for vertex, 2 for branch, 3 for surface
+};	
+std::vector<ActorType> pickPointsActors;
+
 // Handle mouse events
 class MouseInteractorAdd : public vtkInteractorStyleTrackballCamera
 {
@@ -60,13 +66,9 @@ public:
 	struct PickPoint{
 		double p[3];
 	};
-	std::vector<PickPoint>pickPoints;
+	std::vector<PickPoint>pickPoints;	
 
-	struct ActorType{
-		vtkActor* actor;
-		int type;//1 for vertex, 2 for branch, 3 for surface
-	};	
-	std::vector<ActorType> pickPointsActors;
+	vtkActor *prePolyLineActor;
 
 	virtual void OnLeftButtonDown()
 	{		
@@ -124,6 +126,7 @@ public:
 				vtkSmartPointer<vtkUnsignedCharArray> colors = 
 					vtkSmartPointer<vtkUnsignedCharArray>::New();
 				colors->SetNumberOfComponents(pickPoints.size());
+				std::cout<<"line size "<<pickPoints.size()<<std::endl;
 				colors->SetName("Colors");
 				unsigned char red[3] = {0, 0, 255};
 				for(unsigned int i = 0; i < pickPoints.size(); i++){
@@ -152,6 +155,9 @@ public:
 #endif
 				vtkSmartPointer<vtkActor> actor = 
 					vtkSmartPointer<vtkActor>::New();
+				if(prePolyLineActor != NULL)
+					this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
+				prePolyLineActor = actor;
 				actor->SetMapper(mapper);
 				this->GetDefaultRenderer()->GetActors()->GetNumberOfItems();
 				this->GetDefaultRenderer()->AddActor(actor);
@@ -187,6 +193,8 @@ public:
 				vtkSmartPointer<vtkActor> pickedActor
 					= vtkSmartPointer<vtkActor>::New();
 				pickedActor = picker->GetActor();
+				
+
 				if(pickedActor != NULL && pickedActor != actor0){
 					pickedActor->GetProperty()->SetColor(1,1,0);
 					for(int i = 0; i < pickPointsActors.size(); i++){
@@ -199,7 +207,13 @@ public:
 							else 
 								at.actor->GetProperty()->SetColor(0,0,1);
 						}					
+						else{
+							pickPoints.erase(pickPoints.begin() + i);
+							pickPointsActors.erase(pickPointsActors.begin() + i);
+							i--;
+						}
 					}
+					this->GetDefaultRenderer()->RemoveActor(pickedActor);
 					std::cout << "Picked actor: " << picker->GetActor() << std::endl;		
 				}
 			}
