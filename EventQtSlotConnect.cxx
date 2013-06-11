@@ -70,6 +70,69 @@ public:
 
 	vtkActor *prePolyLineActor;
 
+	void drawLine(){
+		if(pickPoints.size() >= 2){
+			vtkSmartPointer<vtkPoints> pts =
+				vtkSmartPointer<vtkPoints>::New();
+			for(int i = 0; i < pickPoints.size(); i++){
+				pts->InsertNextPoint(pickPoints[i].p);
+			}
+			vtkSmartPointer<vtkPolyLine> polyLine = 
+				vtkSmartPointer<vtkPolyLine>::New();
+			polyLine->GetPointIds()->SetNumberOfIds(pickPoints.size());
+			for(unsigned int i = 0; i < pickPoints.size(); i++){
+				polyLine->GetPointIds()->SetId(i,i);
+			}
+			// Create a cell array to store the lines in and add the lines to it
+			vtkSmartPointer<vtkCellArray> cells = 
+				vtkSmartPointer<vtkCellArray>::New();
+			cells->InsertNextCell(polyLine);
+
+			vtkSmartPointer<vtkUnsignedCharArray> colors = 
+				vtkSmartPointer<vtkUnsignedCharArray>::New();
+			colors->SetNumberOfComponents(pickPoints.size());
+			std::cout<<"line size "<<pickPoints.size()<<std::endl;
+			colors->SetName("Colors");
+			unsigned char red[3] = {0, 0, 255};
+			for(unsigned int i = 0; i < pickPoints.size(); i++){
+				colors->InsertNextTupleValue(red);
+			}
+
+			// Create a polydata to store everything in
+			vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+			// Add the points to the dataset
+			polyData->SetPoints(pts);
+
+			// Add the lines to the dataset
+			polyData->SetLines(cells);
+
+			//set color of line
+			polyData->GetCellData()->AddArray(colors);
+
+			// Setup actor and mapper
+			vtkSmartPointer<vtkPolyDataMapper> mapper = 
+				vtkSmartPointer<vtkPolyDataMapper>::New();
+	#if VTK_MAJOR_VERSION <= 5
+			mapper->SetInput(polyData);
+	#else
+			mapper->SetInputData(polyData);
+	#endif
+			vtkSmartPointer<vtkActor> actor = 
+				vtkSmartPointer<vtkActor>::New();
+			if(prePolyLineActor != NULL)
+				this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
+			prePolyLineActor = actor;
+			actor->SetMapper(mapper);
+			this->GetDefaultRenderer()->GetActors()->GetNumberOfItems();
+			this->GetDefaultRenderer()->AddActor(actor);
+		}
+		else{
+			if(prePolyLineActor != NULL)
+				this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
+		}
+	}
+
 	virtual void OnLeftButtonDown()
 	{		
 		int* clickPos = this->GetInteractor()->GetEventPosition();
@@ -106,62 +169,7 @@ public:
 			<< " " << finalPos[2] << std::endl;
 
 			//draw line if the number of selected points is more than 2
-			if(pickPoints.size() >= 2){
-				vtkSmartPointer<vtkPoints> pts =
-					vtkSmartPointer<vtkPoints>::New();
-				for(int i = 0; i < pickPoints.size(); i++){
-					pts->InsertNextPoint(pickPoints[i].p);
-				}
-				vtkSmartPointer<vtkPolyLine> polyLine = 
-					vtkSmartPointer<vtkPolyLine>::New();
-				polyLine->GetPointIds()->SetNumberOfIds(pickPoints.size());
-				for(unsigned int i = 0; i < pickPoints.size(); i++){
-					polyLine->GetPointIds()->SetId(i,i);
-				}
-				// Create a cell array to store the lines in and add the lines to it
-				vtkSmartPointer<vtkCellArray> cells = 
-					vtkSmartPointer<vtkCellArray>::New();
-				cells->InsertNextCell(polyLine);
-
-				vtkSmartPointer<vtkUnsignedCharArray> colors = 
-					vtkSmartPointer<vtkUnsignedCharArray>::New();
-				colors->SetNumberOfComponents(pickPoints.size());
-				std::cout<<"line size "<<pickPoints.size()<<std::endl;
-				colors->SetName("Colors");
-				unsigned char red[3] = {0, 0, 255};
-				for(unsigned int i = 0; i < pickPoints.size(); i++){
-					colors->InsertNextTupleValue(red);
-				}
-
-				// Create a polydata to store everything in
-				vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-
-				// Add the points to the dataset
-				polyData->SetPoints(pts);
-
-				// Add the lines to the dataset
-				polyData->SetLines(cells);
-
-				//set color of line
-				polyData->GetCellData()->AddArray(colors);
-
-				// Setup actor and mapper
-				vtkSmartPointer<vtkPolyDataMapper> mapper = 
-					vtkSmartPointer<vtkPolyDataMapper>::New();
-#if VTK_MAJOR_VERSION <= 5
-				mapper->SetInput(polyData);
-#else
-				mapper->SetInputData(polyData);
-#endif
-				vtkSmartPointer<vtkActor> actor = 
-					vtkSmartPointer<vtkActor>::New();
-				if(prePolyLineActor != NULL)
-					this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
-				prePolyLineActor = actor;
-				actor->SetMapper(mapper);
-				this->GetDefaultRenderer()->GetActors()->GetNumberOfItems();
-				this->GetDefaultRenderer()->AddActor(actor);
-			}
+			drawLine();
 
 			//Create a sphere
 			vtkSmartPointer<vtkSphereSource> sphereSource =
@@ -210,6 +218,7 @@ public:
 						else{
 							pickPoints.erase(pickPoints.begin() + i);
 							pickPointsActors.erase(pickPointsActors.begin() + i);
+							drawLine();
 							i--;
 						}
 					}
@@ -220,7 +229,6 @@ public:
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
 	}
-
 private:
 };
 vtkStandardNewMacro(MouseInteractorAdd);
