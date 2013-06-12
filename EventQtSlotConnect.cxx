@@ -41,6 +41,8 @@
 
 
 #include <vtkDelaunay3D.h>
+#include <vtkDelaunay2D.h>
+#include <vtkShrinkFilter.h>
 #include <sstream> 
 
 double pointColor[3];
@@ -70,14 +72,14 @@ public:
 
 	vtkActor *prePolyLineActor;
 
-	void drawLine(){
-		if(pickPoints.size() >= 2){
+	void DrawDelaunayTriangle(){
+		if(pickPoints.size() > 3){
 			vtkSmartPointer<vtkPoints> pts =
 				vtkSmartPointer<vtkPoints>::New();
 			for(int i = 0; i < pickPoints.size(); i++){
 				pts->InsertNextPoint(pickPoints[i].p);
 			}
-			vtkSmartPointer<vtkPolyLine> polyLine = 
+			/*vtkSmartPointer<vtkPolyLine> polyLine = 
 				vtkSmartPointer<vtkPolyLine>::New();
 			polyLine->GetPointIds()->SetNumberOfIds(pickPoints.size());
 			for(unsigned int i = 0; i < pickPoints.size(); i++){
@@ -86,11 +88,53 @@ public:
 			// Create a cell array to store the lines in and add the lines to it
 			vtkSmartPointer<vtkCellArray> cells = 
 				vtkSmartPointer<vtkCellArray>::New();
-			cells->InsertNextCell(polyLine);			
+			cells->InsertNextCell(polyLine);	*/		
 
 			// Create a polydata to store everything in
 			vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+			polyData->SetPoints(pts);
 
+			vtkSmartPointer<vtkDelaunay3D> delaunay =
+				vtkSmartPointer<vtkDelaunay3D>::New();
+			#if VTK_MAJOR_VERSION <= 5
+			delaunay->SetInput(polyData);
+			#else
+			delaunay->SetInputData(polyData);
+			#endif
+			delaunay->Update();
+
+			delaunay->SetAlpha(10);
+			//delaunay->SetTolerance(10);
+			//delaunay->SetProjectionPlaneMode(2);
+			// Visualize
+			vtkSmartPointer<vtkShrinkFilter> shrink = 
+				vtkSmartPointer<vtkShrinkFilter>::New();
+			shrink->SetInputConnection(delaunay->GetOutputPort());
+			shrink->SetShrinkFactor(0.9);
+
+			vtkSmartPointer<vtkDataSetMapper> meshMapper =
+				vtkSmartPointer<vtkDataSetMapper>::New();
+			meshMapper->SetInputConnection(shrink->GetOutputPort());
+
+			vtkSmartPointer<vtkActor> meshActor =
+				vtkSmartPointer<vtkActor>::New();
+			meshActor->SetMapper(meshMapper);
+			meshActor->GetProperty()->SetColor(0.2,0.8,0.5);
+
+			/*vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter =
+			vtkSmartPointer<vtkVertexGlyphFilter>::New();
+			#if VTK_MAJOR_VERSION <= 5
+			glyphFilter->SetInputConnection(polyData->GetProducerPort());
+			#else
+			glyphFilter->SetInputData(polyData);
+			#endif
+			glyphFilter->Update();
+
+			vtkSmartPointer<vtkPolyDataMapper> pointMapper =
+			vtkSmartPointer<vtkPolyDataMapper>::New();
+			pointMapper->SetInputConnection(glyphFilter->GetOutputPort());*/
+
+/*
 			// Add the points to the dataset
 			polyData->SetPoints(pts);
 
@@ -104,16 +148,17 @@ public:
 			mapper->SetInput(polyData);
 	#else
 			mapper->SetInputData(polyData);
-	#endif
+	#endif*/
 			vtkSmartPointer<vtkActor> actor = 
 				vtkSmartPointer<vtkActor>::New();
 			if(prePolyLineActor != NULL)
 				this->GetDefaultRenderer()->RemoveActor(prePolyLineActor);
-			prePolyLineActor = actor;
-			actor->SetMapper(mapper);
-			actor->GetProperty()->SetColor(0,1,1);
-			this->GetDefaultRenderer()->GetActors()->GetNumberOfItems();
-			this->GetDefaultRenderer()->AddActor(actor);
+			prePolyLineActor = meshActor;
+			//actor->SetMapper(pointMapper);
+			//actor->GetProperty()->SetColor(0,1,1);
+			//this->GetDefaultRenderer()->AddActor(actor);
+
+			this->GetDefaultRenderer()->AddActor(meshActor);
 		}
 		else{
 			if(prePolyLineActor != NULL)
@@ -121,6 +166,15 @@ public:
 		}
 	}
 
+	void DrawRegularTriangle(){
+		if(pickPoints.size() > 3){
+			vtkSmartPointer<vtkPoints> pts =
+				vtkSmartPointer<vtkPoints>::New();
+			for(int i = 0; i < pickPoints.size(); i++){
+				pts->InsertNextPoint(pickPoints[i].p);
+			}
+		}
+	}
 
 	virtual void OnLeftButtonDown()
 	{		
@@ -165,7 +219,7 @@ public:
 					<< " " << finalPos[2] << std::endl;
 
 					//draw line if the number of selected points is more than 2
-					drawLine();
+					DrawDelaunayTriangle();
 
 					//Create a sphere
 					vtkSmartPointer<vtkSphereSource> sphereSource =
@@ -228,7 +282,7 @@ public:
 						else{
 							pickPoints.erase(pickPoints.begin() + i);
 							pickPointsActors.erase(pickPointsActors.begin() + i);
-							drawLine();
+							DrawDelaunayTriangle();
 							i--;
 						}
 					}
@@ -266,8 +320,8 @@ EventQtSlotConnect::EventQtSlotConnect()
   this->connect(this->radioButtonBranch, SIGNAL(clicked()), this, SLOT(branchChecked()));
   this->connect(this->radioButtonSurface, SIGNAL(clicked()), this, SLOT(surfaceChecked()));  
 
-  //this->connect(this->radioButtonAdd, SIGNAL(clicked()), this, SLOT(addChecked()));
-  //this->connect(this->radioButtonSelect, SIGNAL(clicked()), this, SLOT(selectChecked()));
+  this->connect(this->radioButtonAdd, SIGNAL(clicked()), this, SLOT(addChecked()));
+  this->connect(this->radioButtonSelect, SIGNAL(clicked()), this, SLOT(selectChecked()));
 };
 
 void EventQtSlotConnect::slot_finished()
@@ -311,6 +365,28 @@ void EventQtSlotConnect::open(){
 }
 
 void EventQtSlotConnect::save(){
+}
+
+void EventQtSlotConnect::addChecked(){
+	vtkRendererCollection* rendercollection = this->qvtkWidget->GetRenderWindow()->GetRenderers();
+	vtkRenderer* render = rendercollection->GetFirstRenderer();
+	vtkActorCollection* actorcollection = render->GetActors();
+	actorcollection->InitTraversal();
+	vtkActor* actor = actorcollection->GetNextActor();
+	actor->VisibilityOff();
+	//render->ResetCamera();
+	this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void EventQtSlotConnect::selectChecked(){
+	vtkRendererCollection* rendercollection = this->qvtkWidget->GetRenderWindow()->GetRenderers();
+	vtkRenderer* render = rendercollection->GetFirstRenderer();
+	vtkActorCollection* actorcollection = render->GetActors();
+	actorcollection->InitTraversal();
+	vtkActor* actor = actorcollection->GetNextActor();
+	actor->VisibilityOn();
+	//render->ResetCamera();
+	this->qvtkWidget->GetRenderWindow()->Render();
 }
 
 void EventQtSlotConnect::executeCmrepVskel()
