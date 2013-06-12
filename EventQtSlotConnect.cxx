@@ -128,74 +128,95 @@ public:
 		// Pick from this location.
 		vtkSmartPointer<vtkPropPicker>  picker =
 			vtkSmartPointer<vtkPropPicker>::New();
-		picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
 
-		double* pos = picker->GetPickPosition();
-		posX = pos[0]; posY = pos[1]; posZ = pos[2];				
+		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
+		if(sucessPick != 0){//pick successful
+			double* pos = picker->GetPickPosition();
+			posX = pos[0]; posY = pos[1]; posZ = pos[2];				
 
-		//find the first actor
-		vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
-		vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));		
-			
-		if( this->Interactor->GetControlKey() ){//for the adding point event
-			vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
-			double minDistance = DBL_MAX;
-			double finalPos[3];
-			for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
-				double p[3];
-				vtkdata->GetPoint(i,p);
-				double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
-				if(dist < minDistance){
-					minDistance = dist;
-					finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
+			//find the first actor
+			vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
+			vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));	
+			vtkRenderWindowInteractor *rwi = this->Interactor;
+			if(rwi->GetKeySym() != NULL)
+			{
+				std::string key = rwi->GetKeySym();
+				//for the adding point event
+				if( key.compare("a") == 0 && pos[0] != 0 && pos[1] != 0 && pos[2] != 0)
+				{
+					vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
+					double minDistance = DBL_MAX;
+					double finalPos[3];
+					//finalPos[0] = pos[0]; finalPos[1] = pos[1]; finalPos[2] = pos[2];
+					for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
+						double p[3];
+						vtkdata->GetPoint(i,p);
+						double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
+						if(dist < minDistance){
+							minDistance = dist;
+							finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
+						}
+					}
+					PickPoint temp;
+					temp.p[0] = finalPos[0];temp.p[1] = finalPos[1]; temp.p[2] = finalPos[2];
+					pickPoints.push_back(temp);
+					std::cout << "Pick position (final position) is: "
+						<< finalPos[0] << " " << finalPos[1]
+					<< " " << finalPos[2] << std::endl;
+
+					//draw line if the number of selected points is more than 2
+					drawLine();
+
+					//Create a sphere
+					vtkSmartPointer<vtkSphereSource> sphereSource =
+						vtkSmartPointer<vtkSphereSource>::New();
+					sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
+					sphereSource->SetRadius(1.0);
+
+					//Create a mapper and actor
+					vtkSmartPointer<vtkPolyDataMapper> mapper =
+						vtkSmartPointer<vtkPolyDataMapper>::New();
+					mapper->SetInputConnection(sphereSource->GetOutputPort());
+
+					vtkSmartPointer<vtkActor> actor =
+						vtkSmartPointer<vtkActor>::New();
+					actor->SetMapper(mapper);
+					actor->GetProperty()->SetColor(pointColor[0], pointColor[1], pointColor[2]);
+					//store actor in pickpointactors
+					ActorType actorT;
+					actorT.actor = actor;
+					actorT.type = acotr_type;
+					pickPointsActors.push_back(actorT);
+					this->GetDefaultRenderer()->AddActor(actor);
 				}
-			}
-			PickPoint temp;
-			temp.p[0] = finalPos[0];temp.p[1] = finalPos[1]; temp.p[2] = finalPos[2];
-			pickPoints.push_back(temp);
-			std::cout << "Pick position (final position) is: "
-				<< finalPos[0] << " " << finalPos[1]
-			<< " " << finalPos[2] << std::endl;
+				//for delete point event
+				else if(key.compare("s") == 0)
+				{
+					std::cout<<"are you in"<<std::endl;
+					vtkSmartPointer<vtkActor> pickedActor
+						= vtkSmartPointer<vtkActor>::New();
 
-			//draw line if the number of selected points is more than 2
-			drawLine();
+					vtkActorCollection* actorsCollection = this->GetDefaultRenderer()->GetActors();
+					actorsCollection->InitTraversal();
+					
+					std::cout<<"number of actors: "<<actorsCollection->GetNumberOfItems()<<std::endl;
 
-			//Create a sphere
-			vtkSmartPointer<vtkSphereSource> sphereSource =
-				vtkSmartPointer<vtkSphereSource>::New();
-			sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
-			sphereSource->SetRadius(1.0);
+					for(vtkIdType i = 0; i < actorsCollection->GetNumberOfItems(); i++)
+					{
+						vtkActor* nextActor = actorsCollection->GetNextActor();
+						double* actorPos = nextActor->GetCenter();
+						double dis = std::sqrt(std::pow(pos[0] - actorPos[0],2) 
+							+ std::pow(pos[1] - actorPos[1], 2) 
+							+ std::pow(pos[2] - actorPos[2], 2));
+						if(dis < 1.0 && nextActor){
+							pickedActor = nextActor;
+							break;
+						}
+					}
 
-			//Create a mapper and actor
-			vtkSmartPointer<vtkPolyDataMapper> mapper =
-				vtkSmartPointer<vtkPolyDataMapper>::New();
-			mapper->SetInputConnection(sphereSource->GetOutputPort());
-
-			vtkSmartPointer<vtkActor> actor =
-				vtkSmartPointer<vtkActor>::New();
-			actor->SetMapper(mapper);
-			actor->GetProperty()->SetColor(pointColor[0], pointColor[1], pointColor[2]);
-			//store actor in pickpointactors
-			ActorType actorT;
-			actorT.actor = actor;
-			actorT.type = acotr_type;
-			pickPointsActors.push_back(actorT);
-			this->GetDefaultRenderer()->AddActor(actor);
-		}
-
-		if(this->Interactor->GetKeySym() != NULL){//for delete point event
-			std::string key = this->Interactor->GetKeySym();
-			if(key.compare("s") == 0){
-				std::cout<<"are you in"<<std::endl;
-				vtkSmartPointer<vtkActor> pickedActor
-					= vtkSmartPointer<vtkActor>::New();
-				pickedActor = picker->GetActor();
-				
-
-				if(pickedActor != NULL && pickedActor != actor0){
-					pickedActor->GetProperty()->SetColor(1,1,0);
 					for(int i = 0; i < pickPointsActors.size(); i++){
 						ActorType at = pickPointsActors[i];
+						double* acotrPos = at.actor->GetPosition();
 						if(pickedActor != at.actor){
 							if(at.type == 1)
 								at.actor->GetProperty()->SetColor(1,0,0);
@@ -212,11 +233,11 @@ public:
 						}
 					}
 					this->GetDefaultRenderer()->RemoveActor(pickedActor);
-					std::cout << "Picked actor: " << picker->GetActor() << std::endl;		
 				}
 			}
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
+				
 	}
 private:
 };
@@ -249,7 +270,8 @@ EventQtSlotConnect::EventQtSlotConnect()
   //this->connect(this->radioButtonSelect, SIGNAL(clicked()), this, SLOT(selectChecked()));
 };
 
-void EventQtSlotConnect::slot_finished(){
+void EventQtSlotConnect::slot_finished()
+{
 	readVTK(VTKfilename);
 	this->cmrep_progressBar->hide();
 }
@@ -264,7 +286,8 @@ void EventQtSlotConnect::slot_clicked(vtkObject*, unsigned long, void*, void*)
   textEdit->append("Clicked");
 }
 
-void EventQtSlotConnect::vertexChecked(){
+void EventQtSlotConnect::vertexChecked()
+{
 	acotr_type = 1;
 	pointColor[0] = 1; pointColor[1] = 0; pointColor[2] = 0;
 }
@@ -290,7 +313,8 @@ void EventQtSlotConnect::open(){
 void EventQtSlotConnect::save(){
 }
 
-void EventQtSlotConnect::executeCmrepVskel(){
+void EventQtSlotConnect::executeCmrepVskel()
+{
 
 	std::vector <char *> parameters;
 	parameters.push_back("cmrep_vskel");
@@ -404,17 +428,13 @@ void EventQtSlotConnect::executeCmrepVskel(){
 	strcpy(command[2], outputNameSkel.c_str());
 	parameters.push_back(command[2]);
 
-/*
-	std::cout<<"parameter"<<std::endl;
+
+	/*std::cout<<"parameter"<<std::endl;
 	for(int i = 0; i < parameters.size(); i++)
 		std::cout<<parameters[i]<<std::endl;*/
 	this->cmrep_progressBar->show();
 	QFuture<void> future = QtConcurrent::run(&this->v, &VoronoiSkeletonTool::execute, parameters.size(), parameters);
 	this->FutureWatcher.setFuture(future);
-	/*this->ProgressDialog->setMinimum(0);
-	this->ProgressDialog->setMaximum(0);
-	this->ProgressDialog->setWindowModality(Qt::WindowModal);
-	this->ProgressDialog->exec();*/
 	//v.execute(parameters.size(), parameters);
 
 	VTKfilename = outputNameSkel;
