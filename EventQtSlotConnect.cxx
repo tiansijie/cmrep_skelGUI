@@ -492,10 +492,6 @@ public:
 				}//end of t
 			}//end of key press
 		}
-		/*for(int i = 0; i < vectorTagPoints.size(); i++){
-			std::cout<<vectorTagPoints[i].typeIndex<<" "<<vectorTagPoints[i].typeName<<" "<<vectorTagPoints[i].radius<<std::endl;
-		}*/
-
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();				
 	}
 private:
@@ -571,9 +567,23 @@ void EventQtSlotConnect::slot_open(){
 }
 
 void EventQtSlotConnect::slot_save(){
+
+	QFileDialog::Options options;
+	//if (!native->isChecked())
+	//	options |= QFileDialog::DontUseNativeDialog;
+	QString selectedFilter;
+	QString fileName = QFileDialog::getSaveFileName(this,
+		tr("QFileDialog::getSaveFileName()"),
+		tr("Save VTK Files"),
+		tr("VTK Files (*.vtk)"),
+		&selectedFilter,
+		options);
+	
+
 	vtkSmartPointer<vtkGenericDataObjectWriter> writer = 
 		vtkSmartPointer<vtkGenericDataObjectWriter>::New();
-	writer->SetFileName("TagPointTest.vtk");
+	if (!fileName.isEmpty())
+		writer->SetFileName(fileName.toStdString().c_str());
 
 	for(int i = 0; i < vectorTagInfo.size(); i++)
 	{
