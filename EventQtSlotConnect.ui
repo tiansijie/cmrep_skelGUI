@@ -49,14 +49,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>560</x>
       <y>30</y>
       <width>211</width>
       <height>451</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <property name="enabled">
@@ -378,90 +378,64 @@
      <attribute name="title">
       <string>Pick</string>
      </attribute>
-     <widget class="QRadioButton" name="radioButtonAdd">
+     <widget class="QCheckBox" name="checkBoxHideSkel">
       <property name="geometry">
        <rect>
         <x>20</x>
         <y>20</y>
-        <width>89</width>
+        <width>101</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Add Mode</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
+       <string>Hide Skeleton</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButtonSelect">
+     <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>89</width>
-        <height>16</height>
+        <x>0</x>
+        <y>60</y>
+        <width>201</width>
+        <height>121</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Select Mode</string>
+      <property name="title">
+       <string>Tag Selection</string>
       </property>
+      <widget class="QComboBox" name="comboBoxTagPoint">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>131</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="editable">
+        <bool>false</bool>
+       </property>
+       <property name="maxVisibleItems">
+        <number>10</number>
+       </property>
+       <property name="duplicatesEnabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButtonAddTag">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Add Tag</string>
+       </property>
+      </widget>
      </widget>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>499</y>
-      <width>211</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Point Selection</string>
-    </property>
-    <widget class="QRadioButton" name="radioButtonSurface">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>60</y>
-       <width>89</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Surface Point</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="radioButtonVertex">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>89</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Vertex</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="radioButtonBranch">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>40</y>
-       <width>89</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Branch Point</string>
-     </property>
     </widget>
    </widget>
    <widget class="QProgressBar" name="cmrep_progressBar">
@@ -481,7 +455,6 @@
     </property>
    </widget>
    <zorder>tabWidget</zorder>
-   <zorder>groupBox</zorder>
    <zorder>qvtkWidget</zorder>
    <zorder>textEdit</zorder>
    <zorder>cmrep_progressBar</zorder>

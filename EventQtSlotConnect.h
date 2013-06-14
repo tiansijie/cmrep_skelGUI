@@ -8,6 +8,7 @@
 #include <vtkSmartPointer.h>
 #include <QFutureWatcher>
 #include <QtGui>
+#include <vtkPolyData.h>
 
 #include "VoronoiSkeletonTool.h"
 
@@ -26,38 +27,34 @@ class EventQtSlotConnect : public QMainWindow, private Ui::EventQtSlotConnect
   Q_OBJECT
 public:
 
-  EventQtSlotConnect();
-
-  void createActions();
-
-  void createMenus();
-
-  void readVTK(std::string filename);
+	EventQtSlotConnect();
+	void createActions();
+	void createMenus();
+	void readVTK(std::string filename);
+	QComboBox* getTagComboBox();
 
 public slots:
-  void slot_clicked(vtkObject*, unsigned long, void*, void*);
-  void slot_position(double x, double y, double z);
-  void open();
-  void save();
-  void executeCmrepVskel();
-  void slot_finished();
-  void vertexChecked();
-  void branchChecked();
-  void surfaceChecked();
-  void addChecked();
-  void selectChecked();
+	void slot_clicked(vtkObject*, unsigned long, void*, void*);
+	void slot_position(double x, double y, double z);
+	void slot_finished();
+	void slot_skelStateChange(int);
+	void slot_addTag();
 
+	void slot_open();
+	void slot_save();
+	void executeCmrepVskel();
 private:
+	
+	vtkSmartPointer<vtkEventQtSlotConnect> Connections;
+	QFutureWatcher<void> FutureWatcher;
+	VoronoiSkeletonTool v;
 
-  vtkSmartPointer<vtkEventQtSlotConnect> Connections;
-  QFutureWatcher<void> FutureWatcher;
-  VoronoiSkeletonTool v;
+	QMenu *fileMenu;
+	QAction *openAct;
+	QAction *saveAct;
 
-  QMenu *fileMenu;
-  QAction *openAct;
-  QAction *saveAct;
-
-  std::string VTKfilename;  
+	std::string VTKfilename;  
+	vtkPolyData* polyObject;
 };
 
 #endif
