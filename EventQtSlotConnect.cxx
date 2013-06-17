@@ -1,6 +1,7 @@
 #include "EventQtSlotConnect.h"
 #include "AddTagDialog.h"
 
+
 #include <vtkGenericDataObjectReader.h>
 
 #include <vtkPolyDataMapper.h>
@@ -52,6 +53,7 @@
 
 double pointColor[3];
 
+
 struct TagPoint{
 	vtkActor* actor;
 	std::string typeName;
@@ -61,14 +63,14 @@ struct TagPoint{
 std::vector<TagPoint> vectorTagPoints;
 std::vector<std::vector<TagPoint>> vectorClassifyPoints;
 
-
 struct TagInfo
 {
 	std::string tagName;
 	int tagType; // 1 = Branch point  2 = Free Edge point 3 = Interior point  4 = others
-	double tagColor[3];
+	int tagColor[3];
 };
 std::vector<TagInfo> vectorTagInfo;
+
 //std::vector<std::string> vectorTagNames;
 
 bool isSkeleton;
@@ -403,7 +405,7 @@ public:
 						vtkSmartPointer<vtkActor> actor =
 							vtkSmartPointer<vtkActor>::New();
 						actor->SetMapper(mapper);
-						actor->GetProperty()->SetColor(ti.tagColor[0], ti.tagColor[1], ti.tagColor[2]);
+						actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
 						
 						//store actor in vectorTagPoints
 						TagPoint actorT;
@@ -451,9 +453,9 @@ public:
 						TagPoint at = vectorTagPoints[i];
 						double* acotrPos = at.actor->GetPosition();
 						if(pickedActor != at.actor){							
-							at.actor->GetProperty()->SetColor(vectorTagInfo[at.typeIndex].tagColor[0],
-								vectorTagInfo[at.typeIndex].tagColor[1], 
-								vectorTagInfo[at.typeIndex].tagColor[2]);
+							at.actor->GetProperty()->SetColor(vectorTagInfo[at.typeIndex].tagColor[0] / 255.0,
+								vectorTagInfo[at.typeIndex].tagColor[1] / 255.0, 
+								vectorTagInfo[at.typeIndex].tagColor[2] / 255.0);
 						}					
 						else{
 							pickPoints.erase(pickPoints.begin() + i);
@@ -532,7 +534,13 @@ void EventQtSlotConnect::slot_addTag(){
 
 		TagInfo ti;
 		ti.tagName = tagText.toStdString();
-		ti.tagColor[0] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[1] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[2] = ((double) std::rand() / (RAND_MAX));
+		addDialog.color;
+		int r, g, b;
+		r = addDialog.color.red();
+		g = addDialog.color.green();
+		b = addDialog.color.blue();
+		//ti.tagColor[0] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[1] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[2] = ((double) std::rand() / (RAND_MAX));
+		ti.tagColor[0] = r; ti.tagColor[1] = g; ti.tagColor[2] = b;
 		if(addDialog.branchButton->isChecked())
 			ti.tagType = 1;
 		else if(addDialog.freeEdgeButton->isChecked())
@@ -545,7 +553,8 @@ void EventQtSlotConnect::slot_addTag(){
 		vectorTagInfo.push_back(ti);
 
 		QPixmap pix(22,22);
-		pix.fill(QColor(ti.tagColor[0] * 255, ti.tagColor[1] * 255, ti.tagColor[2] * 255));
+		//pix.fill(QColor(ti.tagColor[0] * 255, ti.tagColor[1] * 255, ti.tagColor[2] * 255));
+		pix.fill(addDialog.color);
 		this->comboBoxTagPoint->addItem(pix, tagText);
 	}	
 }
@@ -564,7 +573,7 @@ void EventQtSlotConnect::slot_position(double x, double y, double z)
 
 void EventQtSlotConnect::slot_clicked(vtkObject*, unsigned long, void*, void*)
 { 
-  textEdit->append("Clicked");
+ // textEdit->append("Clicked");
 }
 
 
@@ -584,7 +593,7 @@ void EventQtSlotConnect::slot_save(){
 	QString selectedFilter;
 	QString fileName = QFileDialog::getSaveFileName(this,
 		tr("QFileDialog::getSaveFileName()"),
-		tr("Save VTK Files"),
+		tr(""),
 		tr("VTK Files (*.vtk)"),
 		&selectedFilter,
 		options);

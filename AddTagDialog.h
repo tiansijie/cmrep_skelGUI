@@ -2,9 +2,10 @@
 #define ADDTAGDIALOG_H
 
 #include <QDialog>
+#include "constants.h"
 
 QT_BEGIN_NAMESPACE
-class QCheckBox;
+//class QCheckBox;
 class QDialogButtonBox;
 class QGroupBox;
 class QLabel;
@@ -24,6 +25,8 @@ public:
 //private:
     QLabel *label;
     QLineEdit *lineEdit;
+	QLabel *colorLabel;
+	QColor color;
    /* QCheckBox *caseCheckBox;
     QCheckBox *fromStartCheckBox;
     QCheckBox *wholeWordsCheckBox;
@@ -36,6 +39,8 @@ public:
     QRadioButton *branchButton;
     QRadioButton *interiorButton;
     QRadioButton *otherButton;
+	private slots:
+		void setColor();
 };
 //! [0]
 

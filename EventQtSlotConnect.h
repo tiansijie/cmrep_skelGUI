@@ -2,7 +2,8 @@
 #define EventQtSlotConnect_H
 
 #include "ui_EventQtSlotConnect.h"
-
+#include "constants.h"
+#include "VoronoiSkeletonTool.h"
 
 #include <QMainWindow>
 #include <vtkSmartPointer.h>
@@ -10,7 +11,7 @@
 #include <QtGui>
 #include <vtkPolyData.h>
 
-#include "VoronoiSkeletonTool.h"
+
 
 
 QT_BEGIN_NAMESPACE
