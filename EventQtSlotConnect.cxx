@@ -1,4 +1,5 @@
 #include "EventQtSlotConnect.h"
+#include "AddTagDialog.h"
 
 #include <vtkGenericDataObjectReader.h>
 
@@ -64,6 +65,7 @@ std::vector<std::vector<TagPoint>> vectorClassifyPoints;
 struct TagInfo
 {
 	std::string tagName;
+	int tagType; // 1 = Branch point  2 = Free Edge point 3 = Interior point  4 = others
 	double tagColor[3];
 };
 std::vector<TagInfo> vectorTagInfo;
@@ -522,22 +524,30 @@ EventQtSlotConnect::EventQtSlotConnect()
 };
 
 void EventQtSlotConnect::slot_addTag(){
-	bool ok;
-	QString tagText = QInputDialog::getText(this, 
-		tr("Add Tag"), 
-		tr("Enter a tag name:"), 
-		QLineEdit::Normal, 
-		tr(""), 
-		&ok );
-	TagInfo ti;
-	ti.tagName = tagText.toStdString();
-	ti.tagColor[0] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[1] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[2] = ((double) std::rand() / (RAND_MAX));
-	vectorTagInfo.push_back(ti);
 
-	QPixmap pix(22,22);
-	pix.fill(QColor(ti.tagColor[0] * 255, ti.tagColor[1] * 255, ti.tagColor[2] * 255));
-	this->comboBoxTagPoint->addItem(pix, tagText);
-	
+	AddTagDialog addDialog;
+	addDialog.show();
+	if(addDialog.exec()){
+		QString tagText = addDialog.lineEdit->text();
+
+		TagInfo ti;
+		ti.tagName = tagText.toStdString();
+		ti.tagColor[0] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[1] = ((double) std::rand() / (RAND_MAX)); ti.tagColor[2] = ((double) std::rand() / (RAND_MAX));
+		if(addDialog.branchButton->isChecked())
+			ti.tagType = 1;
+		else if(addDialog.freeEdgeButton->isChecked())
+			ti.tagType = 2;
+		else if(addDialog.interiorButton->isChecked())
+			ti.tagType = 3;
+		else
+			ti.tagType = 4;
+
+		vectorTagInfo.push_back(ti);
+
+		QPixmap pix(22,22);
+		pix.fill(QColor(ti.tagColor[0] * 255, ti.tagColor[1] * 255, ti.tagColor[2] * 255));
+		this->comboBoxTagPoint->addItem(pix, tagText);
+	}	
 }
 
 
