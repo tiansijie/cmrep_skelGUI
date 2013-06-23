@@ -2,8 +2,8 @@
 #define EventQtSlotConnect_H
 
 #include "ui_EventQtSlotConnect.h"
-#include "constants.h"
 #include "VoronoiSkeletonTool.h"
+#include "AddTagDialog.h"
 
 #include <QMainWindow>
 #include <vtkSmartPointer.h>
@@ -11,8 +11,7 @@
 #include <QtGui>
 #include <vtkPolyData.h>
 
-
-
+//#include "MouseInteractorAdd.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -33,6 +32,12 @@ public:
 	void createMenus();
 	void readVTK(std::string filename);
 	QComboBox* getTagComboBox();
+	void readCustomData(vtkPolyData *polydata);
+	void readCustomDataTri(vtkDoubleArray* triDBL);
+	void readCustomDataEdge(vtkDoubleArray* edgeDBL);
+	void readCustomDataPoints(vtkDoubleArray* ptsDBL);
+	void readCustomDataTag(vtkDoubleArray* tagDBL);
+	void readCustomDataLabel(vtkDoubleArray* labelDBL);
 
 public slots:
 	void slot_clicked(vtkObject*, unsigned long, void*, void*);
@@ -43,9 +48,9 @@ public slots:
 
 	void slot_open();
 	void slot_save();
-	void executeCmrepVskel();
+	void executeCmrepVskel();	
 private:
-	
+
 	vtkSmartPointer<vtkEventQtSlotConnect> Connections;
 	QFutureWatcher<void> FutureWatcher;
 	VoronoiSkeletonTool v;
@@ -55,7 +60,7 @@ private:
 	QAction *saveAct;
 
 	std::string VTKfilename;  
-	vtkPolyData* polyObject;
+	vtkPolyData* polyObject;	
 };
 
 #endif

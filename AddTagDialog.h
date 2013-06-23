@@ -2,7 +2,6 @@
 #define ADDTAGDIALOG_H
 
 #include <QDialog>
-#include "constants.h"
 
 QT_BEGIN_NAMESPACE
 //class QCheckBox;
@@ -39,8 +38,19 @@ public:
     QRadioButton *branchButton;
     QRadioButton *interiorButton;
     QRadioButton *otherButton;
+	
+
+	std::vector<std::string> tagName;
+	std::vector<QColor> tagColor;
+
+	void setTagName(std::string);
+	void setTagColor(QColor);
+
+
 	private slots:
+		void accept();
 		void setColor();
+		
 };
 //! [0]
 
