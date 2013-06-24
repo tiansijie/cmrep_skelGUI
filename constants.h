@@ -18,6 +18,7 @@ struct TagTriangle
 	double p1[3], p2[3], p3[3];
 	double centerPos[3];
 	int id1,id2,id3;
+	int seq1, seq2, seq3;
 };
 
 
@@ -40,10 +41,5 @@ struct TagEdge
 	int numEdge;
 	int seq;//use of deletion
 };
-
-
-
-
-
 
 #endif

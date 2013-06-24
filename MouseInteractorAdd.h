@@ -52,6 +52,9 @@
 #include <vtkPolyDataReader.h>
 #include <vtkGenericDataObjectWriter.h>
 #include <sstream>
+#include <vtkPolyDataNormals.h>
+#include <vtkFloatArray.h>
+#include <vtkMath.h>
 
 #include <QtGui>
 
@@ -86,8 +89,6 @@ public:
 
 	double Distance(double p1[3], double p2[3]);
 	void SetSelectedTriColor();
-	void DrawDelaunayTriangle();
-	void DrawRegularTriangle();
 	int ConstrainEdge(int type1, int type2);
 	int PairNumber(int a, int b);
 	void DrawTriangle();
@@ -294,7 +295,6 @@ public:
 									vectorTagInfo[at.typeIndex].tagColor[1] / 255.0, 
 									vectorTagInfo[at.typeIndex].tagColor[2] / 255.0);
 							}
-
 							triPtIds.resize(0);
 						}
 					}

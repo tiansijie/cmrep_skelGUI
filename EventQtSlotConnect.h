@@ -33,11 +33,11 @@ public:
 	void readVTK(std::string filename);
 	QComboBox* getTagComboBox();
 	void readCustomData(vtkPolyData *polydata);
-	void readCustomDataTri(vtkDoubleArray* triDBL);
-	void readCustomDataEdge(vtkDoubleArray* edgeDBL);
-	void readCustomDataPoints(vtkDoubleArray* ptsDBL);
-	void readCustomDataTag(vtkDoubleArray* tagDBL);
-	void readCustomDataLabel(vtkDoubleArray* labelDBL);
+	void readCustomDataTri(vtkFloatArray* triDBL);
+	void readCustomDataEdge(vtkFloatArray* edgeDBL);
+	void readCustomDataPoints(vtkFloatArray* ptsDBL);
+	void readCustomDataTag(vtkFloatArray* tagDBL);
+	void readCustomDataLabel(vtkFloatArray* labelDBL);
 
 	//vtkSmartPointer<MouseInteractorAdd> style;
 	//MouseInteractorAdd kk;

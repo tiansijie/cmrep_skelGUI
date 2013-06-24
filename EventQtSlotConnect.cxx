@@ -51,6 +51,8 @@
 #include <vtkPolyDataReader.h>
 #include <vtkGenericDataObjectWriter.h>
 #include <sstream>
+#include <vtkFloatArray.h>
+#include <vtkIntArray.h>
 
 
 double pointColor[3];
@@ -172,87 +174,116 @@ void EventQtSlotConnect::slot_save(){
 
 	finalPolyData = polyObject;
 
-	if(finalPolyData->GetPointData()->GetArray("Label")){
-		finalPolyData->GetPointData()->RemoveArray("Label");
+	if(finalPolyData->GetFieldData()->GetArray("Label")){
+		finalPolyData->GetFieldData()->RemoveArray("Label");
 	}
-	if(finalPolyData->GetPointData()->GetArray("TagTriangles")){
-		finalPolyData->GetPointData()->RemoveArray("TagTriangles");
+	if(finalPolyData->GetFieldData()->GetArray("TagTriangles")){
+		finalPolyData->GetFieldData()->RemoveArray("TagTriangles");
 	}
-	if(finalPolyData->GetPointData()->GetArray("TagEdges")){
-		finalPolyData->GetPointData()->RemoveArray("TagEdges");
+	if(finalPolyData->GetFieldData()->GetArray("TagEdges")){
+		finalPolyData->GetFieldData()->RemoveArray("TagEdges");
 	}
-	if(finalPolyData->GetPointData()->GetArray("TagPoints")){
-		finalPolyData->GetPointData()->RemoveArray("TagPoints");
+	if(finalPolyData->GetFieldData()->GetArray("TagPoints")){
+		finalPolyData->GetFieldData()->RemoveArray("TagPoints");
 	}
-	if(finalPolyData->GetPointData()->GetArray("TagInfo")){
-		finalPolyData->GetPointData()->RemoveArray("TagInfo");
+	if(finalPolyData->GetFieldData()->GetArray("TagInfo")){
+		finalPolyData->GetFieldData()->RemoveArray("TagInfo");
 	}
 
-	vtkSmartPointer<vtkDoubleArray> dblArray1 = 
-		vtkSmartPointer<vtkDoubleArray>::New();
-	dblArray1->SetName("Label");
+	vtkSmartPointer<vtkFieldData> field =
+		vtkSmartPointer<vtkFieldData>::New();
+
+	vtkSmartPointer<vtkFloatArray> fltArray1 = 
+		vtkSmartPointer<vtkFloatArray>::New();
+	fltArray1->SetName("Label");
 	for(int i = 0; i < MouseInteractorAdd::labelData.size(); i++)
-		dblArray1->InsertNextValue(MouseInteractorAdd::labelData[i]);
-	finalPolyData->GetPointData()->AddArray(dblArray1);
+		fltArray1->InsertNextValue(MouseInteractorAdd::labelData[i]);
+	if(MouseInteractorAdd::labelData.size() !=0 )
+		//finalPolyData->GetFieldData()->AddArray(fltArray1);
+		field->AddArray(fltArray1);
 
-	vtkSmartPointer<vtkDoubleArray> dblArray2 = 
-		vtkSmartPointer<vtkDoubleArray>::New();
-	dblArray2->SetName("TagTriangles");
+	vtkSmartPointer<vtkFloatArray> fltArray2 = 
+		vtkSmartPointer<vtkFloatArray>::New();
+	fltArray2->SetName("TagTriangles");
 	for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
 	{
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[0]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[1]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[2]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id1);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[0]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[1]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[2]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id2);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[0]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[1]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[2]);
-		dblArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id3);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[0]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[1]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[2]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id1);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq1);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[0]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[1]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[2]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id2);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq2);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[0]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[1]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[2]);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id3);
+		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq3);
 	}
-	finalPolyData->GetPointData()->AddArray(dblArray2);
+	if(MouseInteractorAdd::vectorTagTriangles.size() != 0)
+		//finalPolyData->GetFieldData()->AddArray(fltArray2);
+		field->AddArray(fltArray2);
 
-	vtkSmartPointer<vtkDoubleArray> dblArray3 = 
-		vtkSmartPointer<vtkDoubleArray>::New();
-	dblArray3->SetName("TagEdges");
+	vtkSmartPointer<vtkFloatArray> fltArray3 = 
+		vtkSmartPointer<vtkFloatArray>::New();
+	fltArray3->SetName("TagEdges");
 	for(int i = 0; i < MouseInteractorAdd::vectorTagEdges.size(); i++)
 	{
-		dblArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].ptId1);
-		dblArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].ptId2);
-		dblArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].seq);
-		dblArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].numEdge);
-		dblArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].constrain);
+		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].ptId1);
+		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].ptId2);
+		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].seq);
+		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].numEdge);
+		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].constrain);
 	}
-	finalPolyData->GetPointData()->AddArray(dblArray3);
+	if(MouseInteractorAdd::vectorTagEdges.size() != 0)
+		//finalPolyData->GetFieldData()->AddArray(fltArray3);
+		field->AddArray(fltArray3);
 
-	vtkSmartPointer<vtkDoubleArray> dblArray4 = 
-		vtkSmartPointer<vtkDoubleArray>::New();
-	dblArray4->SetName("TagPoints");
+	vtkSmartPointer<vtkFloatArray> fltArray4 = 
+		vtkSmartPointer<vtkFloatArray>::New();
+	fltArray4->SetName("TagPoints");
 	for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
 	{
-		dblArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[0]);
-		dblArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[1]);
-		dblArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[2]);
-		dblArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].radius);
-		dblArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].seq);
-		dblArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].typeIndex);
+		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[0]);
+		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[1]);
+		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[2]);
+		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].radius);
+		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].seq);
+		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].typeIndex);
 	}
-	finalPolyData->GetPointData()->AddArray(dblArray4);
+	if(MouseInteractorAdd::vectorTagPoints.size() != 0)
+		//finalPolyData->GetFieldData()->AddArray(fltArray4);
+		field->AddArray(fltArray4);
 
-	vtkSmartPointer<vtkDoubleArray> dblArray5 = 
-		vtkSmartPointer<vtkDoubleArray>::New();
-	dblArray5->SetName("TagInfo");
+	vtkSmartPointer<vtkFloatArray> fltArray5 = 
+		vtkSmartPointer<vtkFloatArray>::New();
+	fltArray5->SetName("TagInfo");
 	for(int i = 0; i < MouseInteractorAdd::vectorTagInfo.size(); i++)
 	{
-		dblArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagType);
-		dblArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[0]);
-		dblArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[1]);
-		dblArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[2]);
+		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagType);
+		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[0]);
+		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[1]);
+		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[2]);
 	}
-	finalPolyData->GetPointData()->AddArray(dblArray5);
+	if(MouseInteractorAdd::vectorTagInfo.size() != 0)
+		//finalPolyData->GetFieldData()->AddArray(fltArray5);
+		field->AddArray(fltArray5);
+
+	vtkSmartPointer<vtkIntArray> intArray1 = 
+		vtkSmartPointer<vtkIntArray>::New();
+	intArray1->SetName("TriSeq");
+	for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+	{
+		intArray1->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq1);
+		intArray1->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq2);
+		intArray1->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq3);
+	}
+	//finalPolyData->GetFieldData()->AddArray(intArray1);
+	field->AddArray(intArray1);
+
 	/*for(int i = 0; i < vectorTagInfo.size(); i++)
 	{
 	vtkSmartPointer<vtkDoubleArray> dblArray1 = 
@@ -275,9 +306,8 @@ void EventQtSlotConnect::slot_save(){
 	polyObject->GetPointData()->AddArray(dblArray1);
 	polyObject->GetPointData()->AddArray(dblArray2);
 	}*/
-
+	finalPolyData->SetFieldData(field);
 	writer->SetInput(finalPolyData);
-	//writer->SetInput(polyObject);
 	writer->Update();
 	writer->Write();
 }
@@ -300,7 +330,6 @@ void EventQtSlotConnect::slot_skelStateChange(int state){
 
 void EventQtSlotConnect::slot_comboxChanged(int state)
 {
-	std::cout<<"combox changed "<<std::endl;
 	MouseInteractorAdd::selectedTag = this->comboBoxTagPoint->currentIndex();
 }
 
@@ -453,7 +482,7 @@ QComboBox* EventQtSlotConnect::getTagComboBox(){
 }
 
 
-void EventQtSlotConnect::readCustomDataLabel(vtkDoubleArray* labelDBL)
+void EventQtSlotConnect::readCustomDataLabel(vtkFloatArray* labelDBL)
 {
 	MouseInteractorAdd::labelData.clear();
 	for(int i = 0; i < labelDBL->GetSize(); i++)
@@ -462,7 +491,7 @@ void EventQtSlotConnect::readCustomDataLabel(vtkDoubleArray* labelDBL)
 	}
 }
 
-void EventQtSlotConnect::readCustomDataTri(vtkDoubleArray* triDBL)
+void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 {
 	for(vtkIdType i = 0; i < triDBL->GetSize();)
 	{
@@ -473,17 +502,20 @@ void EventQtSlotConnect::readCustomDataTri(vtkDoubleArray* triDBL)
 		TagTriangle tri;
 		tri.p1[0] = triDBL->GetValue(i);tri.p1[1] = triDBL->GetValue(i+1);tri.p1[2] = triDBL->GetValue(i+2);
 		tri.id1 = triDBL->GetValue(i+3);
-		tri.p2[0] = triDBL->GetValue(i+4);tri.p2[1] = triDBL->GetValue(i+5);tri.p2[2] = triDBL->GetValue(i+6);
-		tri.id2 = triDBL->GetValue(i+7);
-		tri.p3[0] = triDBL->GetValue(i+8);tri.p3[1] = triDBL->GetValue(i+9);tri.p3[2] = triDBL->GetValue(i+10);
-		tri.id3 = triDBL->GetValue(i+11);
+		tri.seq1 = triDBL->GetValue(i+4);
+		tri.p2[0] = triDBL->GetValue(i+5);tri.p2[1] = triDBL->GetValue(i+6);tri.p2[2] = triDBL->GetValue(i+7);
+		tri.id2 = triDBL->GetValue(i+8);
+		tri.seq2 = triDBL->GetValue(i+9);
+		tri.p3[0] = triDBL->GetValue(i+10);tri.p3[1] = triDBL->GetValue(i+11);tri.p3[2] = triDBL->GetValue(i+12);
+		tri.id3 = triDBL->GetValue(i+13);
+		tri.seq3 = triDBL->GetValue(i+14);
 
 
 		for(int j = 0; j < 3; j++){
-			int t1,t2,t3;
+			double t1,t2,t3;
 			t1 = triDBL->GetValue(i); t2 = triDBL->GetValue(i+1); t3 = triDBL->GetValue(i+2);
 			pts->InsertNextPoint(t1,t2,t3);
-			i += 4;
+			i += 5;
 		}
 
 		vtkSmartPointer<vtkTriangle> triangle =
@@ -528,7 +560,7 @@ void EventQtSlotConnect::readCustomDataTri(vtkDoubleArray* triDBL)
 	}
 }
 
-void EventQtSlotConnect::readCustomDataEdge(vtkDoubleArray* edgeDBL)
+void EventQtSlotConnect::readCustomDataEdge(vtkFloatArray* edgeDBL)
 {
 	for(int i = 0; i < edgeDBL->GetSize(); i += 5)
 	{
@@ -543,7 +575,7 @@ void EventQtSlotConnect::readCustomDataEdge(vtkDoubleArray* edgeDBL)
 	}
 }
 
-void EventQtSlotConnect::readCustomDataTag(vtkDoubleArray* tagDBL)
+void EventQtSlotConnect::readCustomDataTag(vtkFloatArray* tagDBL)
 {
 	for(int i = 0; i < tagDBL->GetSize(); i += 4)
 	{
@@ -566,7 +598,7 @@ void EventQtSlotConnect::readCustomDataTag(vtkDoubleArray* tagDBL)
 	}
 }
 
-void EventQtSlotConnect::readCustomDataPoints(vtkDoubleArray* ptsDBL)
+void EventQtSlotConnect::readCustomDataPoints(vtkFloatArray* ptsDBL)
 {
 	for(int i = 0; i < ptsDBL->GetSize(); i += 6)
 	{
@@ -604,19 +636,19 @@ void EventQtSlotConnect::readCustomDataPoints(vtkDoubleArray* ptsDBL)
 
 void EventQtSlotConnect::readCustomData(vtkPolyData *polydata)
 {
-	vtkDoubleArray* labelDBL = (vtkDoubleArray*)polydata->GetPointData()->GetArray("Label");
+	vtkFloatArray* labelDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("Label");
 	readCustomDataLabel(labelDBL);
 
-	vtkDoubleArray* triDBL = (vtkDoubleArray*)polydata->GetPointData()->GetArray("TagTriangles");
+	vtkFloatArray* triDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagTriangles");
 	readCustomDataTri(triDBL);
 
-	vtkDoubleArray* edgeDBL = (vtkDoubleArray*)polydata->GetPointData()->GetArray("TagEdges");
+	vtkFloatArray* edgeDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagEdges");
 	readCustomDataEdge(edgeDBL);
 
-	vtkDoubleArray* tagDBL = (vtkDoubleArray*)polydata->GetPointData()->GetArray("TagInfo");
+	vtkFloatArray* tagDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagInfo");
 	readCustomDataTag(tagDBL);
 
-	vtkDoubleArray* ptsDBL = (vtkDoubleArray*)polydata->GetPointData()->GetArray("TagPoints");
+	vtkFloatArray* ptsDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagPoints");
 	readCustomDataPoints(ptsDBL);
 }
 
@@ -631,6 +663,8 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	// Create a polydata object
 	//vtkPolyData* polydata = planeSource->GetOutput();
     vtkPolyData* polydata =  reader->GetPolyDataOutput();
+
+	std::cout<<"let see points "<<polydata->GetPoint(0)[0]<<std::endl;
 	/*vtkSmartPointer<vtkCleanPolyData> cleanPolyData = 
 		vtkSmartPointer<vtkCleanPolyData>::New();
 	cleanPolyData->SetInputConnection(reader->GetOutputPort());
@@ -641,8 +675,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 
 	//polydata = cleanPolyData->GetOutput();
 	
-	//initialize label data for store in vtk file
-	
+	//initialize label data for store in vtk file	
 
 	this->polyObject = polydata;
 
@@ -713,7 +746,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 		SLOT(slot_clicked(vtkObject*, unsigned long, void*, void*)));
 
 	//see triangle
-	vtkDoubleArray* triDBL = (vtkDoubleArray*)polydata->GetPointData()->GetArray("TagTriangles");
+	vtkDoubleArray* triDBL = (vtkDoubleArray*)polydata->GetFieldData()->GetArray("TagTriangles");
 	if(triDBL != NULL)
 	{
 		readCustomData(polydata);
