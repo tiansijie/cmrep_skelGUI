@@ -4,14 +4,14 @@
 #include "ui_EventQtSlotConnect.h"
 #include "VoronoiSkeletonTool.h"
 #include "AddTagDialog.h"
+#include "MouseInteractorAdd.h"
+//#include "constants.h"
 
 #include <QMainWindow>
 #include <vtkSmartPointer.h>
 #include <QFutureWatcher>
 #include <QtGui>
 #include <vtkPolyData.h>
-
-//#include "MouseInteractorAdd.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -39,15 +39,22 @@ public:
 	void readCustomDataTag(vtkDoubleArray* tagDBL);
 	void readCustomDataLabel(vtkDoubleArray* labelDBL);
 
+	//vtkSmartPointer<MouseInteractorAdd> style;
+	//MouseInteractorAdd kk;
+	//MouseInteractorAdd *style;
+	
+
 public slots:
 	void slot_clicked(vtkObject*, unsigned long, void*, void*);
 	void slot_position(double x, double y, double z);
 	void slot_finished();
 	void slot_skelStateChange(int);
 	void slot_addTag();
+	void slot_comboxChanged(int);
 
 	void slot_open();
 	void slot_save();
+	
 	void executeCmrepVskel();	
 private:
 
@@ -60,7 +67,7 @@ private:
 	QAction *saveAct;
 
 	std::string VTKfilename;  
-	vtkPolyData* polyObject;	
+	vtkPolyData* polyObject;
 };
 
 #endif
