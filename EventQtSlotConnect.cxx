@@ -172,6 +172,22 @@ void EventQtSlotConnect::slot_save(){
 
 	finalPolyData = polyObject;
 
+	if(finalPolyData->GetPointData()->GetArray("Label")){
+		finalPolyData->GetPointData()->RemoveArray("Label");
+	}
+	if(finalPolyData->GetPointData()->GetArray("TagTriangles")){
+		finalPolyData->GetPointData()->RemoveArray("TagTriangles");
+	}
+	if(finalPolyData->GetPointData()->GetArray("TagEdges")){
+		finalPolyData->GetPointData()->RemoveArray("TagEdges");
+	}
+	if(finalPolyData->GetPointData()->GetArray("TagPoints")){
+		finalPolyData->GetPointData()->RemoveArray("TagPoints");
+	}
+	if(finalPolyData->GetPointData()->GetArray("TagInfo")){
+		finalPolyData->GetPointData()->RemoveArray("TagInfo");
+	}
+
 	vtkSmartPointer<vtkDoubleArray> dblArray1 = 
 		vtkSmartPointer<vtkDoubleArray>::New();
 	dblArray1->SetName("Label");
@@ -457,9 +473,9 @@ void EventQtSlotConnect::readCustomDataTri(vtkDoubleArray* triDBL)
 		TagTriangle tri;
 		tri.p1[0] = triDBL->GetValue(i);tri.p1[1] = triDBL->GetValue(i+1);tri.p1[2] = triDBL->GetValue(i+2);
 		tri.id1 = triDBL->GetValue(i+3);
-		tri.p2[0] = triDBL->GetValue(i+4);tri.p1[1] = triDBL->GetValue(i+5);tri.p1[2] = triDBL->GetValue(i+6);
+		tri.p2[0] = triDBL->GetValue(i+4);tri.p2[1] = triDBL->GetValue(i+5);tri.p2[2] = triDBL->GetValue(i+6);
 		tri.id2 = triDBL->GetValue(i+7);
-		tri.p3[0] = triDBL->GetValue(i+8);tri.p1[1] = triDBL->GetValue(i+9);tri.p1[2] = triDBL->GetValue(i+10);
+		tri.p3[0] = triDBL->GetValue(i+8);tri.p3[1] = triDBL->GetValue(i+9);tri.p3[2] = triDBL->GetValue(i+10);
 		tri.id3 = triDBL->GetValue(i+11);
 
 
@@ -683,6 +699,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	MouseInteractorAdd::vectorTagEdges.clear();
 	MouseInteractorAdd::vectorTagInfo.clear();
 	MouseInteractorAdd::selectedTag = 0;
+	this->comboBoxTagPoint->clear();
 
 	this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle( style );
 	if(this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer() != NULL)
