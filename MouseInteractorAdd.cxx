@@ -76,7 +76,7 @@ void MouseInteractorAdd::DrawTriangle()
 	
 	vtkFloatArray* normalDataFloat =
 		vtkFloatArray::SafeDownCast(normalPolyData->GetPointData()->GetArray("Normals"));
-
+	float result[3];
 	if(normalDataFloat)
 	{
 		int nc = normalDataFloat->GetNumberOfTuples();
@@ -103,8 +103,7 @@ void MouseInteractorAdd::DrawTriangle()
 		d2[0] = vectorTagPoints[id3].pos[0] - vectorTagPoints[id2].pos[0];
 		d2[1] = vectorTagPoints[id3].pos[1] - vectorTagPoints[id2].pos[1];
 		d2[2] = vectorTagPoints[id3].pos[2] - vectorTagPoints[id2].pos[2];
-
-		float result[3];
+				
 		vtkMath::Cross(d1, d2, result);
 		vtkMath::Normalize(result);
 		vtkMath::Normalize(normalAverage);
@@ -112,14 +111,26 @@ void MouseInteractorAdd::DrawTriangle()
 		float cos = vtkMath::Dot(result, normalAverage);
 
 		if(cos < 0){//need to swap
+			std::cout<<"Need to swap"<<std::endl;
 			int tempid = triPtIds[1];
 			triPtIds[1] = triPtIds[2];
 			triPtIds[2] = tempid;
 			tempid = id2;
 			id2 = id3;
 			id3 = tempid;
-		}
+		}		
 		std::cout<<"see this result "<<result[0]<<" "<<result[1]<<" "<<result[2]<<std::endl;
+
+		d1[0] = vectorTagPoints[id2].pos[0] - vectorTagPoints[id1].pos[0];
+		d1[1] = vectorTagPoints[id2].pos[1] - vectorTagPoints[id1].pos[1];
+		d1[2] = vectorTagPoints[id2].pos[2] - vectorTagPoints[id1].pos[2];
+		d2[0] = vectorTagPoints[id3].pos[0] - vectorTagPoints[id2].pos[0];
+		d2[1] = vectorTagPoints[id3].pos[1] - vectorTagPoints[id2].pos[1];
+		d2[2] = vectorTagPoints[id3].pos[2] - vectorTagPoints[id2].pos[2];
+		vtkMath::Cross(d1, d2, result);		
+		vtkMath::Normalize(result);
+
+		std::cout<<"after see this result "<<result[0]<<" "<<result[1]<<" "<<result[2]<<std::endl;
 		std::cout<<"see this normalAverage "<<normalAverage[0]<<" "<<normalAverage[1]<<" "<<normalAverage[2]<<std::endl;
 	}
 	//vectorTagPoints[id1]; vectorTagPoints[id2]; vectorTagPoints[id3];
@@ -207,8 +218,45 @@ void MouseInteractorAdd::DrawTriangle()
 	tri.seq2 = vectorTagPoints[triPtIds[1]].seq;
 	tri.seq3 = vectorTagPoints[triPtIds[2]].seq;
 	vectorTagTriangles.push_back(tri);
-
 	this->GetDefaultRenderer()->AddActor(actor);
+
+	//draw normal
+	double p2[3];
+	p2[0] = tri.centerPos[0] + result[0];
+	p2[1] = tri.centerPos[1] + result[1];
+	p2[2] = tri.centerPos[2] + result[2];
+	vtkSmartPointer<vtkLineSource> lineSource = 
+		vtkSmartPointer<vtkLineSource>::New();
+	lineSource->SetPoint1(tri.centerPos);
+	lineSource->SetPoint2(p2);
+	lineSource->Update();
+
+	// Visualize
+	vtkSmartPointer<vtkPolyDataMapper> linemapper = 
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	linemapper->SetInputConnection(lineSource->GetOutputPort());
+	vtkSmartPointer<vtkActor> lineactor = 
+		vtkSmartPointer<vtkActor>::New();
+	lineactor->SetMapper(linemapper);
+	lineactor->GetProperty()->SetLineWidth(4);
+	lineactor->GetProperty()->SetColor(0.2,0.5,0.2);
+	this->GetDefaultRenderer()->AddActor(lineactor);	
+
+	vtkSmartPointer<vtkSphereSource> sphereEndSource =
+		vtkSmartPointer<vtkSphereSource>::New();
+	sphereEndSource->SetCenter(p2);
+	sphereEndSource->SetRadius(0.3);
+	sphereEndSource->Update();
+	// Visualize
+	vtkSmartPointer<vtkPolyDataMapper> endpointmapper = 
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	endpointmapper->SetInputConnection(sphereEndSource->GetOutputPort());
+	vtkSmartPointer<vtkActor> endpointactor = 
+		vtkSmartPointer<vtkActor>::New();
+	endpointactor->SetMapper(endpointmapper);
+	endpointactor->GetProperty()->SetLineWidth(4);
+	endpointactor->GetProperty()->SetColor(0.7,0.5,0.7);
+	this->GetDefaultRenderer()->AddActor(endpointactor);	
 }
 
 void MouseInteractorAdd::DeleteTriangle(vtkActor* pickedActor){

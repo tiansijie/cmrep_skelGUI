@@ -55,6 +55,8 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkFloatArray.h>
 #include <vtkMath.h>
+#include <vtkLineSource.h>
+#include <vtkArrowSource.h>
 
 #include <QtGui>
 
@@ -311,26 +313,6 @@ public:
 					pickedActor = PickAcotrFromMesh(pos);
 					DeleteTriangle(pickedActor);
 				}
-				/*else if(key.compare("p") == 0){
-					vtkSmartPointer<vtkActor> pickedActor
-						= vtkSmartPointer<vtkActor>::New();
-
-					pickedActor = PickAcotrFromMesh(pos);
-
-					for(int i = 0; i < vectorTagPoints.size(); i++){
-						TagPoint at = vectorTagPoints[i];
-						double* acotrPos = at.actor->GetPosition();
-						if(pickedActor == at.actor){	
-							at.actor->GetProperty()->SetColor(0,0,0);
-							deletePointIds.push_back(i);
-						}
-					}
-				}
-
-
-				else if(key.compare("i") == 0){
-					DrawDelaunayTriangle();
-				}*/
 			}//end of key press
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();				

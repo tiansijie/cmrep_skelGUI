@@ -39,11 +39,6 @@ public:
 	void readCustomDataTag(vtkFloatArray* tagDBL);
 	void readCustomDataLabel(vtkFloatArray* labelDBL);
 
-	//vtkSmartPointer<MouseInteractorAdd> style;
-	//MouseInteractorAdd kk;
-	//MouseInteractorAdd *style;
-	
-
 public slots:
 	void slot_clicked(vtkObject*, unsigned long, void*, void*);
 	void slot_position(double x, double y, double z);

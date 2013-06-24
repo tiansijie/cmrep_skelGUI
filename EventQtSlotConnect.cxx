@@ -124,7 +124,6 @@ void EventQtSlotConnect::slot_addTag(){
 	}	
 }
 
-
 void EventQtSlotConnect::slot_finished()
 {
 	readVTK(VTKfilename);
@@ -140,7 +139,6 @@ void EventQtSlotConnect::slot_clicked(vtkObject*, unsigned long, void*, void*)
 { 
  // textEdit->append("Clicked");
 }
-
 
 void EventQtSlotConnect::slot_open(){
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
@@ -480,7 +478,6 @@ void EventQtSlotConnect::createMenus(){
 QComboBox* EventQtSlotConnect::getTagComboBox(){
 	return this->comboBoxTagPoint;
 }
-
 
 void EventQtSlotConnect::readCustomDataLabel(vtkFloatArray* labelDBL)
 {
