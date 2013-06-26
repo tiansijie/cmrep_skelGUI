@@ -53,24 +53,16 @@ int MouseInteractorAdd::PairNumber(int a, int b){
 	return (a1 + b1) * (a1 + b1 + 1) / 2.0 + b1;
 }
 
+void MouseInteractorAdd::setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator)
+{
+	this->normalGenerator = normalGenerator;
+}
+
 void MouseInteractorAdd::DrawTriangle()
 {
 	int id1 = triPtIds[0], id2 = triPtIds[1], id3 = triPtIds[2];
 	if(id1 == id2 || id1 == id3 || id2 == id3)
-		return;
-	//get normals
-	vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-	vtkSmartPointer<vtkActor> actor0 = static_cast<vtkActor *>(this->GetDefaultRenderer()->GetActors()->GetItemAsObject(0));
-	vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();	
-
-#if VTK_MAJOR_VERSION <= 5
-	normalGenerator->SetInput(vtkPolyData::SafeDownCast(vtkdata));
-#else
-	normalGenerator->SetInputData(vtkdata);
-#endif
-	normalGenerator->ComputePointNormalsOn();
-	normalGenerator->ComputeCellNormalsOff();
-	normalGenerator->Update();
+		return;	
 	
 	vtkSmartPointer<vtkPolyData> normalPolyData = normalGenerator->GetOutput();
 	
@@ -133,16 +125,15 @@ void MouseInteractorAdd::DrawTriangle()
 		std::cout<<"after see this result "<<result[0]<<" "<<result[1]<<" "<<result[2]<<std::endl;
 		std::cout<<"see this normalAverage "<<normalAverage[0]<<" "<<normalAverage[1]<<" "<<normalAverage[2]<<std::endl;
 	}
-	//vectorTagPoints[id1]; vectorTagPoints[id2]; vectorTagPoints[id3];
 		
 	int edgeid1 = PairNumber(triPtIds[0], triPtIds[1]);//id
 	int edgeid2 = PairNumber(triPtIds[1], triPtIds[2]);
 	int edgeid3 = PairNumber(triPtIds[2], triPtIds[0]);
 	std::cout<<"ID "<<id1<<" "<<id2<<" "<<id3<<std::endl;
 	//std::cout<<"Pair N "<<edgeid1<<" "<<edgeid2<<" "<<edgeid3<<std::endl;
-	int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].typeIndex].tagType, vectorTagInfo[vectorTagPoints[id2].typeIndex].tagType);
-	int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].typeIndex].tagType, vectorTagInfo[vectorTagPoints[id3].typeIndex].tagType);
-	int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].typeIndex].tagType, vectorTagInfo[vectorTagPoints[id3].typeIndex].tagType);
+	int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType);
+	int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+	int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
 
 	if(vectorTagEdges[edgeid1].numEdge >= cons1)
 		return;
@@ -170,6 +161,10 @@ void MouseInteractorAdd::DrawTriangle()
 	triangle->GetPointIds()->SetId ( 1, 1 );
 	triangle->GetPointIds()->SetId ( 2, 2 );
 
+	double *n = new double;
+	triangle->ComputeNormal(vectorTagPoints[triPtIds[0]].pos, vectorTagPoints[triPtIds[1]].pos, vectorTagPoints[triPtIds[2]].pos, n);
+	std::cout<<"triangle n "<<n[0]<<" "<<n[1]<<" "<<n[2]<<std::endl;
+
 	vtkSmartPointer<vtkCellArray> triangles =
 		vtkSmartPointer<vtkCellArray>::New();
 	triangles->InsertNextCell ( triangle );
@@ -182,17 +177,46 @@ void MouseInteractorAdd::DrawTriangle()
 	trianglePolyData->SetPoints ( pts );
 	trianglePolyData->SetPolys ( triangles );
 
+	//draw normal
+	double p2[3];
+	p2[0] = trianglePolyData->GetCenter()[0] + result[0];
+	p2[1] = trianglePolyData->GetCenter()[1] + result[1];
+	p2[2] = trianglePolyData->GetCenter()[2] + result[2];
+
+	vtkSmartPointer<vtkLineSource> lineSource = 
+		vtkSmartPointer<vtkLineSource>::New();
+	lineSource->SetPoint1(trianglePolyData->GetCenter());
+	lineSource->SetPoint2(p2);
+	lineSource->Update();
+
+	vtkSmartPointer<vtkSphereSource> sphereEndSource =
+		vtkSmartPointer<vtkSphereSource>::New();
+	sphereEndSource->SetCenter(p2);
+	sphereEndSource->SetRadius(0.3);
+	sphereEndSource->Update();
+
+	//Append the two meshes 
+	vtkSmartPointer<vtkAppendPolyData> appendFilter =
+		vtkSmartPointer<vtkAppendPolyData>::New();
+
+	appendFilter->AddInputConnection(trianglePolyData->GetProducerPort());
+	//appendFilter->AddInputConnection(lineSource->GetOutputPort());
+	//appendFilter->AddInputConnection(sphereEndSource->GetOutputPort());
+	appendFilter->Update();
 	// Create mapper and actor
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
 		vtkSmartPointer<vtkPolyDataMapper>::New();
 #if VTK_MAJOR_VERSION <= 5
-	mapper->SetInput(trianglePolyData);
+	//mapper->SetInput(trianglePolyData);
+	mapper->SetInput(appendFilter->GetOutput());
 #else
 	mapper->SetInputData(trianglePolyData);
 #endif
 	vtkSmartPointer<vtkActor> actor =
 		vtkSmartPointer<vtkActor>::New();
 	actor->SetMapper(mapper);
+	actor->GetProperty()->SetEdgeVisibility(true);
+	actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
 	actor->GetProperty()->SetColor(triCol);
 
 	for(int i = 0; i < vectorTagTriangles.size(); i++)
@@ -218,45 +242,30 @@ void MouseInteractorAdd::DrawTriangle()
 	tri.seq2 = vectorTagPoints[triPtIds[1]].seq;
 	tri.seq3 = vectorTagPoints[triPtIds[2]].seq;
 	vectorTagTriangles.push_back(tri);
-	this->GetDefaultRenderer()->AddActor(actor);
-
-	//draw normal
-	double p2[3];
-	p2[0] = tri.centerPos[0] + result[0];
-	p2[1] = tri.centerPos[1] + result[1];
-	p2[2] = tri.centerPos[2] + result[2];
-	vtkSmartPointer<vtkLineSource> lineSource = 
-		vtkSmartPointer<vtkLineSource>::New();
-	lineSource->SetPoint1(tri.centerPos);
-	lineSource->SetPoint2(p2);
-	lineSource->Update();
+	this->GetDefaultRenderer()->AddActor(actor);	
 
 	// Visualize
-	vtkSmartPointer<vtkPolyDataMapper> linemapper = 
-		vtkSmartPointer<vtkPolyDataMapper>::New();
-	linemapper->SetInputConnection(lineSource->GetOutputPort());
-	vtkSmartPointer<vtkActor> lineactor = 
-		vtkSmartPointer<vtkActor>::New();
-	lineactor->SetMapper(linemapper);
-	lineactor->GetProperty()->SetLineWidth(4);
-	lineactor->GetProperty()->SetColor(0.2,0.5,0.2);
-	this->GetDefaultRenderer()->AddActor(lineactor);	
+	//vtkSmartPointer<vtkPolyDataMapper> linemapper = 
+	//	vtkSmartPointer<vtkPolyDataMapper>::New();
+	//linemapper->SetInputConnection(lineSource->GetOutputPort());
+	//vtkSmartPointer<vtkActor> lineactor = 
+	//	vtkSmartPointer<vtkActor>::New();
+	//lineactor->SetMapper(linemapper);
+	//lineactor->GetProperty()->SetLineWidth(4);
+	//lineactor->GetProperty()->SetColor(0.2,0.5,0.2);
+	//this->GetDefaultRenderer()->AddActor(lineactor);	
 
-	vtkSmartPointer<vtkSphereSource> sphereEndSource =
-		vtkSmartPointer<vtkSphereSource>::New();
-	sphereEndSource->SetCenter(p2);
-	sphereEndSource->SetRadius(0.3);
-	sphereEndSource->Update();
+	
 	// Visualize
-	vtkSmartPointer<vtkPolyDataMapper> endpointmapper = 
-		vtkSmartPointer<vtkPolyDataMapper>::New();
-	endpointmapper->SetInputConnection(sphereEndSource->GetOutputPort());
-	vtkSmartPointer<vtkActor> endpointactor = 
-		vtkSmartPointer<vtkActor>::New();
-	endpointactor->SetMapper(endpointmapper);
-	endpointactor->GetProperty()->SetLineWidth(4);
-	endpointactor->GetProperty()->SetColor(0.7,0.5,0.7);
-	this->GetDefaultRenderer()->AddActor(endpointactor);	
+	//vtkSmartPointer<vtkPolyDataMapper> endpointmapper = 
+	//	vtkSmartPointer<vtkPolyDataMapper>::New();
+	//endpointmapper->SetInputConnection(sphereEndSource->GetOutputPort());
+	//vtkSmartPointer<vtkActor> endpointactor = 
+	//	vtkSmartPointer<vtkActor>::New();
+	//endpointactor->SetMapper(endpointmapper);
+	//endpointactor->GetProperty()->SetLineWidth(4);
+	//endpointactor->GetProperty()->SetColor(0.7,0.5,0.7);
+	//this->GetDefaultRenderer()->AddActor(endpointactor);	
 }
 
 void MouseInteractorAdd::DeleteTriangle(vtkActor* pickedActor){
@@ -279,26 +288,33 @@ void MouseInteractorAdd::DeleteTriangle(vtkActor* pickedActor){
 	}
 }
 	
-vtkActor* MouseInteractorAdd::PickAcotrFromMesh(double pos[3])
+vtkActor* MouseInteractorAdd::PickActorFromMesh(double pos[3])
 {
 	vtkSmartPointer<vtkActor> pickedActor
 		= vtkSmartPointer<vtkActor>::New();
 
-	vtkActorCollection* actorsCollection = this->GetDefaultRenderer()->GetActors();
-	actorsCollection->InitTraversal();
-
-	std::cout<<"number of actors: "<<actorsCollection->GetNumberOfItems()<<std::endl;
-	//find the point to delete
-	for(vtkIdType i = 0; i < actorsCollection->GetNumberOfItems(); i++)
+	for(int i = 0; i < vectorTagPoints.size(); i++)
 	{
-		vtkActor* nextActor = actorsCollection->GetNextActor();
-		double* actorPos = nextActor->GetCenter();
-		double dis = Distance(pos,actorPos);
-
-		if(dis < 1.0 && nextActor){
-			pickedActor = nextActor;
-			return pickedActor;
+		if(Distance(vectorTagPoints[i].pos, pos) < 1.0)
+		{
+			return vectorTagPoints[i].actor;
 		}
+	}
+	return NULL;
+}
+
+vtkActor* MouseInteractorAdd::PickActorFromTriangle(double pos[3])
+{
+	for(int i = 0; i < vectorTagTriangles.size(); i++)
+	{
+		vtkActor* triActor = vectorTagTriangles[i].triActor;
+
+		vtkSmartPointer<vtkActorCollection> actorCollection 
+			= vtkSmartPointer<vtkActorCollection>::New();
+		triActor->GetActors(actorCollection);
+		vtkTriangle* tri = vtkTriangle::SafeDownCast(actorCollection->GetItemAsObject(0));
+		if(tri->PointInTriangle(pos, vectorTagTriangles[i].p1, vectorTagTriangles[i].p2, vectorTagTriangles[i].p3, 0.5))
+			return vectorTagTriangles[i].triActor;
 	}
 	return NULL;
 }
@@ -428,6 +444,109 @@ void MouseInteractorAdd::deleteEdge(int seq)
 		vectorTagEdges[nu].ptId2 = temp[j].ptId2;
 	}
 		
+}
+
+void MouseInteractorAdd::flipNormal(vtkActor* pickedActor)
+{
+	for(int i = 0; i < vectorTagTriangles.size(); i++)
+	{
+		if(vectorTagTriangles[i].triActor == pickedActor)
+		{
+			//flip the 2nd and 3rd vertices 
+			int tempChange;
+			tempChange = vectorTagTriangles[i].id2;
+			vectorTagTriangles[i].id2 = vectorTagTriangles[i].id3;
+			vectorTagTriangles[i].id3 = tempChange;
+
+			tempChange = vectorTagTriangles[i].seq2;
+			vectorTagTriangles[i].seq2 = vectorTagTriangles[i].seq3;
+			vectorTagTriangles[i].seq3 = tempChange;
+
+			double tempPos[3];
+			tempPos[0] = vectorTagTriangles[i].p2[0]; tempPos[1] = vectorTagTriangles[i].p2[1]; tempPos[2] = vectorTagTriangles[i].p2[2]; 
+			vectorTagTriangles[i].p2[0] = vectorTagTriangles[i].p3[0]; vectorTagTriangles[i].p2[1] = vectorTagTriangles[i].p3[1]; vectorTagTriangles[i].p2[2] = vectorTagTriangles[i].p3[2];
+			vectorTagTriangles[i].p3[0] = tempPos[0]; vectorTagTriangles[i].p3[1] = tempPos[1]; vectorTagTriangles[i].p3[2] = tempPos[2];
+
+			//remove the original triangle
+			this->GetDefaultRenderer()->RemoveActor(pickedActor);
+
+			//create new triangle
+			vtkSmartPointer<vtkPoints> pts =
+				vtkSmartPointer<vtkPoints>::New();
+			pts->InsertNextPoint(vectorTagTriangles[i].p1);
+			pts->InsertNextPoint(vectorTagTriangles[i].p2);
+			pts->InsertNextPoint(vectorTagTriangles[i].p3);
+
+			vtkSmartPointer<vtkTriangle> triangle =
+				vtkSmartPointer<vtkTriangle>::New();
+			triangle->GetPointIds()->SetId ( 0, 0 );
+			triangle->GetPointIds()->SetId ( 1, 1 );
+			triangle->GetPointIds()->SetId ( 2, 2 );
+
+			double *n = new double;
+			triangle->ComputeNormal(vectorTagTriangles[i].p1, vectorTagTriangles[i].p2, vectorTagTriangles[i].p3, n);
+			std::cout<<"triangle n "<<n[0]<<" "<<n[1]<<" "<<n[2]<<std::endl;
+
+			vtkSmartPointer<vtkCellArray> triangles =
+				vtkSmartPointer<vtkCellArray>::New();
+			triangles->InsertNextCell ( triangle );
+
+			// Create a polydata object
+			vtkSmartPointer<vtkPolyData> trianglePolyData =
+				vtkSmartPointer<vtkPolyData>::New();
+
+			// Add the geometry and topology to the polydata
+			trianglePolyData->SetPoints ( pts );
+			trianglePolyData->SetPolys ( triangles );
+
+			//draw normal
+			double p2[3];
+			p2[0] = trianglePolyData->GetCenter()[0] + n[0];
+			p2[1] = trianglePolyData->GetCenter()[1] + n[1];
+			p2[2] = trianglePolyData->GetCenter()[2] + n[2];
+			vtkSmartPointer<vtkLineSource> lineSource = 
+				vtkSmartPointer<vtkLineSource>::New();
+			lineSource->SetPoint1(trianglePolyData->GetCenter());
+			lineSource->SetPoint2(p2);
+			lineSource->Update();
+
+			vtkSmartPointer<vtkSphereSource> sphereEndSource =
+				vtkSmartPointer<vtkSphereSource>::New();
+			sphereEndSource->SetCenter(p2);
+			sphereEndSource->SetRadius(0.3);
+			sphereEndSource->Update();
+
+			//Append the two meshes 
+			vtkSmartPointer<vtkAppendPolyData> appendFilter =
+				vtkSmartPointer<vtkAppendPolyData>::New();
+
+			appendFilter->AddInputConnection(trianglePolyData->GetProducerPort());
+			//appendFilter->AddInputConnection(lineSource->GetOutputPort());
+			//appendFilter->AddInputConnection(sphereEndSource->GetOutputPort());
+			appendFilter->Update();
+
+
+			// Create mapper and actor
+			vtkSmartPointer<vtkPolyDataMapper> mapper =
+				vtkSmartPointer<vtkPolyDataMapper>::New();
+#if VTK_MAJOR_VERSION <= 5
+			//mapper->SetInput(trianglePolyData);
+			mapper->SetInput(appendFilter->GetOutput());
+#else
+			mapper->SetInputData(trianglePolyData);
+#endif
+			vtkSmartPointer<vtkActor> actor =
+				vtkSmartPointer<vtkActor>::New();
+			actor->SetMapper(mapper);
+			actor->GetProperty()->SetEdgeVisibility(true);
+			actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
+			actor->GetProperty()->SetColor(triCol);
+
+			vectorTagTriangles[i].triActor = actor;
+
+			this->GetDefaultRenderer()->AddActor(actor);
+		}
+	}
 }
 
 vtkStandardNewMacro(MouseInteractorAdd);

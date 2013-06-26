@@ -11,6 +11,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QRadioButton;
+class QComboBox;
 QT_END_NAMESPACE
 
 //! [0]
@@ -26,22 +27,18 @@ public:
     QLineEdit *lineEdit;
 	QLabel *colorLabel;
 	QColor color;
-   /* QCheckBox *caseCheckBox;
-    QCheckBox *fromStartCheckBox;
-    QCheckBox *wholeWordsCheckBox;
-    QCheckBox *searchSelectionCheckBox;
-    QCheckBox *backwardCheckBox;
-    QDialogButtonBox *buttonBox;*/
     QPushButton *addButton;
-    //QPushButton *moreButton;
     QRadioButton *freeEdgeButton;
     QRadioButton *branchButton;
     QRadioButton *interiorButton;
     QRadioButton *otherButton;
-	
+	QComboBox *indexBox;
+	QLabel *comboLabel;
 
 	std::vector<std::string> tagName;
 	std::vector<QColor> tagColor;
+
+	int tagIndex;
 
 	void setTagName(std::string);
 	void setTagColor(QColor);
@@ -50,6 +47,7 @@ public:
 	private slots:
 		void accept();
 		void setColor();
+		void indexChanged(int);
 		
 };
 //! [0]

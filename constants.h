@@ -9,6 +9,7 @@ struct TagInfo
 	int tagType; // 1 = Branch point  2 = Free Edge point 3 = Interior point  4 = others
 	int tagColor[3];//for color
 	QColor qc;//for color	
+	int tagIndex;
 };
 
 
@@ -27,6 +28,7 @@ struct TagPoint
 	vtkActor* actor;
 	std::string typeName;
 	int typeIndex;
+	int comboBoxIndex;
 	double radius;//radius of that points
 	int seq;//the sequence in all points
 	double pos[3];

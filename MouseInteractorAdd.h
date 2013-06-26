@@ -95,11 +95,17 @@ public:
 	int PairNumber(int a, int b);
 	void DrawTriangle();
 	void DeleteTriangle(vtkActor* pickedActor);
-	vtkActor* PickAcotrFromMesh(double pos[3]);
+	vtkActor* PickActorFromMesh(double pos[3]);
+	vtkActor* PickActorFromTriangle(double pos[3]);
+
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
 	int deleteEdgeHelper2(int id, int seq);
 	void deleteEdge(int seq);
+	void setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator);
+	void flipNormal(vtkActor* pickedActor);
+
+
 
 	virtual void OnLeftButtonDown()
 	{		
@@ -119,6 +125,7 @@ public:
 			if(rwi->GetKeySym() != NULL && isSkeleton)
 			{
 				std::string key = rwi->GetKeySym();
+
 				//for the adding point event
 				if( rwi->GetControlKey() && pos[0] != 0 && pos[1] != 0 && pos[2] != 0)
 				{
@@ -174,7 +181,8 @@ public:
 							//store actor in vectorTagPoints
 							TagPoint actorT;
 							actorT.actor = actor;
-							actorT.typeIndex = selectedTag;
+							actorT.typeIndex = ti.tagIndex;
+							actorT.comboBoxIndex = selectedTag;
 							//actorT.typeName = cbTagPoint->currentText().toStdString(); 
 							actorT.radius = pointRadius;
 							actorT.seq = pointSeq;
@@ -184,12 +192,12 @@ public:
 							//calculate the biggest number of edges possibility
 							vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
 							
-							labelData[pointSeq] = selectedTag + 1;//cbTagPoint->currentIndex() + 1;
+							labelData[pointSeq] = ti.tagIndex;//selectedTag + 1;//cbTagPoint->currentIndex() + 1;
 						
-							if(vectorClassifyPoints.size() <= selectedTag/*cbTagPoint->currentIndex()*/){
-								vectorClassifyPoints.resize(selectedTag/*cbTagPoint->currentIndex()*/ + 1);
+							/*if(vectorClassifyPoints.size() <= selectedTag/ *cbTagPoint->currentIndex()* /){
+								vectorClassifyPoints.resize(selectedTag/ *cbTagPoint->currentIndex()* / + 1);
 							}
-							vectorClassifyPoints[selectedTag/*cbTagPoint->currentIndex()*/].push_back(actorT);
+							vectorClassifyPoints[selectedTag/ *cbTagPoint->currentIndex()* /].push_back(actorT);*/
 
 							this->GetDefaultRenderer()->AddActor(actor);
 						}
@@ -204,16 +212,16 @@ public:
 					vtkSmartPointer<vtkActor> pickedActor
 						= vtkSmartPointer<vtkActor>::New();
 
-					pickedActor = PickAcotrFromMesh(pos);
+					pickedActor = PickActorFromMesh(pos);
 
 					//erase from vectorTagPoints and color other points
 					for(int i = 0; i < vectorTagPoints.size(); i++){
 						TagPoint at = vectorTagPoints[i];
 						double* acotrPos = at.actor->GetPosition();
 						if(pickedActor != at.actor){							
-							at.actor->GetProperty()->SetColor(vectorTagInfo[at.typeIndex].tagColor[0] / 255.0,
-								vectorTagInfo[at.typeIndex].tagColor[1] / 255.0, 
-								vectorTagInfo[at.typeIndex].tagColor[2] / 255.0);
+							at.actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+								vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+								vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
 						}					
 						else{
 							/*for(int j = 0; j < vectorClassifyPoints[vectorTagPoints[i].typeIndex].size(); j++){
@@ -277,14 +285,13 @@ public:
 					vtkSmartPointer<vtkActor> pickedActor
 						= vtkSmartPointer<vtkActor>::New();
 
-					pickedActor = PickAcotrFromMesh(pos);
+					pickedActor = PickActorFromMesh(pos);
 
 					if(pickedActor != NULL){
-						pickedActor->GetProperty()->SetColor(1,1,1);
-
 						for(int i = 0; i < vectorTagPoints.size(); i++){
 							TagPoint at = vectorTagPoints[i];
 							if(pickedActor == at.actor){	
+								pickedActor->GetProperty()->SetColor(1,1,1);
 								triPtIds.push_back(i);
 							}
 						}
@@ -293,15 +300,24 @@ public:
 							DrawTriangle();
 							for(int i = 0; i < triPtIds.size(); i++){
 								TagPoint at = vectorTagPoints[triPtIds[i]];
-								vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.typeIndex].tagColor[0] / 255.0,
-									vectorTagInfo[at.typeIndex].tagColor[1] / 255.0, 
-									vectorTagInfo[at.typeIndex].tagColor[2] / 255.0);
+								vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+									vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+									vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
 							}
 							triPtIds.resize(0);
 						}
 					}
 				}// end of q
 
+				else if(key.compare("b") == 0)
+				{
+					rwi->SetKeySym("");
+
+					vtkSmartPointer<vtkActor> pickedActor
+						= vtkSmartPointer<vtkActor>::New();
+					pickedActor = PickActorFromTriangle(pos);
+					flipNormal(pickedActor);
+				}
 
 				else if(key.compare("d") == 0)
 				{
@@ -310,7 +326,7 @@ public:
 					vtkSmartPointer<vtkActor> pickedActor
 						= vtkSmartPointer<vtkActor>::New();
 
-					pickedActor = PickAcotrFromMesh(pos);
+					pickedActor = PickActorFromTriangle(pos);
 					DeleteTriangle(pickedActor);
 				}
 			}//end of key press
@@ -320,6 +336,6 @@ public:
 
 private:
 	double triCol[3];
-
+	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
 };
 #endif

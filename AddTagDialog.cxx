@@ -21,6 +21,13 @@ AddTagDialog::AddTagDialog(QWidget *parent)
 	interiorButton = new QRadioButton(tr("&Interior Point"));
 	otherButton = new QRadioButton(tr("&Others"));
 
+	comboLabel = new QLabel(tr("Choose index:"));
+	indexBox = new QComboBox;
+	for(int i = 1; i <= 10; i++)
+	{
+		indexBox->addItem(QString::number(i));
+	}
+
 	QHBoxLayout *topLeftLayout = new QHBoxLayout;
 	topLeftLayout->addWidget(label);
 	topLeftLayout->addWidget(lineEdit);
@@ -29,15 +36,18 @@ AddTagDialog::AddTagDialog(QWidget *parent)
 	secondLeftLayout->addWidget(colorButton);
 	secondLeftLayout->addWidget(colorLabel);
 
+	QHBoxLayout *thirdLeftLayout = new QHBoxLayout;
+	thirdLeftLayout->addWidget(comboLabel);
+	thirdLeftLayout->addWidget(indexBox);
+
 	QVBoxLayout *leftLayout = new QVBoxLayout;
 	leftLayout->addLayout(topLeftLayout);
 	leftLayout->addLayout(secondLeftLayout);
-	//leftLayout->addWidget(colorButton);
-	//leftLayout->addWidget(colorLabel);
     leftLayout->addWidget(freeEdgeButton);
     leftLayout->addWidget(branchButton);
     leftLayout->addWidget(interiorButton);
 	leftLayout->addWidget(otherButton);
+	leftLayout->addLayout(thirdLeftLayout);
 	leftLayout->addWidget(addButton);
 
 	QGridLayout *mainLayout = new QGridLayout;
@@ -46,8 +56,11 @@ AddTagDialog::AddTagDialog(QWidget *parent)
 	setLayout(mainLayout);
 	setWindowTitle(tr("Add Tag"));	
 
+	tagIndex = 1;
+
 	connect(addButton, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(colorButton, SIGNAL(clicked()), this, SLOT(setColor()));
+	connect(indexBox, SIGNAL(activated(int)), this, SLOT(indexChanged(int)));
 }
 
 void AddTagDialog::setTagName(std::string name){
@@ -98,4 +111,8 @@ void AddTagDialog::setColor(){
 		colorLabel->setPalette(QPalette(color));
 		colorLabel->setAutoFillBackground(true);
 	}
+}
+
+void AddTagDialog::indexChanged(int state){
+	tagIndex = this->indexBox->currentIndex() + 1;
 }
