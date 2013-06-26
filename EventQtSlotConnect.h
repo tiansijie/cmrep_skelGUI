@@ -12,6 +12,7 @@
 #include <QFutureWatcher>
 #include <QtGui>
 #include <vtkPolyData.h>
+#include <vtkStringArray.h>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -36,7 +37,7 @@ public:
 	void readCustomDataTri(vtkFloatArray* triDBL);
 	void readCustomDataEdge(vtkFloatArray* edgeDBL);
 	void readCustomDataPoints(vtkFloatArray* ptsDBL);
-	void readCustomDataTag(vtkFloatArray* tagDBL);
+	void readCustomDataTag(vtkFloatArray* tagDBL, vtkStringArray* tagStr);
 	void readCustomDataLabel(vtkFloatArray* labelDBL);
 
 public slots:

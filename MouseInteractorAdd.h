@@ -75,6 +75,7 @@ public:
 	
 	std::vector<int>deletePointIds;
 	std::vector<int>triPtIds;
+	
 	vtkActor *selectedTriangle;
 	vtkActor *prePolyLineActor;
 
@@ -85,6 +86,7 @@ public:
 	static std::vector<TagEdge> vectorTagEdges;
 	//store all the label info, 0 represent no tag on this point
 	static std::vector<double> labelData;
+	static std::vector<vtkActor*> triNormalActors;
 	static bool isSkeleton;
 	static int selectedTag;
 	
@@ -104,19 +106,22 @@ public:
 	void deleteEdge(int seq);
 	void setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator);
 	void flipNormal(vtkActor* pickedActor);
+	void reset();
 
 
 
 	virtual void OnLeftButtonDown()
 	{		
-		int* clickPos = this->GetInteractor()->GetEventPosition();
+		int* clickPos = new int[2];
+		clickPos = this->GetInteractor()->GetEventPosition();
 		// Pick from this location.
 		vtkSmartPointer<vtkPropPicker>  picker =
 			vtkSmartPointer<vtkPropPicker>::New();
 
 		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
 		if(sucessPick != 0){//pick successful
-			double* pos = picker->GetPickPosition();
+			double* pos = new double[3];
+			pos = picker->GetPickPosition();
 						 
 			//find the first actor
 			vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
@@ -132,6 +137,7 @@ public:
 					//see if there is any tag have been added
 					if(vectorTagInfo.size() != 0)
 					{
+						reset();
 						vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
 						//vtkdata->GetPointData()->GetAbstractArray("Radius");
 						vtkDoubleArray* radiusArray = (vtkDoubleArray*)vtkdata->GetPointData()->GetArray("Radius");
@@ -207,6 +213,7 @@ public:
 				//for delete point event
 				else if(key.compare("s") == 0)
 				{
+					reset();
 					rwi->SetKeySym("");
 
 					vtkSmartPointer<vtkActor> pickedActor
@@ -217,7 +224,8 @@ public:
 					//erase from vectorTagPoints and color other points
 					for(int i = 0; i < vectorTagPoints.size(); i++){
 						TagPoint at = vectorTagPoints[i];
-						double* acotrPos = at.actor->GetPosition();
+						double* acotrPos = new double[3];
+						acotrPos = at.actor->GetPosition();
 						if(pickedActor != at.actor){							
 							at.actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
 								vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
@@ -259,6 +267,7 @@ public:
 				
 				else if(key.compare("t") == 0)
 				{
+					reset();
 					rwi->SetKeySym("");
 					std::cout<<"Tri in"<<std::endl;
 					vtkActor *actor = picker->GetActor();
@@ -311,6 +320,7 @@ public:
 
 				else if(key.compare("b") == 0)
 				{
+					reset();
 					rwi->SetKeySym("");
 
 					vtkSmartPointer<vtkActor> pickedActor
@@ -321,6 +331,7 @@ public:
 
 				else if(key.compare("d") == 0)
 				{
+					reset();
 					rwi->SetKeySym("");
 
 					vtkSmartPointer<vtkActor> pickedActor

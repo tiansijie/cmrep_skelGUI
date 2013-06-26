@@ -115,11 +115,6 @@ void EventQtSlotConnect::slot_addTag(){
 		MouseInteractorAdd::vectorTagInfo.push_back(ti);
 
 		QPixmap pix(22,22);
-		int iSize = MouseInteractorAdd::vectorTagInfo.size();
-		std::stringstream ss;
-		ss << iSize;
-		std::string num = ss.str() + " ";
-		//QString displayText = QString(num.c_str()) + " " + tagText;
 		QString displayText = QString::number(ti.tagIndex) + " " + tagText;
 		pix.fill(addDialog.color);
 		this->comboBoxTagPoint->addItem(pix, displayText);
@@ -262,16 +257,27 @@ void EventQtSlotConnect::slot_save(){
 		vtkSmartPointer<vtkFloatArray> fltArray5 = 
 			vtkSmartPointer<vtkFloatArray>::New();
 		fltArray5->SetName("TagInfo");
+
+		vtkSmartPointer<vtkStringArray> strArray1 = 
+			vtkSmartPointer<vtkStringArray>::New();
+		strArray1->SetName("TagName");
+
 		for(int i = 0; i < MouseInteractorAdd::vectorTagInfo.size(); i++)
 		{
 			fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagType);
+			fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagIndex);
 			fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[0]);
 			fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[1]);
 			fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[2]);
+
+			strArray1->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagName.c_str());
 		}
 		if(MouseInteractorAdd::vectorTagInfo.size() != 0)
-			//finalPolyData->GetFieldData()->AddArray(fltArray5);
+		{
 			field->AddArray(fltArray5);
+			field->AddArray(strArray1);
+		}
+
 
 		vtkSmartPointer<vtkIntArray> intArray1 = 
 			vtkSmartPointer<vtkIntArray>::New();
@@ -622,6 +628,53 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		tri.triActor = actor;
 		MouseInteractorAdd::vectorTagTriangles.push_back(tri);
 		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actor);
+
+
+		//draw normal
+		double *n = new double[3];
+		triangle->ComputeNormal(MouseInteractorAdd::vectorTagPoints[tri.id1].pos, 
+			MouseInteractorAdd::vectorTagPoints[tri.id2].pos, 
+			MouseInteractorAdd::vectorTagPoints[tri.id3].pos, n);
+		double p2[3];
+		p2[0] = trianglePolyData->GetCenter()[0] + n[0];
+		p2[1] = trianglePolyData->GetCenter()[1] + n[1];
+		p2[2] = trianglePolyData->GetCenter()[2] + n[2];
+
+		vtkSmartPointer<vtkLineSource> lineSource = 
+			vtkSmartPointer<vtkLineSource>::New();
+		lineSource->SetPoint1(trianglePolyData->GetCenter());
+		lineSource->SetPoint2(p2);
+		lineSource->Update();
+
+		vtkSmartPointer<vtkSphereSource> sphereEndSource =
+			vtkSmartPointer<vtkSphereSource>::New();
+		sphereEndSource->SetCenter(p2);
+		sphereEndSource->SetRadius(0.3);
+		sphereEndSource->Update();
+
+		//Append the two meshes 
+		vtkSmartPointer<vtkAppendPolyData> appendFilter =
+			vtkSmartPointer<vtkAppendPolyData>::New();
+
+		appendFilter->AddInputConnection(lineSource->GetOutputPort());
+		appendFilter->AddInputConnection(sphereEndSource->GetOutputPort());
+		appendFilter->Update();
+
+		// Create mapper and actor
+		vtkSmartPointer<vtkPolyDataMapper> mapperNormal =
+			vtkSmartPointer<vtkPolyDataMapper>::New();
+#if VTK_MAJOR_VERSION <= 5
+		mapperNormal->SetInput(appendFilter->GetOutput());
+#else
+		mapperNormal->SetInputData(appendFilter->GetOutput());
+#endif
+		vtkSmartPointer<vtkActor> actorNormal =
+			vtkSmartPointer<vtkActor>::New();
+		actorNormal->SetMapper(mapperNormal);
+		actorNormal->GetProperty()->SetColor(0.3, 0.7, 0.7);
+
+		MouseInteractorAdd::triNormalActors.push_back(actorNormal);
+		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actorNormal);
 	}
 }
 
@@ -640,24 +693,22 @@ void EventQtSlotConnect::readCustomDataEdge(vtkFloatArray* edgeDBL)
 	}
 }
 
-void EventQtSlotConnect::readCustomDataTag(vtkFloatArray* tagDBL)
+void EventQtSlotConnect::readCustomDataTag(vtkFloatArray* tagDBL, vtkStringArray* tagStr)
 {
-	for(int i = 0; i < tagDBL->GetSize(); i += 4)
+	for(int i = 0, j = 0; i < tagDBL->GetSize(); i += 5, j++)
 	{
 		TagInfo info;
 		info.tagType = tagDBL->GetValue(i);
-		info.tagColor[0] = tagDBL->GetValue(i+1);
-		info.tagColor[1] = tagDBL->GetValue(i+2);
-		info.tagColor[2] = tagDBL->GetValue(i+3);
+		info.tagIndex = tagDBL->GetValue(i+1);
+		info.tagColor[0] = tagDBL->GetValue(i+2);
+		info.tagColor[1] = tagDBL->GetValue(i+3);
+		info.tagColor[2] = tagDBL->GetValue(i+4);
 		info.qc = QColor(info.tagColor[0], info.tagColor[1], info.tagColor[2]);
+		info.tagName = tagStr->GetValue(j).c_str();
 		MouseInteractorAdd::vectorTagInfo.push_back(info);
 
 		QPixmap pix(22,22);
-		int iSize = MouseInteractorAdd::vectorTagInfo.size();
-		std::stringstream ss;
-		ss << iSize;
-		std::string num = ss.str() + " ";
-		QString displayText = QString(num.c_str()) + " " + "";
+		QString displayText = QString::number(info.tagIndex) + " " + tagStr->GetValue(j);
 		pix.fill(info.qc);
 		this->comboBoxTagPoint->addItem(pix, displayText);
 	}
@@ -703,19 +754,24 @@ void EventQtSlotConnect::readCustomDataPoints(vtkFloatArray* ptsDBL)
 void EventQtSlotConnect::readCustomData(vtkPolyData *polydata)
 {
 	vtkFloatArray* labelDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("Label");
-	readCustomDataLabel(labelDBL);
-
-	vtkFloatArray* triDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagTriangles");
-	readCustomDataTri(triDBL);
-
-	vtkFloatArray* edgeDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagEdges");
-	readCustomDataEdge(edgeDBL);
+	readCustomDataLabel(labelDBL);	
 
 	vtkFloatArray* tagDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagInfo");
-	readCustomDataTag(tagDBL);
+	vtkStringArray* tagStr = (vtkStringArray*)polydata->GetFieldData()->GetAbstractArray("TagName");
+	std::cout<<" string size "<<tagStr->GetSize()<<std::endl;
+	readCustomDataTag(tagDBL, tagStr);
 
 	vtkFloatArray* ptsDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagPoints");
 	readCustomDataPoints(ptsDBL);
+	std::cout<<"after tag point"<<std::endl;
+
+	vtkFloatArray* triDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagTriangles");
+	readCustomDataTri(triDBL);
+	std::cout<<"after tri point"<<std::endl;
+
+	vtkFloatArray* edgeDBL = (vtkFloatArray*)polydata->GetFieldData()->GetArray("TagEdges");
+	readCustomDataEdge(edgeDBL);
+	std::cout<<"after tagEdge point"<<std::endl;
 }
 
 void EventQtSlotConnect::readVTK(std::string filename){

@@ -22,7 +22,6 @@ class AddTagDialog : public QDialog
 public:
     AddTagDialog(QWidget *parent = 0);
 
-//private:
     QLabel *label;
     QLineEdit *lineEdit;
 	QLabel *colorLabel;
@@ -43,12 +42,10 @@ public:
 	void setTagName(std::string);
 	void setTagColor(QColor);
 
-
 	private slots:
 		void accept();
 		void setColor();
-		void indexChanged(int);
-		
+		void indexChanged(int);		
 };
 //! [0]
 
