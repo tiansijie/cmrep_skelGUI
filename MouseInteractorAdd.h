@@ -58,6 +58,7 @@
 #include <vtkLineSource.h>
 #include <vtkArrowSource.h>
 
+
 #include <QtGui>
 
 #include "constants.h"
@@ -96,16 +97,19 @@ public:
 	int ConstrainEdge(int type1, int type2);
 	int PairNumber(int a, int b);
 	void DrawTriangle();
-	void DeleteTriangle(vtkActor* pickedActor);
+	void DeleteTriangle(double*);
 	vtkActor* PickActorFromMesh(double pos[3]);
 	vtkActor* PickActorFromTriangle(double pos[3]);
+	void FlipNormal(double*);
+	void AddPoint(double*);
+	void DeletePoint(double*);
+	void PickPointForTri(double*);
 
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
 	int deleteEdgeHelper2(int id, int seq);
 	void deleteEdge(int seq);
 	void setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator);
-	void flipNormal(vtkActor* pickedActor);
 	void reset();
 
 
@@ -121,12 +125,9 @@ public:
 		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
 		if(sucessPick != 0){//pick successful
 			double* pos = new double[3];
-			pos = picker->GetPickPosition();
-						 
-			//find the first actor
-			vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
-			vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));	
+			pos = picker->GetPickPosition();			
 			vtkRenderWindowInteractor *rwi = this->Interactor;
+
 			if(rwi->GetKeySym() != NULL && isSkeleton)
 			{
 				std::string key = rwi->GetKeySym();
@@ -134,138 +135,33 @@ public:
 				//for the adding point event
 				if( rwi->GetControlKey() && pos[0] != 0 && pos[1] != 0 && pos[2] != 0)
 				{
-					//see if there is any tag have been added
-					if(vectorTagInfo.size() != 0)
-					{
-						reset();
-						vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
-						//vtkdata->GetPointData()->GetAbstractArray("Radius");
-						vtkDoubleArray* radiusArray = (vtkDoubleArray*)vtkdata->GetPointData()->GetArray("Radius");
-						double minDistance = DBL_MAX;
-						double finalPos[3];
-						double pointRadius;
-						int pointSeq;
-						//finalPos[0] = pos[0]; finalPos[1] = pos[1]; finalPos[2] = pos[2];
-						for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
-							double p[3];
-							vtkdata->GetPoint(i,p);
-							double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
-							if(dist < minDistance){
-								minDistance = dist;
-								pointSeq = i;
-								finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
-								pointRadius = radiusArray->GetValue(i);
-							}
-						}
-						if(labelData[pointSeq] == 0.0){
-							std::cout << "Pick position (final position) is: "
-								<< finalPos[0] << " " << finalPos[1]
-							<< " " << finalPos[2] << std::endl;
-
-							//draw line if the number of selected points is more than 2
-							//DrawDelaunayTriangle();
-							//DrawRegularTriangle();
-
-							//Create a sphere
-							vtkSmartPointer<vtkSphereSource> sphereSource =
-								vtkSmartPointer<vtkSphereSource>::New();
-							sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
-							sphereSource->SetRadius(1.0);
-
-							//Create a mapper and actor
-							vtkSmartPointer<vtkPolyDataMapper> mapper =
-								vtkSmartPointer<vtkPolyDataMapper>::New();
-							mapper->SetInputConnection(sphereSource->GetOutputPort());
-
-							//QComboBox* cbTagPoint;// =  qtObject->getTagComboBox();
-							TagInfo ti = vectorTagInfo[selectedTag];
-							vtkSmartPointer<vtkActor> actor =
-								vtkSmartPointer<vtkActor>::New();
-							actor->SetMapper(mapper);
-							actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
-						
-							//store actor in vectorTagPoints
-							TagPoint actorT;
-							actorT.actor = actor;
-							actorT.typeIndex = ti.tagIndex;
-							actorT.comboBoxIndex = selectedTag;
-							//actorT.typeName = cbTagPoint->currentText().toStdString(); 
-							actorT.radius = pointRadius;
-							actorT.seq = pointSeq;
-							actorT.pos[0] = finalPos[0]; actorT.pos[1] = finalPos[1]; actorT.pos[2] = finalPos[2];
-							vectorTagPoints.push_back(actorT);
-
-							//calculate the biggest number of edges possibility
-							vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
-							
-							labelData[pointSeq] = ti.tagIndex;//selectedTag + 1;//cbTagPoint->currentIndex() + 1;
-						
-							/*if(vectorClassifyPoints.size() <= selectedTag/ *cbTagPoint->currentIndex()* /){
-								vectorClassifyPoints.resize(selectedTag/ *cbTagPoint->currentIndex()* / + 1);
-							}
-							vectorClassifyPoints[selectedTag/ *cbTagPoint->currentIndex()* /].push_back(actorT);*/
-
-							this->GetDefaultRenderer()->AddActor(actor);
-						}
-					}
-				}//end of control
-
-				//for delete point event
+					reset();
+					AddPoint(pos);
+				}				
 				else if(key.compare("s") == 0)
 				{
 					reset();
 					rwi->SetKeySym("");
-
-					vtkSmartPointer<vtkActor> pickedActor
-						= vtkSmartPointer<vtkActor>::New();
-
-					pickedActor = PickActorFromMesh(pos);
-
-					//erase from vectorTagPoints and color other points
-					for(int i = 0; i < vectorTagPoints.size(); i++){
-						TagPoint at = vectorTagPoints[i];
-						double* acotrPos = new double[3];
-						acotrPos = at.actor->GetPosition();
-						if(pickedActor != at.actor){							
-							at.actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
-								vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
-								vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
-						}					
-						else{
-							/*for(int j = 0; j < vectorClassifyPoints[vectorTagPoints[i].typeIndex].size(); j++){
-								if(vectorClassifyPoints[vectorTagPoints[i].typeIndex][j].actor == at.actor){
-									vectorClassifyPoints[vectorTagPoints[i].typeIndex].erase(vectorClassifyPoints[vectorTagPoints[i].typeIndex].begin()
-										+ j);
-								}
-							}*/
-							labelData[vectorTagPoints[i].seq] = 0.0;							
-							deleteEdge(i);
-							
-							vectorTagPoints.erase(vectorTagPoints.begin() + i);
-
-							////find triangle and delete triangle
-							/*for(int j = 0; j < vectorTagTriangles.size(); j++)
-							{
-								if(vectorTagTriangles[j].id1 == i || vectorTagTriangles[j].id2 == i || vectorTagTriangles[j].id3 == i){
-									//DeleteTriangle(vectorTagTriangles[j].triActor);
-									this->GetDefaultRenderer()->RemoveActor(vectorTagTriangles[j].triActor);
-									vectorTagTriangles.erase(vectorTagTriangles.begin() + j);
-									j--;
-								}
-							}*/
-
-							vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
-							this->GetDefaultRenderer()->RemoveActor(pickedActor);
-							//DrawDelaunayTriangle();
-							//DrawRegularTriangle();
-							i--;
-						}
-					}
-					std::cout<<"you are out"<<std::endl;
-				}//end of s
-
-				
-				else if(key.compare("t") == 0)
+					DeletePoint(pos);	//for delete point event				
+				}								
+				else if(key.compare("q") == 0)
+				{
+					rwi->SetKeySym("");
+					PickPointForTri(pos);
+				}
+				else if(key.compare("b") == 0)
+				{
+					reset();
+					rwi->SetKeySym("");					
+					FlipNormal(pos);
+				}
+				else if(key.compare("d") == 0)
+				{
+					reset();		
+					rwi->SetKeySym("");	
+					DeleteTriangle(pos);					
+				}
+				/*else if(key.compare("t") == 0)
 				{
 					reset();
 					rwi->SetKeySym("");
@@ -273,7 +169,7 @@ public:
 					vtkActor *actor = picker->GetActor();
 					vtkActorCollection* acotrCollection = this->GetDefaultRenderer()->GetActors();
 					acotrCollection->InitTraversal();
-					
+
 					if(actor != acotrCollection->GetNextActor()){//except for the skeleton
 						for(int i = 0; i < vectorTagTriangles.size(); i++){
 							if(actor == vectorTagTriangles[i].triActor){
@@ -285,61 +181,7 @@ public:
 							}
 						}												
 					}					
-				}//end of t
-
-				else if(key.compare("q") == 0)
-				{
-					rwi->SetKeySym("");
-
-					vtkSmartPointer<vtkActor> pickedActor
-						= vtkSmartPointer<vtkActor>::New();
-
-					pickedActor = PickActorFromMesh(pos);
-
-					if(pickedActor != NULL){
-						for(int i = 0; i < vectorTagPoints.size(); i++){
-							TagPoint at = vectorTagPoints[i];
-							if(pickedActor == at.actor){	
-								pickedActor->GetProperty()->SetColor(1,1,1);
-								triPtIds.push_back(i);
-							}
-						}
-
-						if(triPtIds.size() == 3){
-							DrawTriangle();
-							for(int i = 0; i < triPtIds.size(); i++){
-								TagPoint at = vectorTagPoints[triPtIds[i]];
-								vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
-									vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
-									vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
-							}
-							triPtIds.resize(0);
-						}
-					}
-				}// end of q
-
-				else if(key.compare("b") == 0)
-				{
-					reset();
-					rwi->SetKeySym("");
-
-					vtkSmartPointer<vtkActor> pickedActor
-						= vtkSmartPointer<vtkActor>::New();
-					pickedActor = PickActorFromTriangle(pos);
-					flipNormal(pickedActor);
-				}
-
-				else if(key.compare("d") == 0)
-				{
-					reset();
-					rwi->SetKeySym("");
-
-					vtkSmartPointer<vtkActor> pickedActor
-						= vtkSmartPointer<vtkActor>::New();
-
-					pickedActor = PickActorFromTriangle(pos);
-					DeleteTriangle(pickedActor);
-				}
+				}*/
 			}//end of key press
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();				

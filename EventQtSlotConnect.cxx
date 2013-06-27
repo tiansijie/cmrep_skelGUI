@@ -53,6 +53,7 @@
 #include <sstream>
 #include <vtkFloatArray.h>
 #include <vtkIntArray.h>
+#include <vtkStringArray.h>
 
 
 double pointColor[3];
@@ -708,7 +709,7 @@ void EventQtSlotConnect::readCustomDataTag(vtkFloatArray* tagDBL, vtkStringArray
 		MouseInteractorAdd::vectorTagInfo.push_back(info);
 
 		QPixmap pix(22,22);
-		QString displayText = QString::number(info.tagIndex) + " " + tagStr->GetValue(j);
+		QString displayText = QString::number(info.tagIndex) + QString::fromStdString(" ") + (tagStr->GetValue(j));
 		pix.fill(info.qc);
 		this->comboBoxTagPoint->addItem(pix, displayText);
 	}
@@ -853,6 +854,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	MouseInteractorAdd::vectorTagTriangles.clear();
 	MouseInteractorAdd::vectorTagEdges.clear();
 	MouseInteractorAdd::vectorTagInfo.clear();
+	MouseInteractorAdd::triNormalActors.clear();
 	MouseInteractorAdd::selectedTag = 0;
 	this->comboBoxTagPoint->clear();
 
