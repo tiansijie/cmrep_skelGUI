@@ -58,6 +58,11 @@
 #include <vtkLineSource.h>
 #include <vtkArrowSource.h>
 
+#include <vtkAffineWidget.h>
+#include <vtkAffineRepresentation2D.h>
+#include <vtkCommand.h>
+#include <vtkTransform.h>
+#include <vtkObject.h>
 
 #include <QtGui>
 
@@ -69,7 +74,7 @@ class MouseInteractorAdd : public vtkInteractorStyleTrackballCamera
 {
 public:
 	static MouseInteractorAdd* New();
-	vtkTypeMacro(MouseInteractorAdd, vtkInteractorStyleTrackballCamera);	
+	vtkTypeMacro(MouseInteractorAdd, vtkInteractorStyleTrackballCamera);
 
 	MouseInteractorAdd();
 	//EventQtSlotConnect *qtObject;
@@ -111,9 +116,7 @@ public:
 	void deleteEdge(int seq);
 	void setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator);
 	void reset();
-
-
-
+	
 	virtual void OnLeftButtonDown()
 	{		
 		int* clickPos = new int[2];
@@ -186,7 +189,6 @@ public:
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();				
 	}
-
 private:
 	double triCol[3];
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;

@@ -163,7 +163,8 @@ void EventQtSlotConnect::slot_save(){
 	vtkSmartPointer<vtkGenericDataObjectWriter> writer = 
 		vtkSmartPointer<vtkGenericDataObjectWriter>::New();
 	if (!fileName.isEmpty()){
-		writer->SetFileName(fileName.toStdString().c_str());	
+		writer->SetFileName((fileName.toStdString().substr(0, fileName.toStdString().length() - 4)).append("Affix.vtk").c_str());	
+		
 
 		vtkSmartPointer<vtkPolyData> finalPolyData =
 			vtkSmartPointer<vtkPolyData>::New();
@@ -324,7 +325,7 @@ void EventQtSlotConnect::slot_save(){
 		vtkSmartPointer<vtkGenericDataObjectWriter> writerParaView = 
 			vtkSmartPointer<vtkGenericDataObjectWriter>::New();
 
-		writerParaView->SetFileName((fileName.toStdString().substr(0, fileName.toStdString().length() - 4)).append("ParaView.vtk").c_str());
+		writerParaView->SetFileName(fileName.toStdString().c_str());
 		//Append the two meshes 
 		vtkSmartPointer<vtkAppendPolyData> appendFilter =
 			vtkSmartPointer<vtkAppendPolyData>::New();

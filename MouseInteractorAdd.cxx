@@ -11,6 +11,31 @@ std::vector<vtkActor*> MouseInteractorAdd::triNormalActors;
 bool MouseInteractorAdd::isSkeleton;
 int MouseInteractorAdd::selectedTag;
 
+class vtkAffineCallback : public vtkCommand
+{
+public:
+	static vtkAffineCallback *New() 
+	{ return new vtkAffineCallback; }
+	virtual void Execute(vtkObject *caller, unsigned long, void*);
+	vtkAffineCallback():Actor(0),AffineRep(0) 
+	{
+		this->Transform = vtkTransform::New();
+	}
+	~vtkAffineCallback()
+	{
+		this->Transform->Delete();
+	}
+	vtkActor *Actor;
+	vtkAffineRepresentation2D *AffineRep;
+	vtkTransform *Transform;
+};
+
+void vtkAffineCallback::Execute(vtkObject*, unsigned long vtkNotUsed(event), void*)
+{
+	this->AffineRep->GetTransform(this->Transform);
+	this->Actor->SetUserTransform(this->Transform);
+}
+
 MouseInteractorAdd::MouseInteractorAdd(){
 	selectedTriangle = NULL;
 //	qtObject = NULL;
@@ -518,6 +543,27 @@ void MouseInteractorAdd::AddPoint(double* pos)
 			vectorClassifyPoints[selectedTag/ *cbTagPoint->currentIndex()* /].push_back(actorT);*/
 
 			this->GetDefaultRenderer()->AddActor(actor);
+
+			// Create an affine widget to manipulate the actor
+			// the widget currently only has a 2D representation and therefore applies transforms in the X-Y plane only
+			/*vtkSmartPointer<vtkAffineWidget> affineWidget = 
+			vtkSmartPointer<vtkAffineWidget>::New();
+			affineWidget->SetInteractor(this->GetInteractor());
+			affineWidget->CreateDefaultRepresentation();
+			vtkAffineRepresentation2D::SafeDownCast(affineWidget->GetRepresentation())->PlaceWidget(actor->GetBounds());
+
+
+			vtkSmartPointer<vtkAffineCallback> affineCallback = 
+			vtkSmartPointer<vtkAffineCallback>::New();
+			affineCallback->Actor = actor;
+			affineCallback->AffineRep = vtkAffineRepresentation2D::SafeDownCast(affineWidget->GetRepresentation());
+
+			affineWidget->AddObserver(vtkCommand::InteractionEvent,affineCallback);
+			affineWidget->AddObserver(vtkCommand::EndInteractionEvent,affineCallback);
+
+
+			affineWidget->On();
+			affineWidget->Render();*/
 		}
 	}
 }
