@@ -10,6 +10,9 @@ std::vector<double> MouseInteractorAdd::labelData;
 std::vector<vtkActor*> MouseInteractorAdd::triNormalActors;
 bool MouseInteractorAdd::isSkeleton;
 int MouseInteractorAdd::selectedTag;
+double MouseInteractorAdd::triCol[3];
+double MouseInteractorAdd::backCol[3];
+
 
 class vtkAffineCallback : public vtkCommand
 {
@@ -38,8 +41,9 @@ void vtkAffineCallback::Execute(vtkObject*, unsigned long vtkNotUsed(event), voi
 
 MouseInteractorAdd::MouseInteractorAdd(){
 	selectedTriangle = NULL;
-//	qtObject = NULL;
-	triCol[0] = 0.2; triCol[1] = 0.2; triCol[2] = 0.7;
+	triCol[0] = 0.2; triCol[1] = 0.7; triCol[2] = 0.2;
+	backCol[0] = 0.4; backCol[1] = 0.4; backCol[2] = 0.4;
+	drawTriMode = false;
 }
 
 double MouseInteractorAdd::Distance(double p1[3], double p2[3]){
@@ -218,6 +222,11 @@ void MouseInteractorAdd::DrawTriangle()
 	actor->GetProperty()->SetEdgeVisibility(true);
 	actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
 	actor->GetProperty()->SetColor(triCol);
+	vtkSmartPointer<vtkProperty> backPro = 
+		vtkSmartPointer<vtkProperty>::New();
+	backPro->SetColor(backCol);
+	actor->SetBackfaceProperty(backPro);
+
 
 	for(int i = 0; i < vectorTagTriangles.size(); i++)
 	{
@@ -242,9 +251,11 @@ void MouseInteractorAdd::DrawTriangle()
 	tri.seq2 = vectorTagPoints[triPtIds[1]].seq;
 	tri.seq3 = vectorTagPoints[triPtIds[2]].seq;
 	vectorTagTriangles.push_back(tri);
-	this->GetDefaultRenderer()->AddActor(actor);	
+	this->GetDefaultRenderer()->AddActor(actor);
 
-	//draw normal
+
+	setLabelTriNum();
+	/*//draw normal
 	double p2[3];
 	p2[0] = trianglePolyData->GetCenter()[0] + result[0];
 	p2[1] = trianglePolyData->GetCenter()[1] + result[1];
@@ -284,7 +295,7 @@ void MouseInteractorAdd::DrawTriangle()
 	actorNormal->GetProperty()->SetColor(0.3, 0.7, 0.7);
 
 	triNormalActors.push_back(actorNormal);
-	this->GetDefaultRenderer()->AddActor(actorNormal);
+	this->GetDefaultRenderer()->AddActor(actorNormal);*/
 }
 
 void MouseInteractorAdd::DeleteTriangle(double* pos){
@@ -306,12 +317,13 @@ void MouseInteractorAdd::DeleteTriangle(double* pos){
 				vectorTagEdges[PairNumber(vectorTagTriangles[i].id3, vectorTagTriangles[i].id2)].numEdge--;
 				vectorTagEdges[PairNumber(vectorTagTriangles[i].id1, vectorTagTriangles[i].id3)].numEdge--;
 				this->GetDefaultRenderer()->RemoveActor(pickedActor);
-				this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
+				//this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
 				vectorTagTriangles.erase(vectorTagTriangles.begin() + i);
-				triNormalActors.erase(triNormalActors.begin() + i);
+				//triNormalActors.erase(triNormalActors.begin() + i);
 				i--;
 			}
 		}
+		setLabelTriNum();
 	}
 }
 	
@@ -372,7 +384,7 @@ void MouseInteractorAdd::FlipNormal(double* pos)
 
 			//remove the original triangle
 			this->GetDefaultRenderer()->RemoveActor(pickedActor);
-			this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
+			//this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
 
 			//create new triangle
 			vtkSmartPointer<vtkPoints> pts =
@@ -417,12 +429,16 @@ void MouseInteractorAdd::FlipNormal(double* pos)
 			actor->GetProperty()->SetEdgeVisibility(true);
 			actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
 			actor->GetProperty()->SetColor(triCol);
+			vtkSmartPointer<vtkProperty> backPro = 
+				vtkSmartPointer<vtkProperty>::New();
+			backPro->SetColor(backCol);
+			actor->SetBackfaceProperty(backPro);
 
 			vectorTagTriangles[i].triActor = actor;
 
 			this->GetDefaultRenderer()->AddActor(actor);
 
-			//draw normal
+			/*//draw normal
 			double p2[3];
 			p2[0] = trianglePolyData->GetCenter()[0] + n[0];
 			p2[1] = trianglePolyData->GetCenter()[1] + n[1];
@@ -462,7 +478,7 @@ void MouseInteractorAdd::FlipNormal(double* pos)
 			actorNormal->GetProperty()->SetColor(0.3, 0.7, 0.7);
 
 			triNormalActors[i] = actorNormal;
-			this->GetDefaultRenderer()->AddActor(actorNormal);
+			this->GetDefaultRenderer()->AddActor(actorNormal);*/
 		}
 	}
 }
@@ -544,26 +560,7 @@ void MouseInteractorAdd::AddPoint(double* pos)
 
 			this->GetDefaultRenderer()->AddActor(actor);
 
-			// Create an affine widget to manipulate the actor
-			// the widget currently only has a 2D representation and therefore applies transforms in the X-Y plane only
-			/*vtkSmartPointer<vtkAffineWidget> affineWidget = 
-			vtkSmartPointer<vtkAffineWidget>::New();
-			affineWidget->SetInteractor(this->GetInteractor());
-			affineWidget->CreateDefaultRepresentation();
-			vtkAffineRepresentation2D::SafeDownCast(affineWidget->GetRepresentation())->PlaceWidget(actor->GetBounds());
-
-
-			vtkSmartPointer<vtkAffineCallback> affineCallback = 
-			vtkSmartPointer<vtkAffineCallback>::New();
-			affineCallback->Actor = actor;
-			affineCallback->AffineRep = vtkAffineRepresentation2D::SafeDownCast(affineWidget->GetRepresentation());
-
-			affineWidget->AddObserver(vtkCommand::InteractionEvent,affineCallback);
-			affineWidget->AddObserver(vtkCommand::EndInteractionEvent,affineCallback);
-
-
-			affineWidget->On();
-			affineWidget->Render();*/
+			setLabelPtNum();
 		}
 	}
 }
@@ -596,17 +593,9 @@ void MouseInteractorAdd::DeletePoint(double* pos)
 			deleteEdge(i);
 							
 			vectorTagPoints.erase(vectorTagPoints.begin() + i);
-
-			////find triangle and delete triangle
-			/*for(int j = 0; j < vectorTagTriangles.size(); j++)
-			{
-				if(vectorTagTriangles[j].id1 == i || vectorTagTriangles[j].id2 == i || vectorTagTriangles[j].id3 == i){
-					//DeleteTriangle(vectorTagTriangles[j].triActor);
-					this->GetDefaultRenderer()->RemoveActor(vectorTagTriangles[j].triActor);
-					vectorTagTriangles.erase(vectorTagTriangles.begin() + j);
-					j--;
-				}
-			}*/
+			
+			setLabelPtNum();
+			setLabelTriNum();
 
 			vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
 			this->GetDefaultRenderer()->RemoveActor(pickedActor);
@@ -643,6 +632,8 @@ void MouseInteractorAdd::PickPointForTri(double* pos)
 					vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
 			}
 			triPtIds.resize(0);
+			this->Interactor->SetKeySym("");
+			drawTriMode = false;
 		}
 	}
 }
@@ -718,8 +709,8 @@ void MouseInteractorAdd::deleteEdge(int seq)
 			clearEdgeId.push_back(d2);
 			//std::cout<<"0 id"<<nori<<" "<<d1<<" "<<d2<<std::endl;
 			this->GetDefaultRenderer()->RemoveActor(vectorTagTriangles[i].triActor);
-			this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
-			triNormalActors.erase(triNormalActors.begin() + i);
+			//this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
+			//triNormalActors.erase(triNormalActors.begin() + i);
 			vectorTagTriangles.erase(vectorTagTriangles.begin() + i);
 			i--;
 		}
@@ -777,6 +768,7 @@ void MouseInteractorAdd::deleteEdge(int seq)
 
 void MouseInteractorAdd::reset()
 {
+	drawTriMode = false;
 	for(int i = 0; i < triPtIds.size(); i++){
 		TagPoint at = vectorTagPoints[triPtIds[i]];
 		vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
@@ -786,4 +778,13 @@ void MouseInteractorAdd::reset()
 	triPtIds.resize(0);
 }
 
+void MouseInteractorAdd::setLabelPtNum()
+{
+	labelPtNumber->setText(QString::number(vectorTagPoints.size()));
+}
+
+void MouseInteractorAdd::setLabelTriNum()
+{
+	labelTriNumber->setText(QString::number(vectorTagTriangles.size()));
+}
 vtkStandardNewMacro(MouseInteractorAdd);

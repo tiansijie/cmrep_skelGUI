@@ -85,6 +85,9 @@ public:
 	vtkActor *selectedTriangle;
 	vtkActor *prePolyLineActor;
 
+	QLabel *labelPtNumber;
+	QLabel *labelTriNumber;
+
 	static std::vector<TagInfo> vectorTagInfo;
 	static std::vector<TagTriangle> vectorTagTriangles;
 	static std::vector<TagPoint> vectorTagPoints;
@@ -95,6 +98,9 @@ public:
 	static std::vector<vtkActor*> triNormalActors;
 	static bool isSkeleton;
 	static int selectedTag;
+
+	static double triCol[3];
+	static double backCol[3];
 	
 
 	double Distance(double p1[3], double p2[3]);
@@ -115,10 +121,12 @@ public:
 	int deleteEdgeHelper2(int id, int seq);
 	void deleteEdge(int seq);
 	void setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator);
+	void setLabelTriNum();
+	void setLabelPtNum();
 	void reset();
 	
 	virtual void OnLeftButtonDown()
-	{		
+	{
 		int* clickPos = new int[2];
 		clickPos = this->GetInteractor()->GetEventPosition();
 		// Pick from this location.
@@ -126,7 +134,8 @@ public:
 			vtkSmartPointer<vtkPropPicker>::New();
 
 		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
-		if(sucessPick != 0){//pick successful
+		if(sucessPick != 0)//pick successful
+		{
 			double* pos = new double[3];
 			pos = picker->GetPickPosition();			
 			vtkRenderWindowInteractor *rwi = this->Interactor;
@@ -134,63 +143,46 @@ public:
 			if(rwi->GetKeySym() != NULL && isSkeleton)
 			{
 				std::string key = rwi->GetKeySym();
-
 				//for the adding point event
 				if( rwi->GetControlKey() && pos[0] != 0 && pos[1] != 0 && pos[2] != 0)
 				{
 					reset();
 					AddPoint(pos);
 				}				
-				else if(key.compare("s") == 0)
+				else if(key.compare("s") == 0 || key.compare("S") == 0)
 				{
 					reset();
-					rwi->SetKeySym("");
 					DeletePoint(pos);	//for delete point event				
 				}								
-				else if(key.compare("q") == 0)
+				else if(key.compare("q") == 0 || key.compare("Q") == 0 || drawTriMode)
 				{
-					rwi->SetKeySym("");
+					drawTriMode = true;
 					PickPointForTri(pos);
 				}
-				else if(key.compare("b") == 0)
+				else if(key.compare("b") == 0 || key.compare("B") == 0)
 				{
 					reset();
-					rwi->SetKeySym("");					
 					FlipNormal(pos);
 				}
-				else if(key.compare("d") == 0)
-				{
-					reset();		
-					rwi->SetKeySym("");	
-					DeleteTriangle(pos);					
-				}
-				/*else if(key.compare("t") == 0)
+				else if(key.compare("d") == 0 || key.compare("D") == 0)
 				{
 					reset();
-					rwi->SetKeySym("");
-					std::cout<<"Tri in"<<std::endl;
-					vtkActor *actor = picker->GetActor();
-					vtkActorCollection* acotrCollection = this->GetDefaultRenderer()->GetActors();
-					acotrCollection->InitTraversal();
-
-					if(actor != acotrCollection->GetNextActor()){//except for the skeleton
-						for(int i = 0; i < vectorTagTriangles.size(); i++){
-							if(actor == vectorTagTriangles[i].triActor){
-								selectedTriangle = actor;
-								selectedTriangle->GetProperty()->SetColor(1,1,0);
-							}
-							else{
-								vectorTagTriangles[i].triActor->GetProperty()->SetColor(triCol);
-							}
-						}												
-					}					
-				}*/
+					DeleteTriangle(pos);					
+				}
 			}//end of key press
 		}
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();				
 	}
+
+	void OnKeyRelease()
+	{
+		std::string key = this->Interactor->GetKeySym();
+		if(key.compare("q") != 0 && key.compare("Q") != 0)
+			this->Interactor->SetKeySym("");
+	}
+
 private:
-	double triCol[3];
+	bool drawTriMode;
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
 };
 #endif

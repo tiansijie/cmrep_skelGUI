@@ -79,6 +79,7 @@ EventQtSlotConnect::EventQtSlotConnect()
   this->connect(this->checkBoxHideSkel, SIGNAL(stateChanged(int)), this, SLOT(slot_skelStateChange(int)));
   this->connect(this->pushButtonAddTag, SIGNAL(clicked()), this, SLOT(slot_addTag()));
   this->connect(this->comboBoxTagPoint, SIGNAL(activated(int)), this, SLOT(slot_comboxChanged(int)));
+  this->PointNumber;
 };
 
 void EventQtSlotConnect::slot_addTag(){
@@ -321,7 +322,7 @@ void EventQtSlotConnect::slot_save(){
 		writer->Write();
 
 
-		//save another file for ParaView
+		//////////////save another file for ParaView////////////////////
 		vtkSmartPointer<vtkGenericDataObjectWriter> writerParaView = 
 			vtkSmartPointer<vtkGenericDataObjectWriter>::New();
 
@@ -618,11 +619,15 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		vtkSmartPointer<vtkActor> actor =
 			vtkSmartPointer<vtkActor>::New();
 		actor->SetMapper(mapper);
-		double triCol[3];
-		triCol[0] = 0.2; triCol[1] = 0.2; triCol[2] = 0.7;
-		actor->GetProperty()->SetColor(triCol);
+		actor->GetProperty()->SetColor(MouseInteractorAdd::triCol);
 		actor->GetProperty()->EdgeVisibilityOn();
 		actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
+		vtkSmartPointer<vtkProperty> backPro = 
+			vtkSmartPointer<vtkProperty>::New();
+		backPro->SetColor(MouseInteractorAdd::backCol);
+		actor->SetBackfaceProperty(backPro);
+
+		
 
 		tri.centerPos[0] = actor->GetCenter()[0];
 		tri.centerPos[1] = actor->GetCenter()[1];
@@ -632,7 +637,7 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actor);
 
 
-		//draw normal
+		/*//draw normal
 		double *n = new double[3];
 		triangle->ComputeNormal(MouseInteractorAdd::vectorTagPoints[tri.id1].pos, 
 			MouseInteractorAdd::vectorTagPoints[tri.id2].pos, 
@@ -676,7 +681,7 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		actorNormal->GetProperty()->SetColor(0.3, 0.7, 0.7);
 
 		MouseInteractorAdd::triNormalActors.push_back(actorNormal);
-		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actorNormal);
+		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actorNormal);*/
 	}
 }
 
@@ -848,6 +853,8 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	vtkSmartPointer<MouseInteractorAdd> style = vtkSmartPointer<MouseInteractorAdd>::New();
 //	style->qtObject = this;
 	style->SetDefaultRenderer(renderer);
+	style->labelTriNumber = this->TriangleNumber;
+	style->labelPtNumber = this->PointNumber;
 
 	//reset everything
 	MouseInteractorAdd::vectorTagPoints.clear();
@@ -891,5 +898,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	if(triDBL != NULL)
 	{
 		readCustomData(polydata);
+		this->PointNumber->setText(QString::number(MouseInteractorAdd::vectorTagPoints.size()));
+		this->TriangleNumber->setText(QString::number(MouseInteractorAdd::vectorTagTriangles.size()));
 	}
 }
