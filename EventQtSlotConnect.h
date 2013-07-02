@@ -45,6 +45,7 @@ public slots:
 	void slot_position(double x, double y, double z);
 	void slot_finished();
 	void slot_skelStateChange(int);
+	void slot_meshStateChange(int);
 	void slot_addTag();
 	void slot_comboxChanged(int);
 

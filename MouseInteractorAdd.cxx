@@ -71,7 +71,7 @@ int MouseInteractorAdd::ConstrainEdge(int type1, int type2)
 		return 2;
 	else if((type1 == 1 && type2 == 2) || (type1 == 2 && type2 == 1))
 		return 2;
-	else if((type1 == 1 && type2 == 3) || (type1 == 1 && type2 == 3))
+	else if((type1 == 1 && type2 == 3) || (type1 == 3 && type2 == 1))
 		return 2;
 	else if((type1 == 2 && type2 == 3) || (type1 == 3 && type2 == 2))
 		return 2;
@@ -88,11 +88,29 @@ void MouseInteractorAdd::setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> 
 	this->normalGenerator = normalGenerator;
 }
 
-void MouseInteractorAdd::DrawTriangle()
+int MouseInteractorAdd::DrawTriangle()
 {
 	int id1 = triPtIds[0], id2 = triPtIds[1], id3 = triPtIds[2];
 	if(id1 == id2 || id1 == id3 || id2 == id3)
-		return;	
+		return 0;	
+
+	int edgeid1 = PairNumber(triPtIds[0], triPtIds[1]);//id
+	int edgeid2 = PairNumber(triPtIds[1], triPtIds[2]);
+	int edgeid3 = PairNumber(triPtIds[2], triPtIds[0]);
+	std::cout<<"ID "<<id1<<" "<<id2<<" "<<id3<<std::endl;
+	int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType);
+	int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+	int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+
+	if(vectorTagEdges[edgeid1].numEdge >= cons1){		
+		return 0;
+	}
+	else if(vectorTagEdges[edgeid2].numEdge >= cons2){
+		return 0;
+	}
+	else if(vectorTagEdges[edgeid3].numEdge >= cons3){
+		return 0;
+	}
 	
 	vtkSmartPointer<vtkPolyData> normalPolyData = normalGenerator->GetOutput();
 	
@@ -102,9 +120,6 @@ void MouseInteractorAdd::DrawTriangle()
 	if(normalDataFloat)
 	{
 		int nc = normalDataFloat->GetNumberOfTuples();
-		std::cout << "There are " << nc
-			<< " components in normalDataFloat" << std::endl;
-
 		float *normal1 = new float[3];
 		normalDataFloat->GetTupleValue(vectorTagPoints[id1].seq, normal1);
 		float *normal2 = new float[3];
@@ -133,7 +148,6 @@ void MouseInteractorAdd::DrawTriangle()
 		float cos = vtkMath::Dot(result, normalAverage);
 
 		if(cos < 0){//need to swap
-			std::cout<<"Need to swap"<<std::endl;
 			int tempid = triPtIds[1];
 			triPtIds[1] = triPtIds[2];
 			triPtIds[2] = tempid;
@@ -141,8 +155,6 @@ void MouseInteractorAdd::DrawTriangle()
 			id2 = id3;
 			id3 = tempid;
 		}		
-		std::cout<<"see this result "<<result[0]<<" "<<result[1]<<" "<<result[2]<<std::endl;
-
 		d1[0] = vectorTagPoints[id2].pos[0] - vectorTagPoints[id1].pos[0];
 		d1[1] = vectorTagPoints[id2].pos[1] - vectorTagPoints[id1].pos[1];
 		d1[2] = vectorTagPoints[id2].pos[2] - vectorTagPoints[id1].pos[2];
@@ -151,26 +163,9 @@ void MouseInteractorAdd::DrawTriangle()
 		d2[2] = vectorTagPoints[id3].pos[2] - vectorTagPoints[id2].pos[2];
 		vtkMath::Cross(d1, d2, result);		
 		vtkMath::Normalize(result);
-
-		std::cout<<"after see this result "<<result[0]<<" "<<result[1]<<" "<<result[2]<<std::endl;
-		std::cout<<"see this normalAverage "<<normalAverage[0]<<" "<<normalAverage[1]<<" "<<normalAverage[2]<<std::endl;
 	}
 		
-	int edgeid1 = PairNumber(triPtIds[0], triPtIds[1]);//id
-	int edgeid2 = PairNumber(triPtIds[1], triPtIds[2]);
-	int edgeid3 = PairNumber(triPtIds[2], triPtIds[0]);
-	std::cout<<"ID "<<id1<<" "<<id2<<" "<<id3<<std::endl;
-	//std::cout<<"Pair N "<<edgeid1<<" "<<edgeid2<<" "<<edgeid3<<std::endl;
-	int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType);
-	int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
-	int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
-
-	if(vectorTagEdges[edgeid1].numEdge >= cons1)
-		return;
-	else if(vectorTagEdges[edgeid2].numEdge >= cons2)
-		return;
-	else if(vectorTagEdges[edgeid3].numEdge >= cons3)
-		return;
+	
 
 	vectorTagEdges[edgeid1].numEdge++;
 	vectorTagEdges[edgeid1].ptId1 = triPtIds[0]; vectorTagEdges[edgeid1].ptId2 = triPtIds[1];
@@ -233,7 +228,7 @@ void MouseInteractorAdd::DrawTriangle()
 		if(vectorTagTriangles[i].centerPos[0] == actor->GetCenter()[0] &&
 			vectorTagTriangles[i].centerPos[1] == actor->GetCenter()[1] &&
 			vectorTagTriangles[i].centerPos[2] == actor->GetCenter()[2]){
-			return;
+			return 0;
 			std::cout<<"same tri"<<std::endl;
 		}
 	}
@@ -255,6 +250,8 @@ void MouseInteractorAdd::DrawTriangle()
 
 
 	setLabelTriNum();
+
+	return 1;
 	/*//draw normal
 	double p2[3];
 	p2[0] = trianglePolyData->GetCenter()[0] + result[0];
@@ -607,7 +604,7 @@ void MouseInteractorAdd::DeletePoint(double* pos)
 	std::cout<<"you are out"<<std::endl;
 }
 
-void MouseInteractorAdd::PickPointForTri(double* pos)
+int MouseInteractorAdd::PickPointForTri(double* pos)
 {
 	vtkSmartPointer<vtkActor> pickedActor
 		= vtkSmartPointer<vtkActor>::New();
@@ -624,7 +621,7 @@ void MouseInteractorAdd::PickPointForTri(double* pos)
 		}
 
 		if(triPtIds.size() == 3){
-			DrawTriangle();
+			int reVal = DrawTriangle();			
 			for(int i = 0; i < triPtIds.size(); i++){
 				TagPoint at = vectorTagPoints[triPtIds[i]];
 				vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
@@ -634,8 +631,10 @@ void MouseInteractorAdd::PickPointForTri(double* pos)
 			triPtIds.resize(0);
 			this->Interactor->SetKeySym("");
 			drawTriMode = false;
+			return reVal;
 		}
 	}
+	return 1;
 }
 
 void MouseInteractorAdd::copyEdgeBtoA(int a, int b){

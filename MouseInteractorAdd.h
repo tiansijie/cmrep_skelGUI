@@ -107,14 +107,14 @@ public:
 	void SetSelectedTriColor();
 	int ConstrainEdge(int type1, int type2);
 	int PairNumber(int a, int b);
-	void DrawTriangle();
+	int DrawTriangle();
 	void DeleteTriangle(double*);
 	vtkActor* PickActorFromMesh(double pos[3]);
 	vtkActor* PickActorFromTriangle(double pos[3]);
 	void FlipNormal(double*);
 	void AddPoint(double*);
 	void DeletePoint(double*);
-	void PickPointForTri(double*);
+	int PickPointForTri(double*);
 
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
@@ -132,6 +132,8 @@ public:
 		// Pick from this location.
 		vtkSmartPointer<vtkPropPicker>  picker =
 			vtkSmartPointer<vtkPropPicker>::New();
+
+		int con = 1;
 
 		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
 		if(sucessPick != 0)//pick successful
@@ -157,7 +159,11 @@ public:
 				else if(key.compare("q") == 0 || key.compare("Q") == 0 || drawTriMode)
 				{
 					drawTriMode = true;
-					PickPointForTri(pos);
+					con = PickPointForTri(pos);
+					if(con == 0){
+						QMessageBox messageBox;
+						messageBox.critical(0,"Error","Triangle Violation");
+					}
 				}
 				else if(key.compare("b") == 0 || key.compare("B") == 0)
 				{
@@ -170,8 +176,9 @@ public:
 					DeleteTriangle(pos);					
 				}
 			}//end of key press
-		}
-		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();				
+		}		
+		if(con != 0)
+			vtkInteractorStyleTrackballCamera::OnLeftButtonDown();		
 	}
 
 	void OnKeyRelease()

@@ -54,6 +54,7 @@
 #include <vtkFloatArray.h>
 #include <vtkIntArray.h>
 #include <vtkStringArray.h>
+#include <algorithm>
 
 
 double pointColor[3];
@@ -77,6 +78,7 @@ EventQtSlotConnect::EventQtSlotConnect()
   this->connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slot_finished()));
   this->connect(this->cmrepVskel, SIGNAL(clicked()), this, SLOT(executeCmrepVskel()));
   this->connect(this->checkBoxHideSkel, SIGNAL(stateChanged(int)), this, SLOT(slot_skelStateChange(int)));
+  this->connect(this->checkBoxHideMesh, SIGNAL(stateChanged(int)), this, SLOT(slot_meshStateChange(int)));
   this->connect(this->pushButtonAddTag, SIGNAL(clicked()), this, SLOT(slot_addTag()));
   this->connect(this->comboBoxTagPoint, SIGNAL(activated(int)), this, SLOT(slot_comboxChanged(int)));
   this->PointNumber;
@@ -327,6 +329,7 @@ void EventQtSlotConnect::slot_save(){
 			vtkSmartPointer<vtkGenericDataObjectWriter>::New();
 
 		writerParaView->SetFileName(fileName.toStdString().c_str());
+
 		//Append the two meshes 
 		vtkSmartPointer<vtkAppendPolyData> appendFilter =
 			vtkSmartPointer<vtkAppendPolyData>::New();
@@ -380,6 +383,8 @@ void EventQtSlotConnect::slot_save(){
 		cleanPoly->GetOutput()->GetPointData()->AddArray(fltArray6);
 		cleanPoly->GetOutput()->GetPointData()->AddArray(fltArray7);
 		writerParaView->SetInput(cleanPoly->GetOutput());
+		writerParaView->SetFileTypeToBinary();//solve for matlab
+		//writerParaView->SetFileTypeToASCII();
 		writerParaView->Update();
 		writerParaView->Write();
 	}
@@ -398,6 +403,24 @@ void EventQtSlotConnect::slot_skelStateChange(int state){
 	else
 		actor->VisibilityOff();
 	//render->ResetCamera();
+	this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void EventQtSlotConnect::slot_meshStateChange(int state){
+	if(state == Qt::Unchecked)
+	{
+		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+		{
+			MouseInteractorAdd::vectorTagTriangles[i].triActor->VisibilityOn();
+		}
+	}
+	else
+	{
+		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+		{
+			MouseInteractorAdd::vectorTagTriangles[i].triActor->VisibilityOff();
+		}
+	}
 	this->qvtkWidget->GetRenderWindow()->Render();
 }
 
@@ -865,6 +888,8 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	MouseInteractorAdd::triNormalActors.clear();
 	MouseInteractorAdd::selectedTag = 0;
 	this->comboBoxTagPoint->clear();
+	this->checkBoxHideMesh->setChecked(false);
+	this->checkBoxHideSkel->setChecked(false);
 
 	this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle( style );
 	if(this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer() != NULL)
@@ -898,7 +923,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	if(triDBL != NULL)
 	{
 		readCustomData(polydata);
-		this->PointNumber->setText(QString::number(MouseInteractorAdd::vectorTagPoints.size()));
-		this->TriangleNumber->setText(QString::number(MouseInteractorAdd::vectorTagTriangles.size()));
 	}
+	this->PointNumber->setText(QString::number(MouseInteractorAdd::vectorTagPoints.size()));
+	this->TriangleNumber->setText(QString::number(MouseInteractorAdd::vectorTagTriangles.size()));
 }
