@@ -47,8 +47,10 @@ public slots:
 	void slot_skelStateChange(int);
 	void slot_meshStateChange(int);
 	void slot_addTag();
+	void slot_delTag();
+	void slot_editTag();
 	void slot_comboxChanged(int);
-
+	
 	void slot_open();
 	void slot_save();
 	

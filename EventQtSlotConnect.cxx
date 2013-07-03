@@ -81,7 +81,8 @@ EventQtSlotConnect::EventQtSlotConnect()
   this->connect(this->checkBoxHideMesh, SIGNAL(stateChanged(int)), this, SLOT(slot_meshStateChange(int)));
   this->connect(this->pushButtonAddTag, SIGNAL(clicked()), this, SLOT(slot_addTag()));
   this->connect(this->comboBoxTagPoint, SIGNAL(activated(int)), this, SLOT(slot_comboxChanged(int)));
-  this->PointNumber;
+  this->connect(this->pushButtonDeleteTag, SIGNAL(clicked()), this, SLOT(slot_delTag()));
+  this->connect(this->pushButtonEditTag, SIGNAL(clicked()), this, SLOT(slot_editTag()));
 };
 
 void EventQtSlotConnect::slot_addTag(){
@@ -89,10 +90,10 @@ void EventQtSlotConnect::slot_addTag(){
 	AddTagDialog addDialog;
 	addDialog.show();
 
-	for(int i = 0; i < MouseInteractorAdd::vectorTagInfo.size(); i++){
+	/*for(int i = 0; i < MouseInteractorAdd::vectorTagInfo.size(); i++){
 		addDialog.setTagName(MouseInteractorAdd::vectorTagInfo[i].tagName);
 		addDialog.setTagColor(MouseInteractorAdd::vectorTagInfo[i].qc);
-	}
+	}*/
 
 	if(addDialog.exec()){
 		QString tagText = addDialog.lineEdit->text();
@@ -125,6 +126,102 @@ void EventQtSlotConnect::slot_addTag(){
 	}	
 }
 
+void EventQtSlotConnect::slot_delTag()
+{
+	int curIndex = this->comboBoxTagPoint->currentIndex();
+	for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
+	{
+		if(curIndex == MouseInteractorAdd::vectorTagPoints[i].comboBoxIndex)
+		{
+			QMessageBox messageBox;
+			messageBox.critical(0,"Error","You need to delete these points in skeleton before deletion");
+			return;
+		}
+	}
+	switch( QMessageBox::information( this, "Delete Tag",
+		"Are you sure to delete this tag? ",
+		"Yes", "Cancel",
+		0, 1 ) ) {
+	case 0:
+		MouseInteractorAdd::vectorTagInfo.erase(MouseInteractorAdd::vectorTagInfo.begin() + curIndex);
+		this->comboBoxTagPoint->removeItem(curIndex);
+		//new index
+		MouseInteractorAdd::selectedTag = this->comboBoxTagPoint->currentIndex();
+		break;
+	case 1:
+	default:
+		break;
+	}	
+}
+
+void EventQtSlotConnect::slot_editTag()
+{
+	AddTagDialog addDialog;
+
+	TagInfo tio = MouseInteractorAdd::vectorTagInfo[comboBoxTagPoint->currentIndex()];
+
+	addDialog.lineEdit->setText(QString::fromStdString(tio.tagName));
+	addDialog.color = tio.qc;
+	addDialog.colorLabel->setPalette(QPalette(tio.qc));
+	addDialog.colorLabel->setAutoFillBackground(true);
+	if(tio.tagType == 1)
+		addDialog.branchButton->setChecked(true);
+	else if(tio.tagType == 2)
+		addDialog.freeEdgeButton->setChecked(true);
+	else if(tio.tagType == 3)
+		addDialog.interiorButton->setChecked(true);
+	else
+		addDialog.otherButton->setChecked(true);
+
+	addDialog.indexBox->setCurrentIndex(tio.tagIndex-1);
+	addDialog.tagIndex = tio.tagIndex;
+
+	addDialog.show();
+	
+	if(addDialog.exec())
+	{
+		QString tagText = addDialog.lineEdit->text();
+
+		TagInfo ti;
+		ti.tagName = tagText.toStdString();
+		ti.qc = addDialog.color;
+		int r, g, b;
+		r = addDialog.color.red();
+		g = addDialog.color.green();
+		b = addDialog.color.blue();
+		ti.tagColor[0] = r; ti.tagColor[1] = g; ti.tagColor[2] = b;
+		if(addDialog.branchButton->isChecked())
+			ti.tagType = 1;
+		else if(addDialog.freeEdgeButton->isChecked())
+			ti.tagType = 2;
+		else if(addDialog.interiorButton->isChecked())
+			ti.tagType = 3;
+		else
+			ti.tagType = 4;
+		ti.tagIndex = addDialog.tagIndex;
+
+		MouseInteractorAdd::vectorTagInfo[this->comboBoxTagPoint->currentIndex()] = ti;
+
+		//update the tag point on skeleton
+		for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
+		{
+			if(MouseInteractorAdd::vectorTagPoints[i].comboBoxIndex == this->comboBoxTagPoint->currentIndex())
+			{
+				MouseInteractorAdd::vectorTagPoints[i].typeIndex = ti.tagType;
+				MouseInteractorAdd::vectorTagPoints[i].typeName = ti.tagName;
+				MouseInteractorAdd::vectorTagPoints[i].actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
+			}
+		}
+
+		//update combobox
+		QPixmap pix(22,22);
+		QString displayText = QString::number(ti.tagIndex) + " " + tagText;
+		pix.fill(addDialog.color);
+		this->comboBoxTagPoint->removeItem(this->comboBoxTagPoint->currentIndex());
+		this->comboBoxTagPoint->insertItem(this->comboBoxTagPoint->currentIndex(), pix, displayText);
+	}
+}
+
 void EventQtSlotConnect::slot_finished()
 {
 	readVTK(VTKfilename);
@@ -133,7 +230,6 @@ void EventQtSlotConnect::slot_finished()
 
 void EventQtSlotConnect::slot_position(double x, double y, double z)
 {
-	textEdit->append("Position");
 }
 
 void EventQtSlotConnect::slot_clicked(vtkObject*, unsigned long, void*, void*)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>798</width>
-    <height>660</height>
+    <width>808</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>521</width>
+      <width>551</width>
       <height>491</height>
      </rect>
     </property>
@@ -36,23 +36,13 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>530</y>
-      <width>301</width>
-      <height>51</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>560</x>
+      <x>590</x>
       <y>30</y>
       <width>211</width>
-      <height>451</height>
+      <height>491</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -69,7 +59,7 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>390</y>
+        <y>410</y>
         <width>101</width>
         <height>31</height>
        </rect>
@@ -378,37 +368,24 @@
      <attribute name="title">
       <string>Pick</string>
      </attribute>
-     <widget class="QCheckBox" name="checkBoxHideSkel">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>10</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Hide Skeleton</string>
-      </property>
-     </widget>
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>60</y>
-        <width>201</width>
-        <height>121</height>
+        <x>10</x>
+        <y>80</y>
+        <width>181</width>
+        <height>151</height>
        </rect>
       </property>
       <property name="title">
-       <string>Tag Selection</string>
+       <string>Tag</string>
       </property>
       <widget class="QComboBox" name="comboBoxTagPoint">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>131</width>
+         <width>151</width>
          <height>22</height>
         </rect>
        </property>
@@ -438,7 +415,7 @@
       <widget class="QPushButton" name="pushButtonDeleteTag">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>90</x>
          <y>70</y>
          <width>71</width>
          <height>23</height>
@@ -448,12 +425,25 @@
         <string>Delete Tag</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="pushButtonEditTag">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>110</y>
+         <width>71</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Edit Tag</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QLabel" name="labelPoint">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>190</y>
+        <y>240</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -475,7 +465,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>190</y>
+        <y>240</y>
         <width>31</width>
         <height>16</height>
        </rect>
@@ -497,7 +487,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>210</y>
+        <y>260</y>
         <width>101</width>
         <height>16</height>
        </rect>
@@ -519,7 +509,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>210</y>
+        <y>260</y>
         <width>31</width>
         <height>16</height>
        </rect>
@@ -537,19 +527,51 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBoxHideMesh">
+     <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>101</width>
-        <height>16</height>
+        <x>10</x>
+        <y>10</y>
+        <width>181</width>
+        <height>61</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Hide Mesh</string>
+      <property name="title">
+       <string>Skeleton and Mesh</string>
       </property>
+      <widget class="QCheckBox" name="checkBoxHideMesh">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>101</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Hide Mesh</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBoxHideSkel">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>101</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Hide Skeleton</string>
+       </property>
+      </widget>
      </widget>
+     <zorder>groupBox_2</zorder>
+     <zorder>groupBox</zorder>
+     <zorder>labelPoint</zorder>
+     <zorder>PointNumber</zorder>
+     <zorder>labelTriangle</zorder>
+     <zorder>TriangleNumber</zorder>
     </widget>
    </widget>
    <widget class="QProgressBar" name="cmrep_progressBar">
@@ -570,7 +592,6 @@
    </widget>
    <zorder>tabWidget</zorder>
    <zorder>qvtkWidget</zorder>
-   <zorder>textEdit</zorder>
    <zorder>cmrep_progressBar</zorder>
   </widget>
   <action name="actionOpenFile">

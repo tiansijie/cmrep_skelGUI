@@ -5,11 +5,11 @@
 AddTagDialog::AddTagDialog(QWidget *parent)
 	: QDialog(parent)
 {
-	label = new QLabel(tr("Add Tag:"));
+	label = new QLabel(tr("Tag:"));
 	lineEdit = new QLineEdit;
 	label->setBuddy(lineEdit);
 
-	addButton = new QPushButton(tr("&Add"));
+	addButton = new QPushButton(tr("&OK"));
 	addButton->setDefault(true);
 
 	colorLabel = new QLabel;
@@ -54,7 +54,7 @@ AddTagDialog::AddTagDialog(QWidget *parent)
 	mainLayout->addLayout(leftLayout, 0, 0);
 	mainLayout->setRowStretch(2, 1);
 	setLayout(mainLayout);
-	setWindowTitle(tr("Add Tag"));	
+	setWindowTitle(tr("Tag"));	
 
 	tagIndex = 1;
 
