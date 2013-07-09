@@ -63,6 +63,9 @@
 #include <vtkCommand.h>
 #include <vtkTransform.h>
 #include <vtkObject.h>
+#include <vtkDecimatePro.h>
+#include <vtkTriangleFilter.h>
+#include <vtkQuadricDecimation.h>
 
 #include <QtGui>
 
@@ -77,31 +80,6 @@ public:
 	vtkTypeMacro(MouseInteractorAdd, vtkInteractorStyleTrackballCamera);
 
 	MouseInteractorAdd();
-	//EventQtSlotConnect *qtObject;
-	
-	std::vector<int>deletePointIds;
-	std::vector<int>triPtIds;
-	
-	vtkActor *selectedTriangle;
-	vtkActor *prePolyLineActor;
-
-	QLabel *labelPtNumber;
-	QLabel *labelTriNumber;
-
-	static std::vector<TagInfo> vectorTagInfo;
-	static std::vector<TagTriangle> vectorTagTriangles;
-	static std::vector<TagPoint> vectorTagPoints;
-	static std::vector<std::vector<TagPoint>> vectorClassifyPoints;
-	static std::vector<TagEdge> vectorTagEdges;
-	//store all the label info, 0 represent no tag on this point
-	static std::vector<double> labelData;
-	static std::vector<vtkActor*> triNormalActors;
-	static bool isSkeleton;
-	static int selectedTag;
-
-	static double triCol[3];
-	static double backCol[3];
-	
 
 	double Distance(double p1[3], double p2[3]);
 	void SetSelectedTriColor();
@@ -115,6 +93,8 @@ public:
 	void AddPoint(double*);
 	void DeletePoint(double*);
 	int PickPointForTri(double*);
+	void CheckNormal(int triId[3]);
+	void AddDecimateEdge(int pointSeq);
 
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
@@ -124,6 +104,9 @@ public:
 	void setLabelTriNum();
 	void setLabelPtNum();
 	void reset();
+
+	void DrawDelaunayTriangle();
+	void AutoTriangulation();
 	
 	virtual void OnLeftButtonDown()
 	{
@@ -187,6 +170,35 @@ public:
 		if(key.compare("q") != 0 && key.compare("Q") != 0)
 			this->Interactor->SetKeySym("");
 	}
+
+
+	std::vector<int>deletePointIds;
+	std::vector<int>triPtIds;
+
+	vtkActor *selectedTriangle;
+	vtkActor *prePolyLineActor;
+
+	QLabel *labelPtNumber;
+	QLabel *labelTriNumber;
+
+	static std::vector<TagInfo> vectorTagInfo;
+	static std::vector<TagTriangle> vectorTagTriangles;
+	static std::vector<TagPoint> vectorTagPoints;
+	static std::vector<std::vector<TagPoint>> vectorClassifyPoints;
+	static std::vector<TagEdge> vectorTagEdges;
+	//store all the label info, 0 represent no tag on this point
+	static std::vector<double> labelData;
+	static std::vector<vtkActor*> triNormalActors;
+	static bool isSkeleton;
+	static int selectedTag;
+	static double targetReduction;
+	static double featureAngle;
+
+	static double triCol[3];
+	static double backCol[3];
+
+	static bool decimateMode;
+
 
 private:
 	bool drawTriMode;

@@ -26,8 +26,8 @@ class vtkEventQtSlotConnect;
 class EventQtSlotConnect : public QMainWindow, private Ui::EventQtSlotConnect
 {
   Q_OBJECT
-public:
 
+public:
 	EventQtSlotConnect();
 	void createActions();
 	void createMenus();
@@ -40,9 +40,13 @@ public:
 	void readCustomDataTag(vtkFloatArray* tagDBL, vtkStringArray* tagStr);
 	void readCustomDataLabel(vtkFloatArray* labelDBL);
 
+	void saveVTKFile(QString fileName);
+	void saveParaViewFile(QString fileName);
+	void saveCmrepFile(QString fileName);
+
+	void Decimate();
+
 public slots:
-	void slot_clicked(vtkObject*, unsigned long, void*, void*);
-	void slot_position(double x, double y, double z);
 	void slot_finished();
 	void slot_skelStateChange(int);
 	void slot_meshStateChange(int);
@@ -50,11 +54,22 @@ public slots:
 	void slot_delTag();
 	void slot_editTag();
 	void slot_comboxChanged(int);
+
+	void slot_gridTypeChanged(int);
+	void slot_solverTypeChanged(int);
+	void slot_consRadiusCheck(int);
 	
 	void slot_open();
 	void slot_save();
+
+	void slot_targetReductSilder(int);
+	void slot_targetReductEditor(QString);
+	void slot_featureAngleSlider(int);
+	void slot_feartureAngleEditor(QString);
+	void slot_decimateButton();
 	
 	void executeCmrepVskel();	
+
 private:
 
 	vtkSmartPointer<vtkEventQtSlotConnect> Connections;
@@ -67,6 +82,9 @@ private:
 
 	std::string VTKfilename;  
 	vtkPolyData* polyObject;
+
+	double targetReduction;
+	double featureAngle;
 };
 
 #endif

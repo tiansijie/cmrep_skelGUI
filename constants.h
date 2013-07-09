@@ -18,8 +18,8 @@ struct TagTriangle
 	vtkActor *triActor;
 	double p1[3], p2[3], p3[3];
 	double centerPos[3];
-	int id1,id2,id3;
-	int seq1, seq2, seq3;
+	int id1, id2, id3;//for point index in tagPoint
+	int seq1, seq2, seq3;//for point index in total point
 };
 
 
@@ -30,7 +30,7 @@ struct TagPoint
 	int typeIndex;
 	int comboBoxIndex;
 	double radius;//radius of that points
-	int seq;//the sequence in all points
+	int seq;//the sequence in total points
 	double pos[3];
 };	
 

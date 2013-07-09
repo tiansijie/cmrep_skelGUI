@@ -12,38 +12,17 @@ bool MouseInteractorAdd::isSkeleton;
 int MouseInteractorAdd::selectedTag;
 double MouseInteractorAdd::triCol[3];
 double MouseInteractorAdd::backCol[3];
+double MouseInteractorAdd::targetReduction;
+double MouseInteractorAdd::featureAngle;
+bool MouseInteractorAdd::decimateMode;
 
-
-class vtkAffineCallback : public vtkCommand
-{
-public:
-	static vtkAffineCallback *New() 
-	{ return new vtkAffineCallback; }
-	virtual void Execute(vtkObject *caller, unsigned long, void*);
-	vtkAffineCallback():Actor(0),AffineRep(0) 
-	{
-		this->Transform = vtkTransform::New();
-	}
-	~vtkAffineCallback()
-	{
-		this->Transform->Delete();
-	}
-	vtkActor *Actor;
-	vtkAffineRepresentation2D *AffineRep;
-	vtkTransform *Transform;
-};
-
-void vtkAffineCallback::Execute(vtkObject*, unsigned long vtkNotUsed(event), void*)
-{
-	this->AffineRep->GetTransform(this->Transform);
-	this->Actor->SetUserTransform(this->Transform);
-}
 
 MouseInteractorAdd::MouseInteractorAdd(){
 	selectedTriangle = NULL;
 	triCol[0] = 0.2; triCol[1] = 0.7; triCol[2] = 0.2;
 	backCol[0] = 0.4; backCol[1] = 0.4; backCol[2] = 0.4;
 	drawTriMode = false;
+	decimateMode = false;
 }
 
 double MouseInteractorAdd::Distance(double p1[3], double p2[3]){
@@ -88,30 +67,9 @@ void MouseInteractorAdd::setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> 
 	this->normalGenerator = normalGenerator;
 }
 
-int MouseInteractorAdd::DrawTriangle()
+void MouseInteractorAdd::CheckNormal(int triPtIds[3])
 {
 	int id1 = triPtIds[0], id2 = triPtIds[1], id3 = triPtIds[2];
-	if(id1 == id2 || id1 == id3 || id2 == id3)
-		return 0;	
-
-	int edgeid1 = PairNumber(triPtIds[0], triPtIds[1]);//id
-	int edgeid2 = PairNumber(triPtIds[1], triPtIds[2]);
-	int edgeid3 = PairNumber(triPtIds[2], triPtIds[0]);
-	std::cout<<"ID "<<id1<<" "<<id2<<" "<<id3<<std::endl;
-	int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType);
-	int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
-	int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
-
-	if(vectorTagEdges[edgeid1].numEdge >= cons1){		
-		return 0;
-	}
-	else if(vectorTagEdges[edgeid2].numEdge >= cons2){
-		return 0;
-	}
-	else if(vectorTagEdges[edgeid3].numEdge >= cons3){
-		return 0;
-	}
-	
 	vtkSmartPointer<vtkPolyData> normalPolyData = normalGenerator->GetOutput();
 	
 	vtkFloatArray* normalDataFloat =
@@ -151,21 +109,47 @@ int MouseInteractorAdd::DrawTriangle()
 			int tempid = triPtIds[1];
 			triPtIds[1] = triPtIds[2];
 			triPtIds[2] = tempid;
-			tempid = id2;
-			id2 = id3;
-			id3 = tempid;
 		}		
-		d1[0] = vectorTagPoints[id2].pos[0] - vectorTagPoints[id1].pos[0];
+	/*	d1[0] = vectorTagPoints[id2].pos[0] - vectorTagPoints[id1].pos[0];
 		d1[1] = vectorTagPoints[id2].pos[1] - vectorTagPoints[id1].pos[1];
 		d1[2] = vectorTagPoints[id2].pos[2] - vectorTagPoints[id1].pos[2];
 		d2[0] = vectorTagPoints[id3].pos[0] - vectorTagPoints[id2].pos[0];
 		d2[1] = vectorTagPoints[id3].pos[1] - vectorTagPoints[id2].pos[1];
 		d2[2] = vectorTagPoints[id3].pos[2] - vectorTagPoints[id2].pos[2];
 		vtkMath::Cross(d1, d2, result);		
-		vtkMath::Normalize(result);
+		vtkMath::Normalize(result);*/
 	}
-		
+}
+
+int MouseInteractorAdd::DrawTriangle()
+{
+	int id1 = triPtIds[0], id2 = triPtIds[1], id3 = triPtIds[2];
+	if(id1 == id2 || id1 == id3 || id2 == id3)
+		return 0;			
 	
+	int triId[3];
+	triId[0] = triPtIds[0]; triId[1] = triPtIds[1]; triId[2] = triPtIds[2];
+	CheckNormal(triId);
+	triPtIds[0] = triId[0]; triPtIds[1] = triId[1]; triPtIds[2] = triId[2];
+	id1 = triPtIds[0], id2 = triPtIds[1], id3 = triPtIds[2];
+
+	int edgeid1 = PairNumber(triPtIds[0], triPtIds[1]);//id
+	int edgeid2 = PairNumber(triPtIds[1], triPtIds[2]);
+	int edgeid3 = PairNumber(triPtIds[2], triPtIds[0]);
+	std::cout<<"ID "<<id1<<" "<<id2<<" "<<id3<<std::endl;
+	int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType);
+	int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+	int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+
+	if(vectorTagEdges[edgeid1].numEdge >= cons1){		
+		return 0;
+	}
+	else if(vectorTagEdges[edgeid2].numEdge >= cons2){
+		return 0;
+	}
+	else if(vectorTagEdges[edgeid3].numEdge >= cons3){
+		return 0;
+	}
 
 	vectorTagEdges[edgeid1].numEdge++;
 	vectorTagEdges[edgeid1].ptId1 = triPtIds[0]; vectorTagEdges[edgeid1].ptId2 = triPtIds[1];
@@ -228,8 +212,8 @@ int MouseInteractorAdd::DrawTriangle()
 		if(vectorTagTriangles[i].centerPos[0] == actor->GetCenter()[0] &&
 			vectorTagTriangles[i].centerPos[1] == actor->GetCenter()[1] &&
 			vectorTagTriangles[i].centerPos[2] == actor->GetCenter()[2]){
-			return 0;
 			std::cout<<"same tri"<<std::endl;
+			return 0;			
 		}
 	}
 
@@ -248,51 +232,9 @@ int MouseInteractorAdd::DrawTriangle()
 	vectorTagTriangles.push_back(tri);
 	this->GetDefaultRenderer()->AddActor(actor);
 
-
 	setLabelTriNum();
 
 	return 1;
-	/*//draw normal
-	double p2[3];
-	p2[0] = trianglePolyData->GetCenter()[0] + result[0];
-	p2[1] = trianglePolyData->GetCenter()[1] + result[1];
-	p2[2] = trianglePolyData->GetCenter()[2] + result[2];
-
-	vtkSmartPointer<vtkLineSource> lineSource = 
-		vtkSmartPointer<vtkLineSource>::New();
-	lineSource->SetPoint1(trianglePolyData->GetCenter());
-	lineSource->SetPoint2(p2);
-	lineSource->Update();
-
-	vtkSmartPointer<vtkSphereSource> sphereEndSource =
-		vtkSmartPointer<vtkSphereSource>::New();
-	sphereEndSource->SetCenter(p2);
-	sphereEndSource->SetRadius(0.3);
-	sphereEndSource->Update();
-
-	//Append the two meshes 
-	vtkSmartPointer<vtkAppendPolyData> appendFilter =
-		vtkSmartPointer<vtkAppendPolyData>::New();
-
-	appendFilter->AddInputConnection(lineSource->GetOutputPort());
-	appendFilter->AddInputConnection(sphereEndSource->GetOutputPort());
-	appendFilter->Update();
-
-	// Create mapper and actor
-	vtkSmartPointer<vtkPolyDataMapper> mapperNormal =
-		vtkSmartPointer<vtkPolyDataMapper>::New();
-#if VTK_MAJOR_VERSION <= 5
-	mapperNormal->SetInput(appendFilter->GetOutput());
-#else
-	mapperNormal->SetInputData(appendFilter->GetOutput());
-#endif
-	vtkSmartPointer<vtkActor> actorNormal =
-		vtkSmartPointer<vtkActor>::New();
-	actorNormal->SetMapper(mapperNormal);
-	actorNormal->GetProperty()->SetColor(0.3, 0.7, 0.7);
-
-	triNormalActors.push_back(actorNormal);
-	this->GetDefaultRenderer()->AddActor(actorNormal);*/
 }
 
 void MouseInteractorAdd::DeleteTriangle(double* pos){
@@ -310,14 +252,17 @@ void MouseInteractorAdd::DeleteTriangle(double* pos){
 			TagTriangle tri = vectorTagTriangles[i];
 			if(pickedActor == tri.triActor)
 			{
-				vectorTagEdges[PairNumber(vectorTagTriangles[i].id1, vectorTagTriangles[i].id2)].numEdge--;
-				vectorTagEdges[PairNumber(vectorTagTriangles[i].id3, vectorTagTriangles[i].id2)].numEdge--;
-				vectorTagEdges[PairNumber(vectorTagTriangles[i].id1, vectorTagTriangles[i].id3)].numEdge--;
+				if(vectorTagTriangles[i].id1 != -1 && vectorTagTriangles[i].id2 != -1 && vectorTagTriangles[i].id3 != -1)
+				{
+					vectorTagEdges[PairNumber(vectorTagTriangles[i].id1, vectorTagTriangles[i].id2)].numEdge--;
+					vectorTagEdges[PairNumber(vectorTagTriangles[i].id3, vectorTagTriangles[i].id2)].numEdge--;
+					vectorTagEdges[PairNumber(vectorTagTriangles[i].id1, vectorTagTriangles[i].id3)].numEdge--;
+				}
 				this->GetDefaultRenderer()->RemoveActor(pickedActor);
 				//this->GetDefaultRenderer()->RemoveActor(triNormalActors[i]);
 				vectorTagTriangles.erase(vectorTagTriangles.begin() + i);
 				//triNormalActors.erase(triNormalActors.begin() + i);
-				i--;
+				break;
 			}
 		}
 		setLabelTriNum();
@@ -480,6 +425,61 @@ void MouseInteractorAdd::FlipNormal(double* pos)
 	}
 }
 
+void MouseInteractorAdd::AddDecimateEdge(int pointSeq)
+{
+	for(int i = 0; i < vectorTagTriangles.size(); i++)
+	{
+		bool track = false;
+		if(vectorTagTriangles[i].seq1 == pointSeq){
+			vectorTagTriangles[i].id1 = vectorTagPoints.size()-1;
+			track = true;
+		}
+		else if(vectorTagTriangles[i].seq2 == pointSeq){
+			vectorTagTriangles[i].id2 = vectorTagPoints.size()-1;
+			track = true;
+		}
+		else if(vectorTagTriangles[i].seq3 == pointSeq){
+			vectorTagTriangles[i].id3 = vectorTagPoints.size()-1;
+			track = true;
+		}
+
+		if(track){
+			//add edge info
+			if(vectorTagTriangles[i].id1 != -1 && vectorTagTriangles[i].id2 != -1 && vectorTagTriangles[i].id3 != -1)
+			{
+				cout<<"You add it"<<endl;
+
+				int id1 = vectorTagTriangles[i].id1; int id2 = vectorTagTriangles[i].id2; int id3 = vectorTagTriangles[i].id3;
+				int edgeid1 = PairNumber(id1, id2);//id
+				int edgeid2 = PairNumber(id2, id3);
+				int edgeid3 = PairNumber(id3, id1);
+				//std::cout<<"ID "<<id1<<" "<<id2<<" "<<id3<<std::endl;
+				int cons1 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType);
+				int cons2 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id2].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+				int cons3 = ConstrainEdge(vectorTagInfo[vectorTagPoints[id1].comboBoxIndex].tagType, vectorTagInfo[vectorTagPoints[id3].comboBoxIndex].tagType);
+
+				if(vectorTagEdges[edgeid1].numEdge >= cons1){		
+					return;
+				}
+				else if(vectorTagEdges[edgeid2].numEdge >= cons2){
+					return;
+				}
+				else if(vectorTagEdges[edgeid3].numEdge >= cons3){
+					return;
+				}
+
+				vectorTagEdges[edgeid1].numEdge++;
+				vectorTagEdges[edgeid1].ptId1 = id1; vectorTagEdges[edgeid1].ptId2 = id2;
+				vectorTagEdges[edgeid2].numEdge++; 
+				vectorTagEdges[edgeid2].ptId1 = id2; vectorTagEdges[edgeid2].ptId2 = id3;
+				vectorTagEdges[edgeid3].numEdge++; 
+				vectorTagEdges[edgeid3].ptId1 = id3; vectorTagEdges[edgeid3].ptId2 = id1;
+			}
+		}
+	}
+}
+
+
 void MouseInteractorAdd::AddPoint(double* pos)
 {
 	//see if there is any tag have been added
@@ -496,69 +496,112 @@ void MouseInteractorAdd::AddPoint(double* pos)
 		double pointRadius;
 		int pointSeq;
 		//finalPos[0] = pos[0]; finalPos[1] = pos[1]; finalPos[2] = pos[2];
-		for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
-			double p[3];
-			vtkdata->GetPoint(i,p);
-			double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
-			if(dist < minDistance){
-				minDistance = dist;
-				pointSeq = i;
-				finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
-				pointRadius = radiusArray->GetValue(i);
+		if(!decimateMode){
+			for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
+				double p[3];
+				vtkdata->GetPoint(i,p);
+				double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
+				if(dist < minDistance){
+					minDistance = dist;
+					pointSeq = i;
+					finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
+					pointRadius = radiusArray->GetValue(i);
+				}
 			}
 		}
-		if(labelData[pointSeq] == 0.0){
-			std::cout << "Pick position (final position) is: "
-				<< finalPos[0] << " " << finalPos[1]
-			<< " " << finalPos[2] << std::endl;
+		else
+		{
+			for(int i = 0; i < vectorTagTriangles.size(); i++)
+			{
+				double dist = Distance(pos, vectorTagTriangles[i].p1);
+				if(dist < minDistance){
+					minDistance = dist;
+					pointSeq = vectorTagTriangles[i].seq1;
+					finalPos[0] = vectorTagTriangles[i].p1[0]; finalPos[1] = vectorTagTriangles[i].p1[1]; finalPos[2] = vectorTagTriangles[i].p1[2];
+					pointRadius = radiusArray->GetValue(vectorTagTriangles[i].seq1);
+				}
 
-			//draw line if the number of selected points is more than 2
-			//DrawDelaunayTriangle();
-			//DrawRegularTriangle();
+				dist = Distance(pos, vectorTagTriangles[i].p2);
+				if(dist < minDistance){
+					minDistance = dist;
+					pointSeq = vectorTagTriangles[i].seq2;
+					finalPos[0] = vectorTagTriangles[i].p2[0]; finalPos[1] = vectorTagTriangles[i].p2[1]; finalPos[2] = vectorTagTriangles[i].p2[2];
+					pointRadius = radiusArray->GetValue(vectorTagTriangles[i].seq2);
+				}
 
-			//Create a sphere
-			vtkSmartPointer<vtkSphereSource> sphereSource =
-				vtkSmartPointer<vtkSphereSource>::New();
-			sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
-			sphereSource->SetRadius(1.0);
+				dist = Distance(pos, vectorTagTriangles[i].p3);
+				if(dist < minDistance){
+					minDistance = dist;
+					pointSeq = vectorTagTriangles[i].seq3;
+					finalPos[0] = vectorTagTriangles[i].p3[0]; finalPos[1] = vectorTagTriangles[i].p3[1]; finalPos[2] = vectorTagTriangles[i].p3[2];
+					pointRadius = radiusArray->GetValue(vectorTagTriangles[i].seq3);
+				}
+			}
+		}
 
-			//Create a mapper and actor
-			vtkSmartPointer<vtkPolyDataMapper> mapper =
-				vtkSmartPointer<vtkPolyDataMapper>::New();
-			mapper->SetInputConnection(sphereSource->GetOutputPort());
 
-			//QComboBox* cbTagPoint;// =  qtObject->getTagComboBox();
-			TagInfo ti = vectorTagInfo[selectedTag];
-			vtkSmartPointer<vtkActor> actor =
-				vtkSmartPointer<vtkActor>::New();
-			actor->SetMapper(mapper);
-			actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
+	//	if(labelData[pointSeq] == 0.0){
+		std::cout << "Pick position (final position) is: "
+			<< finalPos[0] << " " << finalPos[1]
+		<< " " << finalPos[2] << std::endl;
+
+		for(int i = 0; i < vectorTagPoints.size(); i++)
+		{
+			if(finalPos[0] == vectorTagPoints[i].pos[0] 
+				&& finalPos[1] == vectorTagPoints[i].pos[1]
+				&& finalPos[2] == vectorTagPoints[i].pos[2]){
+					cout<<"duplicate point"<<endl;
+					return;
+				}
+
+		}
+
+		//Create a sphere
+		vtkSmartPointer<vtkSphereSource> sphereSource =
+			vtkSmartPointer<vtkSphereSource>::New();
+		sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
+		sphereSource->SetRadius(1.0);
+
+		//Create a mapper and actor
+		vtkSmartPointer<vtkPolyDataMapper> mapper =
+			vtkSmartPointer<vtkPolyDataMapper>::New();
+		mapper->SetInputConnection(sphereSource->GetOutputPort());
+
+		//QComboBox* cbTagPoint;// =  qtObject->getTagComboBox();
+		TagInfo ti = vectorTagInfo[selectedTag];
+		vtkSmartPointer<vtkActor> actor =
+			vtkSmartPointer<vtkActor>::New();
+		actor->SetMapper(mapper);
+		actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
 						
-			//store actor in vectorTagPoints
-			TagPoint actorT;
-			actorT.actor = actor;
-			actorT.typeIndex = ti.tagIndex;
-			actorT.comboBoxIndex = selectedTag;
-			//actorT.typeName = cbTagPoint->currentText().toStdString(); 
-			actorT.radius = pointRadius;
-			actorT.seq = pointSeq;
-			actorT.pos[0] = finalPos[0]; actorT.pos[1] = finalPos[1]; actorT.pos[2] = finalPos[2];
-			vectorTagPoints.push_back(actorT);
+		//store actor in vectorTagPoints
+		TagPoint actorT;
+		actorT.actor = actor;
+		actorT.typeIndex = ti.tagIndex;
+		actorT.comboBoxIndex = selectedTag;
+		//actorT.typeName = cbTagPoint->currentText().toStdString(); 
+		actorT.radius = pointRadius;
+		actorT.seq = pointSeq;
+		actorT.pos[0] = finalPos[0]; actorT.pos[1] = finalPos[1]; actorT.pos[2] = finalPos[2];
+		vectorTagPoints.push_back(actorT);
 
-			//calculate the biggest number of edges possibility
-			vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
+		//calculate the biggest number of edges possibility
+		vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
+
+		if(decimateMode)
+			AddDecimateEdge(pointSeq);
 							
-			labelData[pointSeq] = ti.tagIndex;//selectedTag + 1;//cbTagPoint->currentIndex() + 1;
+		labelData[pointSeq] = ti.tagIndex;//selectedTag + 1;//cbTagPoint->currentIndex() + 1;
 						
-			/*if(vectorClassifyPoints.size() <= selectedTag/ *cbTagPoint->currentIndex()* /){
-				vectorClassifyPoints.resize(selectedTag/ *cbTagPoint->currentIndex()* / + 1);
-			}
-			vectorClassifyPoints[selectedTag/ *cbTagPoint->currentIndex()* /].push_back(actorT);*/
-
-			this->GetDefaultRenderer()->AddActor(actor);
-
-			setLabelPtNum();
+		/*if(vectorClassifyPoints.size() <= selectedTag/ *cbTagPoint->currentIndex()* /){
+			vectorClassifyPoints.resize(selectedTag/ *cbTagPoint->currentIndex()* / + 1);
 		}
+		vectorClassifyPoints[selectedTag/ *cbTagPoint->currentIndex()* /].push_back(actorT);*/
+
+		this->GetDefaultRenderer()->AddActor(actor);
+
+		setLabelPtNum();
+		//}
 	}
 }
 
@@ -596,8 +639,7 @@ void MouseInteractorAdd::DeletePoint(double* pos)
 
 			vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
 			this->GetDefaultRenderer()->RemoveActor(pickedActor);
-			//DrawDelaunayTriangle();
-			//DrawRegularTriangle();
+
 			i--;
 		}
 	}
@@ -786,4 +828,134 @@ void MouseInteractorAdd::setLabelTriNum()
 {
 	labelTriNumber->setText(QString::number(vectorTagTriangles.size()));
 }
+
+void MouseInteractorAdd::DrawDelaunayTriangle(){
+	if(vectorTagPoints.size() > 3){
+		//clear triangle
+		for(int i = 0; i < vectorTagTriangles.size(); i++)
+		{
+			this->GetDefaultRenderer()->RemoveActor(vectorTagTriangles[i].triActor);
+		}
+		vectorTagTriangles.clear();
+		vectorTagEdges.clear();
+		vectorTagEdges.resize(PairNumber(vectorTagPoints.size(), vectorTagPoints.size()));
+
+
+		vtkSmartPointer<vtkPoints> pts =
+			vtkSmartPointer<vtkPoints>::New();
+		for(int i = 0; i < vectorTagPoints.size(); i++){
+			pts->InsertNextPoint(vectorTagPoints[i].pos);
+		}
+
+		// Create a polydata to store everything in
+		vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+		polyData->SetPoints(pts);
+
+		vtkSmartPointer<vtkDelaunay2D> delaunay =
+			vtkSmartPointer<vtkDelaunay2D>::New();
+		#if VTK_MAJOR_VERSION <= 5
+		delaunay->SetInput(polyData);
+		#else
+		delaunay->SetInputData(polyData);
+		delaunay->SetSourceData(boundary);
+		#endif
+		delaunay->Update();
+
+		vtkSmartPointer<vtkPolyDataMapper> meshMapper =
+			vtkSmartPointer<vtkPolyDataMapper>::New();
+		meshMapper->SetInputConnection(delaunay->GetOutputPort());
+
+		vtkSmartPointer<vtkPolyData> triPolyData = vtkPolyData::SafeDownCast(meshMapper->GetInput());
+		vtkIdType npts, *ptsTri;
+		triPolyData->GetPolys()->InitTraversal();
+		while(triPolyData->GetPolys()->GetNextCell(npts,ptsTri)) 
+		{ 
+			/*cout << "Del triangle [" << ptsTri[0] << " " << ptsTri[1] << " " << ptsTri[2] << 
+				"]" << endl; */
+			triPtIds.resize(3);
+			triPtIds[0] = ptsTri[0]; triPtIds[1] = ptsTri[1]; triPtIds[2] = ptsTri[2];
+			double dot1, dot2, dot3;
+			double p1[3], p2[3], p3[3];
+			p1[0] = vectorTagPoints[ptsTri[0]].pos[0]; p1[1] = vectorTagPoints[ptsTri[0]].pos[1]; p1[2] = vectorTagPoints[ptsTri[0]].pos[2];
+			p2[0] = vectorTagPoints[ptsTri[1]].pos[0]; p2[1] = vectorTagPoints[ptsTri[1]].pos[1]; p2[2] = vectorTagPoints[ptsTri[1]].pos[2];
+			p3[0] = vectorTagPoints[ptsTri[2]].pos[0]; p3[1] = vectorTagPoints[ptsTri[2]].pos[1]; p3[2] = vectorTagPoints[ptsTri[2]].pos[2];
+			if(Distance(p1,p2)  > 25 || Distance(p2,p3) > 25 || Distance(p1,p3) > 25){
+				//continue;
+			}
+
+			double e1[3], e2[3], e3[3];
+			e1[0] = p2[0] - p1[0]; e1[1] = p2[1] - p1[1]; e1[2] = p2[2] - p1[2];
+			e2[0] = p3[0] - p2[0]; e2[1] = p3[1] - p2[1]; e2[2] = p3[2] - p2[2];
+			e3[0] = p1[0] - p3[0]; e3[1] = p1[1] - p3[1]; e3[2] = p1[2] - p3[2];
+			vtkMath::Normalize(e1); vtkMath::Normalize(e2); vtkMath::Normalize(e3);
+			dot1 = vtkMath::Dot(e1,e2);
+			dot2 = vtkMath::Dot(e1,e3);
+			dot3 = vtkMath::Dot(e2,e3);
+
+			if(dot1 < -0.95 || dot2 < -0.95 || dot3 < -0.95){
+				cout<<"pass"<<endl;
+				continue;
+			}
+			DrawTriangle();
+		} 
+		triPtIds.clear();
+
+		//AutoTriangulation();
+		//vtkSmartPointer<vtkActor> meshActor =
+		//	vtkSmartPointer<vtkActor>::New();
+		//meshActor->SetMapper(meshMapper);
+		//meshActor->GetProperty()->SetColor(0.2,0.8,0.5);
+		//meshActor->GetProperty()->EdgeVisibilityOn();
+		//meshActor->GetProperty()->SetEdgeColor(0,0,0);
+		////meshActor->GetProperty()->SetRepresentationToWireframe();
+		//this->GetDefaultRenderer()->AddActor(meshActor);
+	}
+}
+
+bool PairSort(std::pair<int,double> t1, std::pair<int,double> t2)
+{
+	return (t1.second < t2.second);
+}
+
+void MouseInteractorAdd::AutoTriangulation()
+{
+	for(int i = 0; i < vectorTagPoints.size(); i++)
+	{
+		std::vector<std::pair<int, double>>idDis;
+		for(int j = 0; j < vectorTagPoints.size(); j++)
+		{
+			std::vector<int>shortestId;
+			if(i != j)
+			{
+				double dis = Distance(vectorTagPoints[i].pos, vectorTagPoints[j].pos);
+				
+				if(dis < 15)//threshold
+				{
+					std::pair<int,double> temp;
+					temp.first = j;
+					temp.second = dis;
+					idDis.push_back(temp);
+				}
+			}
+		}
+		std::sort(idDis.begin(), idDis.end(), PairSort);
+		if(idDis.size() >= 2)
+		{
+			triPtIds.clear();
+			
+			for(int j = 0; j < idDis.size(); j++){
+				for(int k = j; k < idDis.size(); k ++){
+					triPtIds.push_back(i);
+					triPtIds.push_back(idDis[j].first);
+					triPtIds.push_back(idDis[k].first);
+					DrawTriangle();
+					triPtIds.clear();
+					cout<<"Create one"<<endl;
+				}
+			}			
+		}		
+	}
+	
+}
+
 vtkStandardNewMacro(MouseInteractorAdd);
