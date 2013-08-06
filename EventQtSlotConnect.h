@@ -29,6 +29,7 @@ class EventQtSlotConnect : public QMainWindow, private Ui::EventQtSlotConnect
 
 public:
 	EventQtSlotConnect();
+	~EventQtSlotConnect();
 	void createActions();
 	void createMenus();
 	void readVTK(std::string filename);
@@ -67,10 +68,35 @@ public slots:
 	void slot_featureAngleSlider(int);
 	void slot_feartureAngleEditor(QString);
 	void slot_decimateButton();
-	
+
+	void slot_tagSizeSlider(int);
+
+	void slot_addPoint();
+	void slot_deletePoint();
+	void slot_createTri();
+	void slot_deleteTri();
+	void slot_flipNormal();
+	void slot_view();
+	void slot_changeTriLabel();
+
+	void slot_updateOperation(int);
+
+	void slot_updateProgressBar();
+
+	void slot_skelTransparentChanged(int);
+
+	void slot_trilabelChanged(int);
+
 	void executeCmrepVskel();	
 
 private:
+
+	void loadSettings();
+	void saveSettings();
+	void setToolButton(int flag);
+	void iniTriLabel();
+
+	QString settingsFile;
 
 	vtkSmartPointer<vtkEventQtSlotConnect> Connections;
 	QFutureWatcher<void> FutureWatcher;
@@ -85,6 +111,12 @@ private:
 
 	double targetReduction;
 	double featureAngle;
+
+	vtkSmartPointer<MouseInteractorAdd> mouseInteractor;
+
+	int progressSignalCount;
+
+	QColor triLabelColors[10];
 };
 
 #endif

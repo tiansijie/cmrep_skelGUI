@@ -68,13 +68,27 @@
 #include <vtkQuadricDecimation.h>
 
 #include <QtGui>
+#include <QObject>
 
 #include "constants.h"
-//#include "EventQtSlotConnect.h"
+
+#define VIEW 0
+#define ADDPOINT 1
+#define DELETEPOINT 2
+#define CREATETRI 3
+#define DELETETRI 4
+#define FLIPNORMAL 5
+#define CHANGETRILABEL 6
+#define PICKPTTRI 7
+
+#define SHOW 0
+#define HIDE 1
+
 
 // Handle mouse events
-class MouseInteractorAdd : public vtkInteractorStyleTrackballCamera
+class MouseInteractorAdd : public QObject, public vtkInteractorStyleTrackballCamera
 {
+	Q_OBJECT
 public:
 	static MouseInteractorAdd* New();
 	vtkTypeMacro(MouseInteractorAdd, vtkInteractorStyleTrackballCamera);
@@ -86,15 +100,20 @@ public:
 	int ConstrainEdge(int type1, int type2);
 	int PairNumber(int a, int b);
 	int DrawTriangle();
-	void DeleteTriangle(double*);
+	bool DrawTriangle(TagTriangle);
+	TagTriangle DeleteTriangle(double*);
+	bool DeleteTriangle(TagTriangle);
 	vtkActor* PickActorFromMesh(double pos[3]);
 	vtkActor* PickActorFromTriangle(double pos[3]);
-	void FlipNormal(double*);
-	void AddPoint(double*);
-	void DeletePoint(double*);
+	bool FlipNormal(double*);
+	TagPoint AddPoint(double*);
+	bool AddPoint(TagPoint);
+	TagPoint DeletePoint(double*);
+	bool DeletePoint(TagPoint tagpt);
 	int PickPointForTri(double*);
 	void CheckNormal(int triId[3]);
 	void AddDecimateEdge(int pointSeq);
+	int ChangeTriLabel(double pos[3]);
 
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
@@ -108,69 +127,11 @@ public:
 	void DrawDelaunayTriangle();
 	void AutoTriangulation();
 	
-	virtual void OnLeftButtonDown()
-	{
-		int* clickPos = new int[2];
-		clickPos = this->GetInteractor()->GetEventPosition();
-		// Pick from this location.
-		vtkSmartPointer<vtkPropPicker>  picker =
-			vtkSmartPointer<vtkPropPicker>::New();
+	virtual void OnLeftButtonDown();
+	void OnKeyRelease();
+	void OnKeyPress();
 
-		int con = 1;
-
-		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
-		if(sucessPick != 0)//pick successful
-		{
-			double* pos = new double[3];
-			pos = picker->GetPickPosition();			
-			vtkRenderWindowInteractor *rwi = this->Interactor;
-
-			if(rwi->GetKeySym() != NULL && isSkeleton)
-			{
-				std::string key = rwi->GetKeySym();
-				//for the adding point event
-				if( rwi->GetControlKey() && pos[0] != 0 && pos[1] != 0 && pos[2] != 0)
-				{
-					reset();
-					AddPoint(pos);
-				}				
-				else if(key.compare("s") == 0 || key.compare("S") == 0)
-				{
-					reset();
-					DeletePoint(pos);	//for delete point event				
-				}								
-				else if(key.compare("q") == 0 || key.compare("Q") == 0 || drawTriMode)
-				{
-					drawTriMode = true;
-					con = PickPointForTri(pos);
-					if(con == 0){
-						QMessageBox messageBox;
-						messageBox.critical(0,"Error","Triangle Violation");
-					}
-				}
-				else if(key.compare("b") == 0 || key.compare("B") == 0)
-				{
-					reset();
-					FlipNormal(pos);
-				}
-				else if(key.compare("d") == 0 || key.compare("D") == 0)
-				{
-					reset();
-					DeleteTriangle(pos);					
-				}
-			}//end of key press
-		}		
-		if(con != 0)
-			vtkInteractorStyleTrackballCamera::OnLeftButtonDown();		
-	}
-
-	void OnKeyRelease()
-	{
-		std::string key = this->Interactor->GetKeySym();
-		if(key.compare("q") != 0 && key.compare("Q") != 0)
-			this->Interactor->SetKeySym("");
-	}
-
+	
 
 	std::vector<int>deletePointIds;
 	std::vector<int>triPtIds;
@@ -181,10 +142,18 @@ public:
 	QLabel *labelPtNumber;
 	QLabel *labelTriNumber;
 
+	int operationFlag;
+	int preOperationFlag;
+	std::string preKey;
+	int skelState;
+	int meshState;
+	int currentTriIndex;
+
+
 	static std::vector<TagInfo> vectorTagInfo;
 	static std::vector<TagTriangle> vectorTagTriangles;
 	static std::vector<TagPoint> vectorTagPoints;
-	static std::vector<std::vector<TagPoint>> vectorClassifyPoints;
+	static std::vector<std::vector<TagPoint> > vectorClassifyPoints;
 	static std::vector<TagEdge> vectorTagEdges;
 	//store all the label info, 0 represent no tag on this point
 	static std::vector<double> labelData;
@@ -193,15 +162,30 @@ public:
 	static int selectedTag;
 	static double targetReduction;
 	static double featureAngle;
+	static double tagRadius;
 
 	static double triCol[3];
 	static double backCol[3];
 
 	static bool decimateMode;
 
+	int actionCounter;
+	QColor triLabelColors[10];
+signals:
+	void operationChanged(int);
+	void skelStateChanged(int);
+	void meshStateChanged(int);
 
 private:
+	void DoAction(int action);
+	void DoAction(int action, double pos[3], int triIndex = -1);//flip normal and change triangle label;
+	void DoAction(int action, TagPoint pointInfo);//for point interaction
+	void DoAction(int action, TagTriangle triangleInfo);//for triangle interaction
+	void UndoAction();
+	void RedoAction();	
+
 	bool drawTriMode;
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
+	std::vector<TagAction> vectorActions;		
 };
 #endif

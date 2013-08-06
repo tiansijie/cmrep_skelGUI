@@ -20,6 +20,8 @@ struct TagTriangle
 	double centerPos[3];
 	int id1, id2, id3;//for point index in tagPoint
 	int seq1, seq2, seq3;//for point index in total point
+	int index;
+	//double triColor[3];
 };
 
 
@@ -42,6 +44,15 @@ struct TagEdge
 	int constrain;
 	int numEdge;
 	int seq;//use of deletion
+};
+
+struct TagAction
+{
+	int action;
+	double pos[3];
+	int triIndex;//for triangle label
+	TagPoint pointInfo;
+	TagTriangle triangleInfo;
 };
 
 #endif

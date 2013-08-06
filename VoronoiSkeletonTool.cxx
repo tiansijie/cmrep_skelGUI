@@ -129,6 +129,7 @@ vtkPolyData *ReadVoronoiOutput(
     if(i >= next_prog_mark)
       {
       cout << "." << flush;
+	  
       next_prog_mark += nv / 50;
       }
     }
@@ -459,10 +460,12 @@ int VoronoiSkeletonTool::execute(int argc, std::vector <char*> argv)
     if(i >= next_prog_mark)
       {
       cout << "." << flush;
+	  emit progressChanged();
       next_prog_mark += nv / 50;
       }
     }
   cout << "." << endl;
+  emit progressChanged();
 
   // Read the number of cells
   fin >> np;
@@ -572,6 +575,7 @@ int VoronoiSkeletonTool::execute(int argc, std::vector <char*> argv)
     if(j >= next_prog_mark)
       {
       cout << "." << flush;
+	  emit progressChanged();
       next_prog_mark += np / 50;
       }
 
@@ -579,6 +583,7 @@ int VoronoiSkeletonTool::execute(int argc, std::vector <char*> argv)
     }
 
   cout << "." << endl;
+  emit progressChanged();
   cout << "Edge contraint pruned " << npruned_edge << " faces." << endl;
   cout << "Geodesic to Euclidean distance ratio contraint (" << xPrune << ") pruned " << npruned_geo << " faces." << endl;
 

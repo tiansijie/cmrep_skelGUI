@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>868</width>
-    <height>604</height>
+    <width>900</width>
+    <height>631</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <x>20</x>
       <y>30</y>
       <width>551</width>
-      <height>531</height>
+      <height>571</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -41,8 +41,8 @@
      <rect>
       <x>590</x>
       <y>30</y>
-      <width>251</width>
-      <height>531</height>
+      <width>291</width>
+      <height>571</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -58,8 +58,8 @@
      <widget class="QPushButton" name="cmrepVskel">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>440</y>
+        <x>90</x>
+        <y>310</y>
         <width>101</width>
         <height>31</height>
        </rect>
@@ -71,59 +71,73 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>100</y>
-        <width>54</width>
-        <height>12</height>
+        <width>91</width>
+        <height>16</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Minimal number of mesh edges separating two generator points of a VD face for it to be considered (try 2, 3)</string>
+      </property>
       <property name="text">
-       <string>e</string>
+       <string>Edge Criterion</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>130</y>
-        <width>54</width>
-        <height>12</height>
+        <width>101</width>
+        <height>16</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Prune the mesh using factor X.XX (try 2.0). The pruning algorithm deletes faces in the VD for which the ratio of the 
+geodesic distance between the generating points and the euclidean distance between these points is less than X.XX</string>
+      </property>
       <property name="text">
-       <string>p</string>
+       <string>Pruning Factor</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>160</y>
-        <width>54</width>
-        <height>12</height>
+        <width>111</width>
+        <height>16</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Take at most N connected components of the skeleton</string>
+      </property>
       <property name="text">
-       <string>c</string>
+       <string>Max Conn.Component</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>190</y>
-        <width>54</width>
-        <height>12</height>
+        <width>71</width>
+        <height>16</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Tolerance for the inside/outside search algorithm (default 1e-6). Use lower values if holes appear in the skeleton. Set to 
+zero to disable pruning of outside vertices</string>
+      </property>
       <property name="text">
-       <string>t</string>
+       <string>Tolerance</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="eParameter">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>150</x>
         <y>100</y>
         <width>42</width>
         <height>22</height>
@@ -133,28 +147,21 @@
      <widget class="QDoubleSpinBox" name="pParameter">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>150</x>
         <y>130</y>
         <width>62</width>
         <height>22</height>
        </rect>
       </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
      </widget>
      <widget class="QSpinBox" name="cParameter">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>150</x>
         <y>160</y>
-        <width>42</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="tParameter">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>190</y>
         <width>42</width>
         <height>22</height>
        </rect>
@@ -165,7 +172,7 @@
        <rect>
         <x>0</x>
         <y>220</y>
-        <width>251</width>
+        <width>291</width>
         <height>20</height>
        </rect>
       </property>
@@ -178,7 +185,7 @@
        <rect>
         <x>-10</x>
         <y>60</y>
-        <width>251</width>
+        <width>301</width>
         <height>20</height>
        </rect>
       </property>
@@ -189,7 +196,7 @@
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>100</x>
         <y>70</y>
         <width>101</width>
         <height>21</height>
@@ -202,7 +209,7 @@
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>110</x>
         <y>240</y>
         <width>91</width>
         <height>16</height>
@@ -213,10 +220,13 @@
       </property>
      </widget>
      <widget class="QLabel" name="label_7">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>260</y>
+        <x>50</x>
+        <y>380</y>
         <width>54</width>
         <height>12</height>
        </rect>
@@ -228,8 +238,8 @@
      <widget class="QLineEdit" name="sParameter">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>260</y>
+        <x>90</x>
+        <y>380</y>
         <width>113</width>
         <height>20</height>
        </rect>
@@ -238,8 +248,8 @@
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>290</y>
+        <x>50</x>
+        <y>410</y>
         <width>54</width>
         <height>12</height>
        </rect>
@@ -251,8 +261,8 @@
      <widget class="QLineEdit" name="RParameter">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>290</y>
+        <x>90</x>
+        <y>410</y>
         <width>113</width>
         <height>20</height>
        </rect>
@@ -261,8 +271,8 @@
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>320</y>
+        <x>50</x>
+        <y>440</y>
         <width>54</width>
         <height>12</height>
        </rect>
@@ -274,8 +284,8 @@
      <widget class="QLineEdit" name="TParameter">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>320</y>
+        <x>90</x>
+        <y>440</y>
         <width>113</width>
         <height>20</height>
        </rect>
@@ -284,8 +294,8 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>350</y>
+        <x>50</x>
+        <y>470</y>
         <width>54</width>
         <height>12</height>
        </rect>
@@ -297,8 +307,8 @@
      <widget class="QLineEdit" name="IParameter">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>350</y>
+        <x>90</x>
+        <y>470</y>
         <width>113</width>
         <height>20</height>
        </rect>
@@ -307,22 +317,26 @@
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>380</y>
-        <width>54</width>
-        <height>12</height>
+        <x>10</x>
+        <y>270</y>
+        <width>151</width>
+        <height>16</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Postprocess skeleton with VTK's quadric clustering filter. The effect is to reduce the number of vertices in the skeleton. 
+Parameter n_bins is the number of bins in each dimension. A good value for n_bins is 20-50</string>
+      </property>
       <property name="text">
-       <string>q</string>
+       <string>Quadric Clustering Bins</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="qParameter">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>380</y>
-        <width>113</width>
+        <x>160</x>
+        <y>270</y>
+        <width>101</width>
         <height>20</height>
        </rect>
       </property>
@@ -330,7 +344,7 @@
      <widget class="QLabel" name="label_12">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>100</x>
         <y>0</y>
         <width>101</width>
         <height>21</height>
@@ -343,26 +357,88 @@
      <widget class="QLabel" name="label_13">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>40</y>
-        <width>54</width>
-        <height>12</height>
+        <width>121</width>
+        <height>16</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string> Path to the qvoronoi executable</string>
+      </property>
+      <property name="whatsThis">
+       <string/>
+      </property>
       <property name="text">
-       <string>Path</string>
+       <string>Path to the Qvoronoi</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="pathParameter">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>150</x>
         <y>40</y>
         <width>113</width>
         <height>20</height>
        </rect>
       </property>
      </widget>
+     <widget class="QDoubleSpinBox" name="tParameter">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>190</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+     </widget>
+     <widget class="QProgressBar" name="cmrep_progressBar">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>370</y>
+        <width>261</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
+      </property>
+      <property name="textVisible">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <zorder>label_9</zorder>
+     <zorder>label_8</zorder>
+     <zorder>IParameter</zorder>
+     <zorder>sParameter</zorder>
+     <zorder>label_7</zorder>
+     <zorder>RParameter</zorder>
+     <zorder>label_10</zorder>
+     <zorder>TParameter</zorder>
+     <zorder>cmrepVskel</zorder>
+     <zorder>label</zorder>
+     <zorder>label_2</zorder>
+     <zorder>label_3</zorder>
+     <zorder>label_4</zorder>
+     <zorder>eParameter</zorder>
+     <zorder>pParameter</zorder>
+     <zorder>cParameter</zorder>
+     <zorder>line</zorder>
+     <zorder>line_2</zorder>
+     <zorder>label_5</zorder>
+     <zorder>label_6</zorder>
+     <zorder>label_11</zorder>
+     <zorder>qParameter</zorder>
+     <zorder>label_12</zorder>
+     <zorder>label_13</zorder>
+     <zorder>pathParameter</zorder>
+     <zorder>tParameter</zorder>
+     <zorder>cmrep_progressBar</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -372,9 +448,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
-        <width>231</width>
-        <height>131</height>
+        <y>230</y>
+        <width>271</width>
+        <height>111</height>
        </rect>
       </property>
       <property name="title">
@@ -385,7 +461,7 @@
         <rect>
          <x>20</x>
          <y>20</y>
-         <width>181</width>
+         <width>231</width>
          <height>22</height>
         </rect>
        </property>
@@ -403,7 +479,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>60</y>
+         <y>50</y>
          <width>75</width>
          <height>23</height>
         </rect>
@@ -415,8 +491,8 @@
       <widget class="QPushButton" name="pushButtonDeleteTag">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>60</y>
+         <x>180</x>
+         <y>50</y>
          <width>71</width>
          <height>23</height>
         </rect>
@@ -428,8 +504,8 @@
       <widget class="QPushButton" name="pushButtonEditTag">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>100</y>
+         <x>100</x>
+         <y>50</y>
          <width>71</width>
          <height>23</height>
         </rect>
@@ -438,12 +514,47 @@
         <string>Edit Tag</string>
        </property>
       </widget>
+      <widget class="QSlider" name="TagSizeSlider">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>80</y>
+         <width>141</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>50</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_20">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>80</y>
+         <width>91</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Tag Point Size</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QLabel" name="labelPoint">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>220</y>
+        <y>350</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -465,7 +576,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>220</y>
+        <y>350</y>
         <width>31</width>
         <height>16</height>
        </rect>
@@ -487,7 +598,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>240</y>
+        <y>370</y>
         <width>101</width>
         <height>16</height>
        </rect>
@@ -509,7 +620,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>240</y>
+        <y>370</y>
         <width>31</width>
         <height>16</height>
        </rect>
@@ -531,8 +642,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>231</width>
+        <y>160</y>
+        <width>271</width>
         <height>61</height>
        </rect>
       </property>
@@ -549,7 +660,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Hide Mesh</string>
+        <string>Hide (M)esh</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkBoxHideSkel">
@@ -557,12 +668,28 @@
         <rect>
          <x>10</x>
          <y>20</y>
-         <width>101</width>
+         <width>121</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>Hide Skeleton</string>
+        <string>(H)ide Skeleton</string>
+       </property>
+      </widget>
+      <widget class="QSlider" name="SkelTransparentSlider">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>20</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="value">
+        <number>99</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </widget>
@@ -570,9 +697,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>270</y>
-        <width>231</width>
-        <height>201</height>
+        <y>390</y>
+        <width>271</width>
+        <height>151</height>
        </rect>
       </property>
       <property name="title">
@@ -582,7 +709,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
+         <y>40</y>
          <width>151</width>
          <height>22</height>
         </rect>
@@ -597,7 +724,7 @@
         <number>10</number>
        </property>
        <property name="value">
-        <number>0</number>
+        <number>96</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -607,17 +734,20 @@
        <property name="geometry">
         <rect>
          <x>180</x>
-         <y>60</y>
+         <y>40</y>
          <width>41</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="text">
+        <string>0.96</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_18">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
+         <y>20</y>
          <width>131</width>
          <height>16</height>
         </rect>
@@ -630,7 +760,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>100</y>
+         <y>70</y>
          <width>91</width>
          <height>16</height>
         </rect>
@@ -643,7 +773,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>120</y>
+         <y>90</y>
          <width>151</width>
          <height>22</height>
         </rect>
@@ -658,7 +788,7 @@
         <number>10</number>
        </property>
        <property name="value">
-        <number>0</number>
+        <number>30</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -668,17 +798,20 @@
        <property name="geometry">
         <rect>
          <x>180</x>
-         <y>120</y>
+         <y>90</y>
          <width>41</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="text">
+        <string>30</string>
        </property>
       </widget>
       <widget class="QPushButton" name="ApplyDecimateButton">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>160</y>
+         <x>80</x>
+         <y>120</y>
          <width>121</width>
          <height>23</height>
         </rect>
@@ -688,6 +821,153 @@
        </property>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>271</width>
+        <height>141</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Tools</string>
+      </property>
+      <widget class="QToolButton" name="AddPointToolButton">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <underline>false</underline>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Add Tag Points(ctrl)</string>
+       </property>
+       <property name="text">
+        <string>(A)dd Point</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="DelPointToolButton">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>20</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Delete tag points(s)</string>
+       </property>
+       <property name="text">
+        <string>D(e)lete Point</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="CreateTriToolButton">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create triangle by clicking three different points(q)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Create (T)riangle</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="DelTriToolButton">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>40</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete triangle(d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>(D)elete Triangle</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="FlipNormalToolButton">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>60</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flip normal of triangle(b)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>(F)lip Normal</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="ViewToolButton">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>(V)iew Model</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>80</y>
+         <width>251</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Triangle Label</string>
+       </property>
+       <widget class="QComboBox" name="TriLabelComboBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>121</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="ChangeTriLabelButton">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>20</y>
+          <width>101</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Change (L)abel</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
      <zorder>SkandMeshgroupBox</zorder>
      <zorder>TaggroupBox</zorder>
      <zorder>labelPoint</zorder>
@@ -695,6 +975,7 @@
      <zorder>labelTriangle</zorder>
      <zorder>TriangleNumber</zorder>
      <zorder>groupBox</zorder>
+     <zorder>groupBox_2</zorder>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -705,7 +986,7 @@
        <rect>
         <x>0</x>
         <y>10</y>
-        <width>241</width>
+        <width>281</width>
         <height>241</height>
        </rect>
       </property>
@@ -820,9 +1101,9 @@
       <widget class="Line" name="line_3">
        <property name="geometry">
         <rect>
-         <x>7</x>
+         <x>-3</x>
          <y>90</y>
-         <width>221</width>
+         <width>281</width>
          <height>20</height>
         </rect>
        </property>
@@ -849,9 +1130,9 @@
       <widget class="Line" name="line_4">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>-10</x>
          <y>170</y>
-         <width>211</width>
+         <width>291</width>
          <height>20</height>
         </rect>
        </property>
@@ -891,25 +1172,39 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QProgressBar" name="cmrep_progressBar">
+   <widget class="QLabel" name="OperationModelLabel">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>250</y>
-      <width>241</width>
-      <height>21</height>
+      <x>20</x>
+      <y>10</y>
+      <width>121</width>
+      <height>16</height>
      </rect>
     </property>
-    <property name="value">
-     <number>24</number>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
-    <property name="textVisible">
-     <bool>false</bool>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <property name="textInteractionFlags">
+     <set>Qt::LinksAccessibleByMouse|Qt::TextEditable</set>
     </property>
    </widget>
    <zorder>tabWidget</zorder>
    <zorder>qvtkWidget</zorder>
-   <zorder>cmrep_progressBar</zorder>
+   <zorder>OperationModelLabel</zorder>
   </widget>
   <action name="actionOpenFile">
    <property name="enabled">
