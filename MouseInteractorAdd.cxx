@@ -34,6 +34,7 @@ MouseInteractorAdd::MouseInteractorAdd(){
 	skelState = meshState = SHOW;
 	preKey = "";
 	actionCounter = -1;
+	isCtrlPress = false;
 }
 
 void MouseInteractorAdd::OnLeftButtonDown()
@@ -135,6 +136,9 @@ void MouseInteractorAdd::OnKeyRelease()
 	if(key.compare("t") != 0 && key.compare("T") != 0){
 		this->Interactor->SetKeySym("");			
 	}
+	
+	if(key.compare("Control_L") == 0 || key.compare("Control_R") == 0)
+		isCtrlPress = false;
 
 	if(isKeyNeeded(key) && key.compare("Control_L") != 0 && key.compare("c") != 0 && isSkeleton){
 		operationFlag = preOperationFlag;
@@ -146,6 +150,9 @@ void MouseInteractorAdd::OnKeyPress()
 {
 	vtkRenderWindowInteractor *rwi = this->Interactor;
 	std::string key = rwi->GetKeySym();
+	if(key.compare("Control_L") == 0 || key.compare("Control_R") == 0)
+		isCtrlPress = true;
+
 	if(isSkeleton && isKeyNeeded(key)  && key.compare("Control_L") != 0 && key.compare("c") != 0) 
 	{
 		if(preKey.compare(key) != 0)
@@ -202,11 +209,13 @@ void MouseInteractorAdd::OnKeyPress()
 				emit meshStateChanged(HIDE);
 			}
 		}
-		else if(key.compare("z") == 0 || key.compare("Z") == 0)
+		else if(key.compare("z") == 0 || key.compare("Z") == 0 && isCtrlPress)
 		{
 			UndoAction();
 		}
+		
 	}
+	vtkInteractorStyleTrackballCamera::OnKeyPress();
 }
 
 double MouseInteractorAdd::Distance(double p1[3], double p2[3]){

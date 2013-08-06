@@ -187,5 +187,6 @@ private:
 	bool drawTriMode;
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
 	std::vector<TagAction> vectorActions;		
+	bool isCtrlPress;
 };
 #endif
