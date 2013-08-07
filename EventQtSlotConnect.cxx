@@ -167,7 +167,10 @@ EventQtSlotConnect::EventQtSlotConnect()
   settingsFile = QApplication::applicationDirPath() + "/settings.ini";
   loadSettings(); 
 
-  //this->OperationModelLabel->setStyleSheet("QLabel { color : white; }");
+  vtkSmartPointer<vtkRenderer> renderer = 
+	  vtkSmartPointer<vtkRenderer>::New();
+  this->qvtkWidget->GetRenderWindow()->AddRenderer(renderer);
+  this->qvtkWidget->update();
 };
 
 EventQtSlotConnect::~EventQtSlotConnect()
@@ -1047,7 +1050,7 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	this->PointNumber->setText(QString::number(MouseInteractorAdd::vectorTagPoints.size()));
 	this->TriangleNumber->setText(QString::number(MouseInteractorAdd::vectorTagTriangles.size()));
 
-	 this->ViewToolButton->setEnabled(false);
+	this->ViewToolButton->setEnabled(false);
 }
 
 void EventQtSlotConnect::saveVTKFile(QString fileName)

@@ -53,6 +53,7 @@ struct TagAction
 	int triIndex;//for triangle label
 	TagPoint pointInfo;
 	TagTriangle triangleInfo;
+	int ptIndex;
 };
 
 #endif

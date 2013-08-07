@@ -42,18 +42,20 @@ void MouseInteractorAdd::OnLeftButtonDown()
 	int* clickPos = new int[2];
 	clickPos = this->GetInteractor()->GetEventPosition();
 	// Pick from this location.
-	vtkSmartPointer<vtkPropPicker>  picker =
-		vtkSmartPointer<vtkPropPicker>::New();
+	/*vtkSmartPointer<vtkPropPicker>  picker =
+	vtkSmartPointer<vtkPropPicker>::New();*/
+	vtkSmartPointer<vtkCellPicker>  picker =
+		vtkSmartPointer<vtkCellPicker>::New();
 
 	int con = 1;
-
 	int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
 	if(sucessPick != 0)//pick successful
 	{
 		double* pos = new double[3];
-		pos = picker->GetPickPosition();			
+		double* temp = new double [3];
+		temp = picker->GetSelectionPoint();
+		pos = picker->GetPickPosition();		
 		vtkRenderWindowInteractor *rwi = this->Interactor;
-
 		if(isSkeleton)
 		{
 			std::string key;
@@ -65,6 +67,7 @@ void MouseInteractorAdd::OnLeftButtonDown()
 			if( (key.compare("a") == 0 || key.compare("A") == 0|| operationFlag == ADDPOINT) && pos[0] != 0 && pos[1] != 0 && pos[2] != 0)
 			{
 				reset();
+				
 				TagPoint tagpt = AddPoint(pos);
 				if(tagpt.actor != NULL)
 					DoAction(ADDPOINT, tagpt);
@@ -209,7 +212,7 @@ void MouseInteractorAdd::OnKeyPress()
 				emit meshStateChanged(HIDE);
 			}
 		}
-		else if(key.compare("z") == 0 || key.compare("Z") == 0 && isCtrlPress)
+		else if((key.compare("z") == 0 || key.compare("Z") == 0 )&& isCtrlPress)
 		{
 			UndoAction();
 		}
@@ -804,7 +807,7 @@ TagPoint MouseInteractorAdd::AddPoint(double* pos)
 			for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++){
 				double p[3];
 				vtkdata->GetPoint(i,p);
-				double dist = std::sqrt(std::pow(pos[0] - p[0],2) + std::pow(pos[1] - p[1], 2) + std::pow(pos[2] - p[2], 2));
+				double dist = Distance(pos, p);
 				if(dist < minDistance){
 					minDistance = dist;
 					pointSeq = i;
@@ -1025,6 +1028,23 @@ bool MouseInteractorAdd::DeletePoint(TagPoint tagpt)
 
 int MouseInteractorAdd::PickPointForTri(double* pos)
 {
+	for(int i = 0; i < triPtIds.size(); i ++)
+	{
+		double* actorPos = new double[3];
+		actorPos = vectorTagPoints[triPtIds[i]].actor->GetCenter();
+		double deltaDis = Distance(pos, actorPos);
+		if(deltaDis <= tagRadius)
+		{
+			TagPoint at = vectorTagPoints[triPtIds[i]];
+			vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+				vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+				vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);			
+			DoAction(DESELECTPT, triPtIds[i]);
+			triPtIds.erase(triPtIds.begin() + i);
+			return 2;
+		}
+	}
+
 	for(int i = 0; i < vectorTagPoints.size(); i++)
 	{
 		TagPoint at = vectorTagPoints[i];
@@ -1336,7 +1356,6 @@ void MouseInteractorAdd::DoAction(int action)
 	TagAction ac;
 	ac.action = action;
 	vectorActions.push_back(ac);
-	actionCounter ++;
 }
 
 void MouseInteractorAdd::DoAction(int action, double pos[3], int triIndex)
@@ -1347,9 +1366,7 @@ void MouseInteractorAdd::DoAction(int action, double pos[3], int triIndex)
 	ac.pos[1] = pos[1];
 	ac.pos[2] = pos[2];
 	ac.triIndex = triIndex;
-
 	vectorActions.push_back(ac);
-	actionCounter++;
 }
 
 void MouseInteractorAdd::DoAction(int action, TagPoint pointInfo)
@@ -1357,9 +1374,7 @@ void MouseInteractorAdd::DoAction(int action, TagPoint pointInfo)
 	TagAction ac;
 	ac.action = action;
 	ac.pointInfo = pointInfo;
-
 	vectorActions.push_back(ac);
-	actionCounter ++;
 }
 
 void MouseInteractorAdd::DoAction(int action, TagTriangle triangleInfo)
@@ -1367,9 +1382,15 @@ void MouseInteractorAdd::DoAction(int action, TagTriangle triangleInfo)
 	TagAction ac;
 	ac.action = action;
 	ac.triangleInfo = triangleInfo;
-
 	vectorActions.push_back(ac);
-	actionCounter ++;
+}
+
+void MouseInteractorAdd::DoAction(int action, int ptIndex)
+{
+	TagAction ac;
+	ac.action = action;
+	ac.ptIndex = ptIndex;
+	vectorActions.push_back(ac);
 }
 
 void MouseInteractorAdd::UndoAction()
@@ -1396,18 +1417,29 @@ void MouseInteractorAdd::UndoAction()
 			}
 			else if(actionIndex == PICKPTTRI)
 			{
-				int index = triPtIds[triPtIds.size() - 1];
-				TagPoint at = vectorTagPoints[index];
-				vectorTagPoints[index].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
-					vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
-					vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
-				triPtIds.erase(triPtIds.begin() + triPtIds.size()-1);
+				if(triPtIds.size() > 0){
+					int index = triPtIds[triPtIds.size() - 1];
+					TagPoint at = vectorTagPoints[index];
+					vectorTagPoints[index].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+						vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+						vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
+					triPtIds.erase(triPtIds.begin() + triPtIds.size()-1);
+					flag = true;
+				}
+				vectorActions.erase(vectorActions.end() - 1);
+			}
+			else if(actionIndex == DESELECTPT)
+			{
+				int index = vectorActions[size].ptIndex;
+				vectorTagPoints[index].actor->GetProperty()->SetColor(1,1,1);
+				triPtIds.push_back(index);
 				vectorActions.erase(vectorActions.end() - 1);
 				flag = true;
 			}
 			else if(actionIndex == CREATETRI)
 			{
 				flag = DeleteTriangle(vectorActions[size].triangleInfo);
+				int i = vectorActions.size() - 1;
 				for(int i = 0; i < 3; i++)
 					vectorActions.erase(vectorActions.end() - 1);
 			}

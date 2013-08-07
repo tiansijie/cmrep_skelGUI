@@ -66,6 +66,8 @@
 #include <vtkDecimatePro.h>
 #include <vtkTriangleFilter.h>
 #include <vtkQuadricDecimation.h>
+#include <vtkPointPicker.h>
+#include <vtkCellPicker.h>
 
 #include <QtGui>
 #include <QObject>
@@ -80,6 +82,7 @@
 #define FLIPNORMAL 5
 #define CHANGETRILABEL 6
 #define PICKPTTRI 7
+#define DESELECTPT 8
 
 #define SHOW 0
 #define HIDE 1
@@ -181,6 +184,7 @@ private:
 	void DoAction(int action, double pos[3], int triIndex = -1);//flip normal and change triangle label;
 	void DoAction(int action, TagPoint pointInfo);//for point interaction
 	void DoAction(int action, TagTriangle triangleInfo);//for triangle interaction
+	void DoAction(int action, int ptIndex);
 	void UndoAction();
 	void RedoAction();	
 

@@ -6,1202 +6,779 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>631</height>
+    <width>855</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>EventQtSlotConnect</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QVTKWidget" name="qvtkWidget">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>551</width>
-      <height>571</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>30</y>
-      <width>291</width>
-      <height>571</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>1</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <attribute name="title">
-      <string>Cmrep Skeleton</string>
-     </attribute>
-     <widget class="QPushButton" name="cmrepVskel">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>310</y>
-        <width>101</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Get Skeleton</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>100</y>
-        <width>91</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Minimal number of mesh edges separating two generator points of a VD face for it to be considered (try 2, 3)</string>
-      </property>
-      <property name="text">
-       <string>Edge Criterion</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>130</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Prune the mesh using factor X.XX (try 2.0). The pruning algorithm deletes faces in the VD for which the ratio of the 
-geodesic distance between the generating points and the euclidean distance between these points is less than X.XX</string>
-      </property>
-      <property name="text">
-       <string>Pruning Factor</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>111</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Take at most N connected components of the skeleton</string>
-      </property>
-      <property name="text">
-       <string>Max Conn.Component</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>190</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Tolerance for the inside/outside search algorithm (default 1e-6). Use lower values if holes appear in the skeleton. Set to 
-zero to disable pruning of outside vertices</string>
-      </property>
-      <property name="text">
-       <string>Tolerance</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="eParameter">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>100</y>
-        <width>42</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QDoubleSpinBox" name="pParameter">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>130</y>
-        <width>62</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="cParameter">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>160</y>
-        <width>42</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="Line" name="line">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>220</y>
-        <width>291</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="Line" name="line_2">
-      <property name="geometry">
-       <rect>
-        <x>-10</x>
-        <y>60</y>
-        <width>301</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>70</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Pruning Options</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>240</y>
-        <width>91</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Output Options</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0" columnstretch="9,4">
+    <item row="0" column="0">
+     <widget class="QLabel" name="OperationModelLabel">
       <property name="enabled">
        <bool>true</bool>
       </property>
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>380</y>
-        <width>54</width>
-        <height>12</height>
-       </rect>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
       </property>
       <property name="text">
-       <string>s</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="sParameter">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>380</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>410</y>
-        <width>54</width>
-        <height>12</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>R</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="RParameter">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>410</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_9">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>440</y>
-        <width>54</width>
-        <height>12</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>T</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="TParameter">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>440</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_10">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>470</y>
-        <width>54</width>
-        <height>12</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>I</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="IParameter">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>470</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_11">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>270</y>
-        <width>151</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Postprocess skeleton with VTK's quadric clustering filter. The effect is to reduce the number of vertices in the skeleton. 
-Parameter n_bins is the number of bins in each dimension. A good value for n_bins is 20-50</string>
-      </property>
-      <property name="text">
-       <string>Quadric Clustering Bins</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="qParameter">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>270</y>
-        <width>101</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_12">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>0</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>General Option</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_13">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string> Path to the qvoronoi executable</string>
-      </property>
-      <property name="whatsThis">
        <string/>
       </property>
-      <property name="text">
-       <string>Path to the Qvoronoi</string>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextEditable</set>
       </property>
      </widget>
-     <widget class="QLineEdit" name="pathParameter">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>40</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
+    </item>
+    <item row="1" column="0">
+     <widget class="QVTKWidget" name="qvtkWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
       </property>
      </widget>
-     <widget class="QDoubleSpinBox" name="tParameter">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>190</y>
-        <width>62</width>
-        <height>22</height>
-       </rect>
+    </item>
+    <item row="1" column="1">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
+      <property name="minimumSize">
+       <size>
+        <width>206</width>
+        <height>598</height>
+       </size>
       </property>
-     </widget>
-     <widget class="QProgressBar" name="cmrep_progressBar">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>370</y>
-        <width>261</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="value">
-       <number>24</number>
-      </property>
-      <property name="textVisible">
+      <property name="autoFillBackground">
        <bool>false</bool>
       </property>
-     </widget>
-     <zorder>label_9</zorder>
-     <zorder>label_8</zorder>
-     <zorder>IParameter</zorder>
-     <zorder>sParameter</zorder>
-     <zorder>label_7</zorder>
-     <zorder>RParameter</zorder>
-     <zorder>label_10</zorder>
-     <zorder>TParameter</zorder>
-     <zorder>cmrepVskel</zorder>
-     <zorder>label</zorder>
-     <zorder>label_2</zorder>
-     <zorder>label_3</zorder>
-     <zorder>label_4</zorder>
-     <zorder>eParameter</zorder>
-     <zorder>pParameter</zorder>
-     <zorder>cParameter</zorder>
-     <zorder>line</zorder>
-     <zorder>line_2</zorder>
-     <zorder>label_5</zorder>
-     <zorder>label_6</zorder>
-     <zorder>label_11</zorder>
-     <zorder>qParameter</zorder>
-     <zorder>label_12</zorder>
-     <zorder>label_13</zorder>
-     <zorder>pathParameter</zorder>
-     <zorder>tParameter</zorder>
-     <zorder>cmrep_progressBar</zorder>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Pick</string>
-     </attribute>
-     <widget class="QGroupBox" name="TaggroupBox">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>230</y>
-        <width>271</width>
-        <height>111</height>
-       </rect>
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <property name="title">
-       <string>Tag</string>
-      </property>
-      <widget class="QComboBox" name="comboBoxTagPoint">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>231</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-       <property name="maxVisibleItems">
-        <number>10</number>
-       </property>
-       <property name="duplicatesEnabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButtonAddTag">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>50</y>
-         <width>75</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Add Tag</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButtonDeleteTag">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>50</y>
-         <width>71</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Delete Tag</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButtonEditTag">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>50</y>
-         <width>71</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Edit Tag</string>
-       </property>
-      </widget>
-      <widget class="QSlider" name="TagSizeSlider">
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>80</y>
-         <width>141</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>50</number>
-       </property>
-       <property name="singleStep">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>10</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_20">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>91</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Tag Point Size</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QLabel" name="labelPoint">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>350</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Point Number:</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="PointNumber">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>350</y>
-        <width>31</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="labelTriangle">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>370</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Triangle Number:</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="TriangleNumber">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>370</y>
-        <width>31</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QGroupBox" name="SkandMeshgroupBox">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>271</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Skeleton and Mesh</string>
-      </property>
-      <widget class="QCheckBox" name="checkBoxHideMesh">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>101</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Hide (M)esh</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="checkBoxHideSkel">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>121</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>(H)ide Skeleton</string>
-       </property>
-      </widget>
-      <widget class="QSlider" name="SkelTransparentSlider">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>20</y>
-         <width>121</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="value">
-        <number>99</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>390</y>
-        <width>271</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Decimation</string>
-      </property>
-      <widget class="QSlider" name="TargetReductSlider">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>151</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="singleStep">
-        <number>1</number>
-       </property>
-       <property name="pageStep">
-        <number>10</number>
-       </property>
-       <property name="value">
-        <number>96</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="TargetReductLineEdit">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>40</y>
-         <width>41</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>0.96</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_18">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>131</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Target Reduction</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_19">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>91</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Feature Angle</string>
-       </property>
-      </widget>
-      <widget class="QSlider" name="FeatureAngleSlider">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>151</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>360</number>
-       </property>
-       <property name="singleStep">
-        <number>1</number>
-       </property>
-       <property name="pageStep">
-        <number>10</number>
-       </property>
-       <property name="value">
-        <number>30</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="FeatureAngleLineEdit">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>90</y>
-         <width>41</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>30</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="ApplyDecimateButton">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>120</y>
-         <width>121</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Apply Decimation</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>271</width>
-        <height>141</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Tools</string>
-      </property>
-      <widget class="QToolButton" name="AddPointToolButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <underline>false</underline>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Add Tag Points(ctrl)</string>
-       </property>
-       <property name="text">
-        <string>(A)dd Point</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="DelPointToolButton">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>20</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Delete tag points(s)</string>
-       </property>
-       <property name="text">
-        <string>D(e)lete Point</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="CreateTriToolButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create triangle by clicking three different points(q)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Create (T)riangle</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="DelTriToolButton">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>40</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete triangle(d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>(D)elete Triangle</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="FlipNormalToolButton">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>60</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flip normal of triangle(b)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>(F)lip Normal</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="ViewToolButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>(V)iew Model</string>
-       </property>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>251</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Triangle Label</string>
-       </property>
-       <widget class="QComboBox" name="TriLabelComboBox">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>121</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="ChangeTriLabelButton">
-        <property name="geometry">
-         <rect>
-          <x>140</x>
-          <y>20</y>
-          <width>101</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Change (L)abel</string>
-        </property>
-       </widget>
-      </widget>
-     </widget>
-     <zorder>SkandMeshgroupBox</zorder>
-     <zorder>TaggroupBox</zorder>
-     <zorder>labelPoint</zorder>
-     <zorder>PointNumber</zorder>
-     <zorder>labelTriangle</zorder>
-     <zorder>TriangleNumber</zorder>
-     <zorder>groupBox</zorder>
-     <zorder>groupBox_2</zorder>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>Save Option</string>
-     </attribute>
-     <widget class="QGroupBox" name="SaveOptiongroupBox">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>10</y>
-        <width>281</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Save Option</string>
-      </property>
-      <widget class="QLabel" name="label_14">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>40</y>
-         <width>54</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Grid Type</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="GridTypeComboBox">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>40</y>
-         <width>111</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_15">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>111</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Subdivision Level</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="SubLevelComboBox">
+      <widget class="QWidget" name="tab">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>70</y>
-         <width>41</width>
-         <height>22</height>
-        </rect>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
        </property>
-       <item>
-        <property name="text">
-         <string>0</string>
+       <attribute name="title">
+        <string>Cmrep Skeleton</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_9" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="0,0,0,0,0,0,0">
+        <property name="spacing">
+         <number>2</number>
         </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>1</string>
+        <item row="0" column="3" colspan="3">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>General Option</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5" colspan="2">
+         <widget class="QLineEdit" name="pathParameter"/>
+        </item>
+        <item row="2" column="0" rowspan="2" colspan="7">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="5" colspan="2">
+         <widget class="QSpinBox" name="eParameter"/>
+        </item>
+        <item row="5" column="5" colspan="2">
+         <widget class="QDoubleSpinBox" name="pParameter">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="3">
+         <widget class="QLabel" name="label">
+          <property name="toolTip">
+           <string>Minimal number of mesh edges separating two generator points of a VD face for it to be considered (try 2, 3)</string>
+          </property>
+          <property name="text">
+           <string>Edge Criterion</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="4">
+         <widget class="QLabel" name="label_2">
+          <property name="toolTip">
+           <string>Prune the mesh using factor X.XX (try 2.0). The pruning algorithm deletes faces in the VD for which the ratio of the 
+geodesic distance between the generating points and the euclidean distance between these points is less than X.XX</string>
+          </property>
+          <property name="text">
+           <string>Pruning Factor</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="5">
+         <widget class="QLabel" name="label_13">
+          <property name="toolTip">
+           <string> Path to the qvoronoi executable</string>
+          </property>
+          <property name="whatsThis">
+           <string/>
+          </property>
+          <property name="text">
+           <string>Path to the Qvoronoi</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" colspan="2">
+         <widget class="QLabel" name="label_4">
+          <property name="toolTip">
+           <string>Tolerance for the inside/outside search algorithm (default 1e-6). Use lower values if holes appear in the skeleton. Set to 
+zero to disable pruning of outside vertices</string>
+          </property>
+          <property name="text">
+           <string>Tolerance</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="5" colspan="2">
+         <widget class="QDoubleSpinBox" name="tParameter">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3" colspan="3">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Pruning Options</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="5" colspan="2">
+         <widget class="QSpinBox" name="cParameter"/>
+        </item>
+        <item row="8" column="0" colspan="7">
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="4">
+         <widget class="QLabel" name="label_3">
+          <property name="toolTip">
+           <string>Take at most N connected components of the skeleton</string>
+          </property>
+          <property name="text">
+           <string>Max Conn.Component</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="1">
+         <widget class="QLabel" name="label_7">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>s</string>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="1">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>T</string>
+          </property>
+         </widget>
+        </item>
+        <item row="16" column="2" colspan="5">
+         <widget class="QLineEdit" name="IParameter"/>
+        </item>
+        <item row="10" column="0" colspan="5">
+         <widget class="QLabel" name="label_11">
+          <property name="toolTip">
+           <string>Postprocess skeleton with VTK's quadric clustering filter. The effect is to reduce the number of vertices in the skeleton. 
+Parameter n_bins is the number of bins in each dimension. A good value for n_bins is 20-50</string>
+          </property>
+          <property name="text">
+           <string>Quadric Clustering Bins</string>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="2" colspan="5">
+         <widget class="QLineEdit" name="RParameter"/>
+        </item>
+        <item row="12" column="0" rowspan="2" colspan="7">
+         <widget class="QProgressBar" name="cmrep_progressBar">
+          <property name="value">
+           <number>24</number>
+          </property>
+          <property name="textVisible">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="2" colspan="5">
+         <widget class="QLineEdit" name="sParameter"/>
+        </item>
+        <item row="14" column="1">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>R</string>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="2" colspan="5">
+         <widget class="QLineEdit" name="TParameter"/>
+        </item>
+        <item row="16" column="1">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>I</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3" colspan="3">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Output Options</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="6">
+         <widget class="QLineEdit" name="qParameter"/>
+        </item>
+        <item row="11" column="0" colspan="7">
+         <widget class="QPushButton" name="cmrepVskel">
+          <property name="text">
+           <string>Get Skeleton</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>label_9</zorder>
+       <zorder>label_8</zorder>
+       <zorder>IParameter</zorder>
+       <zorder>sParameter</zorder>
+       <zorder>label_7</zorder>
+       <zorder>RParameter</zorder>
+       <zorder>label_10</zorder>
+       <zorder>TParameter</zorder>
+       <zorder>cmrepVskel</zorder>
+       <zorder>label</zorder>
+       <zorder>label_2</zorder>
+       <zorder>label_3</zorder>
+       <zorder>label_4</zorder>
+       <zorder>eParameter</zorder>
+       <zorder>pParameter</zorder>
+       <zorder>cParameter</zorder>
+       <zorder>line</zorder>
+       <zorder>line_2</zorder>
+       <zorder>label_5</zorder>
+       <zorder>label_6</zorder>
+       <zorder>label_11</zorder>
+       <zorder>qParameter</zorder>
+       <zorder>label_12</zorder>
+       <zorder>label_13</zorder>
+       <zorder>pathParameter</zorder>
+       <zorder>tParameter</zorder>
+       <zorder>cmrep_progressBar</zorder>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Pick</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3" rowstretch="4,2,3,0,0,3">
+        <item row="0" column="0" colspan="3">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Tools</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0">
+            <widget class="QToolButton" name="AddPointToolButton">
+             <property name="font">
+              <font>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Add Tag Points(ctrl)</string>
+             </property>
+             <property name="text">
+              <string>(A)dd Point</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QToolButton" name="DelPointToolButton">
+             <property name="toolTip">
+              <string>Delete tag points(s)</string>
+             </property>
+             <property name="text">
+              <string>D(e)lete Point</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QToolButton" name="CreateTriToolButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create triangle by clicking three different points(q)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Create (T)riangle</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QToolButton" name="DelTriToolButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete triangle(d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>(D)elete Triangle</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QToolButton" name="ViewToolButton">
+             <property name="text">
+              <string>(V)iew Model</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QToolButton" name="FlipNormalToolButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flip normal of triangle(b)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>(F)lip Normal</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>Triangle Label</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_8">
+              <item row="0" column="0">
+               <widget class="QComboBox" name="TriLabelComboBox"/>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="ChangeTriLabelButton">
+                <property name="text">
+                 <string>Change (L)abel</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QGroupBox" name="TaggroupBox">
+          <property name="title">
+           <string>Tag</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,1,2,1">
+           <item row="0" column="0" colspan="4">
+            <widget class="QComboBox" name="comboBoxTagPoint">
+             <property name="editable">
+              <bool>false</bool>
+             </property>
+             <property name="maxVisibleItems">
+              <number>10</number>
+             </property>
+             <property name="duplicatesEnabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="pushButtonAddTag">
+             <property name="text">
+              <string>Add Tag</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QPushButton" name="pushButtonEditTag">
+             <property name="text">
+              <string>Edit Tag</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2" colspan="2">
+            <widget class="QPushButton" name="pushButtonDeleteTag">
+             <property name="text">
+              <string>Delete Tag</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>Point Size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="3">
+            <widget class="QSlider" name="TagSizeSlider">
+             <property name="maximum">
+              <number>50</number>
+             </property>
+             <property name="singleStep">
+              <number>1</number>
+             </property>
+             <property name="value">
+              <number>10</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="labelPoint">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Point Number:</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QLabel" name="labelTriangle">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Triangle Number:</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLabel" name="TriangleNumber">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="3">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Decimation</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0,0,0,0" columnstretch="1,2,1">
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="FeatureAngleLineEdit">
+             <property name="text">
+              <string>30</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_18">
+             <property name="text">
+              <string>Target Reduction</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLineEdit" name="TargetReductLineEdit">
+             <property name="text">
+              <string>0.96</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSlider" name="FeatureAngleSlider">
+             <property name="maximum">
+              <number>360</number>
+             </property>
+             <property name="singleStep">
+              <number>1</number>
+             </property>
+             <property name="pageStep">
+              <number>10</number>
+             </property>
+             <property name="value">
+              <number>30</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Feature Angle</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSlider" name="TargetReductSlider">
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="singleStep">
+              <number>1</number>
+             </property>
+             <property name="pageStep">
+              <number>10</number>
+             </property>
+             <property name="value">
+              <number>96</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3">
+            <widget class="QPushButton" name="ApplyDecimateButton">
+             <property name="text">
+              <string>Apply Decimation</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <widget class="QGroupBox" name="SkandMeshgroupBox">
+          <property name="title">
+           <string>Skeleton and Mesh</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkBoxHideSkel">
+             <property name="text">
+              <string>(H)ide Skeleton</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSlider" name="SkelTransparentSlider">
+             <property name="value">
+              <number>99</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBoxHideMesh">
+             <property name="text">
+              <string>Hide (M)esh</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="PointNumber">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>SkandMeshgroupBox</zorder>
+       <zorder>TaggroupBox</zorder>
+       <zorder>labelPoint</zorder>
+       <zorder>PointNumber</zorder>
+       <zorder>labelTriangle</zorder>
+       <zorder>TriangleNumber</zorder>
+       <zorder>groupBox</zorder>
+       <zorder>groupBox_2</zorder>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Save Option</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_10">
+        <property name="bottomMargin">
+         <number>9</number>
         </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-      </widget>
-      <widget class="QLabel" name="label_16">
-       <property name="geometry">
-        <rect>
-         <x>43</x>
-         <y>110</y>
-         <width>81</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Solver Type</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="SolverTypeComboBox">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>110</y>
-         <width>111</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_17">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>140</y>
-         <width>81</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Constant Rho</string>
-       </property>
-      </widget>
-      <widget class="Line" name="line_3">
-       <property name="geometry">
-        <rect>
-         <x>-3</x>
-         <y>90</y>
-         <width>281</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="RhoLineEdit">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>140</y>
-         <width>81</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>-0.001</string>
-       </property>
-      </widget>
-      <widget class="Line" name="line_4">
-       <property name="geometry">
-        <rect>
-         <x>-10</x>
-         <y>170</y>
-         <width>291</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="ConsRadiusCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>190</y>
-         <width>111</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Constant Radius</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="RadiusLineEdit">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>190</y>
-         <width>71</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>0.5</string>
-       </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="SaveOptiongroupBox">
+          <property name="title">
+           <string>Save Option</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_11">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Grid Type</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="GridTypeComboBox"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Subdivision Level</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="SubLevelComboBox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>0</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>3</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="Line" name="line_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Solver Type</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="SolverTypeComboBox"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>Constant Rho</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="RhoLineEdit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>-0.001</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="2">
+            <widget class="Line" name="line_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QCheckBox" name="ConsRadiusCheckBox">
+             <property name="text">
+              <string>Constant Radius</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="RadiusLineEdit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>0.5</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
-    </widget>
-   </widget>
-   <widget class="QLabel" name="OperationModelLabel">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>10</y>
-      <width>121</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="wordWrap">
-     <bool>true</bool>
-    </property>
-    <property name="textInteractionFlags">
-     <set>Qt::LinksAccessibleByMouse|Qt::TextEditable</set>
-    </property>
-   </widget>
+    </item>
+   </layout>
    <zorder>tabWidget</zorder>
    <zorder>qvtkWidget</zorder>
    <zorder>OperationModelLabel</zorder>
