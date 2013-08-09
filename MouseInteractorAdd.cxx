@@ -88,8 +88,14 @@ void MouseInteractorAdd::OnLeftButtonDown()
 				if(con == 0){
 					QMessageBox messageBox;
 					messageBox.critical(0,"Error","Triangle Violation");
-					vectorActions.erase(vectorActions.end() - 1);
-					vectorActions.erase(vectorActions.end() - 1);
+					int sizeT = vectorActions.size() - 1;
+					for(int i = sizeT; i > sizeT - 2; i--)
+					{
+						if(vectorActions[sizeT].action == PICKPTTRI)
+							vectorActions.erase(vectorActions.end() - 1);
+						else
+							break;
+					}
 				}
 			}
 			else if(key.compare("n") == 0 || key.compare("N") == 0 || operationFlag == FLIPNORMAL)
