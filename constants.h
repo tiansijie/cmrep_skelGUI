@@ -34,6 +34,7 @@ struct TagPoint
 	double radius;//radius of that points
 	int seq;//the sequence in total points
 	double pos[3];
+	int ptIndex;
 };	
 
 

@@ -104,6 +104,7 @@ public:
 	int PairNumber(int a, int b);
 	int DrawTriangle();
 	bool DrawTriangle(TagTriangle);
+	vtkSmartPointer<vtkActor>  DrawTriangle(int, int, int, QColor);
 	TagTriangle DeleteTriangle(double*);
 	bool DeleteTriangle(TagTriangle);
 	vtkActor* PickActorFromMesh(double pos[3]);
@@ -117,14 +118,17 @@ public:
 	void CheckNormal(int triId[3]);
 	void AddDecimateEdge(int pointSeq);
 	int ChangeTriLabel(double pos[3]);
+	bool isValidEdge(int id1, int id2);
+	void SetNextTriPt();
+	void SetNextTriPtHelper(int id1, int id2);
 
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
 	int deleteEdgeHelper2(int id, int seq);
 	void deleteEdge(int seq);
 	void setNormalGenerator(vtkSmartPointer<vtkPolyDataNormals> normalGenerator);
-	void setLabelTriNum();
-	void setLabelPtNum();
+	void updateLabelTriNum();
+	void updateLabelPtNum();
 	void reset();
 
 	void DrawDelaunayTriangle();
@@ -158,6 +162,7 @@ public:
 	static std::vector<TagPoint> vectorTagPoints;
 	static std::vector<std::vector<TagPoint> > vectorClassifyPoints;
 	static std::vector<TagEdge> vectorTagEdges;
+
 	//store all the label info, 0 represent no tag on this point
 	static std::vector<double> labelData;
 	static std::vector<vtkActor*> triNormalActors;
@@ -182,7 +187,7 @@ signals:
 private:
 	void DoAction(int action);
 	void DoAction(int action, double pos[3], int triIndex = -1);//flip normal and change triangle label;
-	void DoAction(int action, TagPoint pointInfo);//for point interaction
+	void DoAction(int action, TagPoint pointInfo, int ptIndex);//for point interaction
 	void DoAction(int action, TagTriangle triangleInfo);//for triangle interaction
 	void DoAction(int action, int ptIndex);
 	void UndoAction();
@@ -192,5 +197,9 @@ private:
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
 	std::vector<TagAction> vectorActions;		
 	bool isCtrlPress;
+
+	std::vector<std::vector<TagTriangle> > oldTagTriagnles;
+	std::vector<std::vector<TagPoint> > oldTagPoints;
+	std::vector<std::vector<TagEdge> > oldTagEdges;
 };
 #endif
