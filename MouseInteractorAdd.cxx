@@ -35,6 +35,7 @@ MouseInteractorAdd::MouseInteractorAdd(){
 	preKey = "";
 	actionCounter = -1;
 	isCtrlPress = false;
+	movePtIndex = -1;
 }
 
 void MouseInteractorAdd::OnLeftButtonDown()
@@ -42,8 +43,6 @@ void MouseInteractorAdd::OnLeftButtonDown()
 	int* clickPos = new int[2];
 	clickPos = this->GetInteractor()->GetEventPosition();
 	// Pick from this location.
-	/*vtkSmartPointer<vtkPropPicker>  picker =
-	vtkSmartPointer<vtkPropPicker>::New();*/
 	vtkSmartPointer<vtkCellPicker>  picker =
 		vtkSmartPointer<vtkCellPicker>::New();
 
@@ -52,8 +51,6 @@ void MouseInteractorAdd::OnLeftButtonDown()
 	if(sucessPick != 0)//pick successful
 	{
 		double* pos = new double[3];
-		double* temp = new double [3];
-		temp = picker->GetSelectionPoint();
 		pos = picker->GetPickPosition();		
 		vtkRenderWindowInteractor *rwi = this->Interactor;
 		if(isSkeleton)
@@ -91,7 +88,7 @@ void MouseInteractorAdd::OnLeftButtonDown()
 					int sizeT = vectorActions.size() - 1;
 					for(int i = sizeT; i > sizeT - 2; i--)
 					{
-						if(vectorActions[sizeT].action == PICKPTTRI)
+						if(vectorActions[i].action == PICKPTTRI)
 							vectorActions.erase(vectorActions.end() - 1);
 						else
 							break;
@@ -118,10 +115,346 @@ void MouseInteractorAdd::OnLeftButtonDown()
 				if(preIndex != -1)
 					DoAction(CHANGETRILABEL, pos, preIndex);
 			}
+			else if(key.compare("o") == 0 || key.compare("O") == 0 || operationFlag == MOVEPT)
+			{
+				//reset();
+				SelectMovePt(pos);
+			}
 		}//end of key press
 	}		
 	if(con != 0)
 		vtkInteractorStyleTrackballCamera::OnLeftButtonDown();		
+}
+
+void MouseInteractorAdd::OnMiddleButtonDown()
+{
+	if(movePtIndex != -1)
+	{
+		int* clickPos = new int[2];
+		clickPos = this->GetInteractor()->GetEventPosition();	
+		vtkSmartPointer<vtkCellPicker>  picker =
+			vtkSmartPointer<vtkCellPicker>::New();
+
+		int sucessPick = picker->Pick(clickPos[0], clickPos[1], 0, this->GetDefaultRenderer());
+		if(sucessPick != 0)//pick successful
+		{
+			double* pos = new double[3];
+			pos = picker->GetPickPosition();
+			MovePoint(pos);			
+		}
+	}
+	vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
+}
+
+void MouseInteractorAdd::SelectMovePt(double pos[3])
+{
+	for(int i = 0; i < vectorTagPoints.size(); i++)
+	{
+		TagPoint at = vectorTagPoints[i];
+		double* actorPos = new double [3];
+		actorPos = vectorTagPoints[i].actor->GetCenter();
+		double deltaDis = Distance(pos, actorPos);
+		if(deltaDis <= tagRadius){
+			//reset the color
+			if(movePtIndex != -1)
+			{
+				TagPoint at = vectorTagPoints[movePtIndex];
+				vectorTagPoints[movePtIndex].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+					vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+					vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
+			}
+
+			vectorTagPoints[i].actor->GetProperty()->SetColor(0,0,0);
+			movePtIndex = i;
+			break;
+		}
+	}
+}
+
+bool MouseInteractorAdd::MovePoint(double pos[3])
+{
+	//find the first actor
+	vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
+	vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));	
+	vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
+	vtkDoubleArray* radiusArray = (vtkDoubleArray*)vtkdata->GetPointData()->GetArray("Radius");
+	double minDistance = DBL_MAX;
+	double finalPos[3];
+	double pointRadius;
+	int pointSeq;
+	//finalPos[0] = pos[0]; finalPos[1] = pos[1]; finalPos[2] = pos[2];
+	for(vtkIdType i = 0; i < vtkdata->GetNumberOfPoints(); i++)
+	{
+		double p[3];
+		vtkdata->GetPoint(i,p);
+		double dist = Distance(pos, p);
+		if(dist < minDistance){
+			minDistance = dist;
+			pointSeq = i;
+			finalPos[0] = p[0]; finalPos[1] = p[1]; finalPos[2] = p[2];
+			pointRadius = radiusArray->GetValue(i);
+		}
+	}
+
+	for(int i = 0; i < vectorTagPoints.size(); i++)
+	{
+		if(vectorTagPoints[i].seq == pointSeq)
+			return false;
+	}
+
+	if(vectorTagPoints[movePtIndex].seq != pointSeq)
+	{
+		cout<<"Moving "<<finalPos[0]<<" "<<finalPos[1]<<" "<<finalPos[2]<<endl;
+		DoAction(MOVEPT, movePtIndex, vectorTagPoints[movePtIndex].seq);
+
+		for(int i = 0; i < vectorTagTriangles.size(); i++)
+		{
+			if(vectorTagTriangles[i].seq1 == vectorTagPoints[movePtIndex].seq)
+			{				
+				MoveTriangle(finalPos, i, 1, pointSeq);
+			}
+			else if(vectorTagTriangles[i].seq2 == vectorTagPoints[movePtIndex].seq)
+			{
+				MoveTriangle(finalPos, i, 2, pointSeq);
+			}
+			else if(vectorTagTriangles[i].seq3 == vectorTagPoints[movePtIndex].seq)
+			{
+				MoveTriangle(finalPos, i, 3, pointSeq);
+			}
+		}
+
+		//change the history point seq 
+		for(int i = 0; i < vectorActions.size(); i ++)
+		{
+			if(vectorActions[i].action == DELETEPOINT || vectorActions[i].action == ADDPOINT)
+			{
+				if(vectorActions[i].pointInfo.seq == vectorTagPoints[movePtIndex].seq)
+				{
+					vectorActions[i].pointInfo.seq = pointSeq;
+				}
+			}
+		}
+
+		vectorTagPoints[movePtIndex].seq = pointSeq;
+		vectorTagPoints[movePtIndex].pos[0] = finalPos[0];
+		vectorTagPoints[movePtIndex].pos[1] = finalPos[1];
+		vectorTagPoints[movePtIndex].pos[2] = finalPos[2];
+
+		vectorTagPoints[movePtIndex].radius = pointRadius;
+
+		this->GetDefaultRenderer()->RemoveActor(vectorTagPoints[movePtIndex].actor);
+
+		//Create a sphere
+		vtkSmartPointer<vtkSphereSource> sphereSource =
+			vtkSmartPointer<vtkSphereSource>::New();
+		sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
+		sphereSource->SetRadius(tagRadius);
+
+		//Create a mapper and actor
+		vtkSmartPointer<vtkPolyDataMapper> mapper =
+			vtkSmartPointer<vtkPolyDataMapper>::New();
+		mapper->SetInputConnection(sphereSource->GetOutputPort());
+
+		TagInfo ti = vectorTagInfo[vectorTagPoints[movePtIndex].comboBoxIndex];
+		vtkSmartPointer<vtkActor> actor =
+			vtkSmartPointer<vtkActor>::New();
+		actor->SetMapper(mapper);
+		actor->GetProperty()->SetColor(0,0,0);
+
+		vectorTagPoints[movePtIndex].actor = actor;
+		this->GetDefaultRenderer()->AddActor(actor);
+		return true;
+	}
+
+	return false;
+}
+
+void MouseInteractorAdd::MovePoint(int ptIndex, int oldSeq)
+{
+	vtkSmartPointer<vtkActorCollection> actors = this->GetDefaultRenderer()->GetActors();
+	vtkSmartPointer<vtkActor> actor0 =  static_cast<vtkActor *>(actors->GetItemAsObject(0));	
+	vtkSmartPointer<vtkDataSet> vtkdata = actor0->GetMapper()->GetInputAsDataSet();
+	vtkDoubleArray* radiusArray = (vtkDoubleArray*)vtkdata->GetPointData()->GetArray("Radius");
+
+	double finalPos[3];
+	double pointRadius;
+	vtkdata->GetPoint(oldSeq,finalPos);
+	pointRadius = radiusArray->GetValue(oldSeq);
+
+	//update triangle
+	for(int i = 0; i < vectorTagTriangles.size(); i++)
+	{
+		if(vectorTagTriangles[i].seq1 == vectorTagPoints[ptIndex].seq)
+		{				
+			MoveTriangle(finalPos, i, 1, oldSeq);
+		}
+		else if(vectorTagTriangles[i].seq2 == vectorTagPoints[ptIndex].seq)
+		{
+			MoveTriangle(finalPos, i, 2, oldSeq);
+		}
+		else if(vectorTagTriangles[i].seq3 == vectorTagPoints[ptIndex].seq)
+		{
+			MoveTriangle(finalPos, i, 3, oldSeq);
+		}
+	}
+
+	//update history actions
+	for(int i = 0; i < vectorActions.size(); i ++)
+	{
+		if(vectorActions[i].action == DELETEPOINT || vectorActions[i].action == ADDPOINT)
+		{
+			if(vectorActions[i].pointInfo.seq == vectorTagPoints[ptIndex].seq)
+			{
+				vectorActions[i].pointInfo.seq = oldSeq;
+			}
+		}
+	}
+
+	vectorTagPoints[ptIndex].seq = oldSeq;
+	vectorTagPoints[ptIndex].pos[0] = finalPos[0];
+	vectorTagPoints[ptIndex].pos[1] = finalPos[1];
+	vectorTagPoints[ptIndex].pos[2] = finalPos[2];
+	vectorTagPoints[ptIndex].radius = pointRadius;
+
+	this->GetDefaultRenderer()->RemoveActor(vectorTagPoints[ptIndex].actor);
+	
+	//Create a sphere
+	vtkSmartPointer<vtkSphereSource> sphereSource =
+		vtkSmartPointer<vtkSphereSource>::New();
+	sphereSource->SetCenter(finalPos[0], finalPos[1], finalPos[2]);
+	sphereSource->SetRadius(tagRadius);
+
+	//Create a mapper and actor
+	vtkSmartPointer<vtkPolyDataMapper> mapper =
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputConnection(sphereSource->GetOutputPort());
+
+	TagInfo ti = vectorTagInfo[vectorTagPoints[ptIndex].comboBoxIndex];
+	TagPoint at = vectorTagPoints[ptIndex];
+	vtkSmartPointer<vtkActor> actor =
+		vtkSmartPointer<vtkActor>::New();
+	actor->SetMapper(mapper);
+	actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+		vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+		vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
+
+	vectorTagPoints[ptIndex].actor = actor;
+	this->GetDefaultRenderer()->AddActor(actor);
+}
+
+bool MouseInteractorAdd::MoveTriangle(double pos[3], int triIndex, int num, int newSeq)
+{
+	if(num == 1)
+	{
+		for(int i = 0; i < vectorActions.size(); i++)
+		{
+			if(vectorActions[i].action == CREATETRI || vectorActions[i].action == DELETETRI){
+				if(vectorTagTriangles[triIndex].seq1 == vectorActions[i].triangleInfo.seq1){
+					vectorActions[i].triangleInfo.seq1 = newSeq;
+				}
+			}
+		}
+		vectorTagTriangles[triIndex].seq1 = newSeq;
+		vectorTagTriangles[triIndex].p1[0] = pos[0];
+		vectorTagTriangles[triIndex].p1[1] = pos[1];
+		vectorTagTriangles[triIndex].p1[2] = pos[2];
+		
+	}
+	else if(num == 2)
+	{
+		for(int i = 0; i < vectorActions.size(); i++)
+		{
+			if(vectorActions[i].action == CREATETRI || vectorActions[i].action == DELETETRI){
+				if(vectorTagTriangles[triIndex].seq2 == vectorActions[i].triangleInfo.seq2){
+					vectorActions[i].triangleInfo.seq2 = newSeq;
+				}
+			}
+		}
+		vectorTagTriangles[triIndex].seq2 = newSeq;
+		vectorTagTriangles[triIndex].p2[0] = pos[0];
+		vectorTagTriangles[triIndex].p2[1] = pos[1];
+		vectorTagTriangles[triIndex].p2[2] = pos[2];
+	}
+	else if(num == 3)
+	{
+		for(int i = 0; i < vectorActions.size(); i++)
+		{
+			if(vectorActions[i].action == CREATETRI || vectorActions[i].action == DELETETRI){
+				if(vectorTagTriangles[triIndex].seq3 == vectorActions[i].triangleInfo.seq3){
+					vectorActions[i].triangleInfo.seq3 = newSeq;
+				}
+			}
+		}
+		vectorTagTriangles[triIndex].seq3 = newSeq;
+		vectorTagTriangles[triIndex].p3[0] = pos[0];
+		vectorTagTriangles[triIndex].p3[1] = pos[1];
+		vectorTagTriangles[triIndex].p3[2] = pos[2];
+	}
+
+	this->GetDefaultRenderer()->RemoveActor(vectorTagTriangles[triIndex].triActor);
+
+	vtkSmartPointer<vtkPoints> pts =
+		vtkSmartPointer<vtkPoints>::New();
+	pts->InsertNextPoint(vectorTagTriangles[triIndex].p1);
+	pts->InsertNextPoint(vectorTagTriangles[triIndex].p2);
+	pts->InsertNextPoint(vectorTagTriangles[triIndex].p3);
+
+	vtkSmartPointer<vtkTriangle> triangle =
+		vtkSmartPointer<vtkTriangle>::New();
+	triangle->GetPointIds()->SetId ( 0, 0 );
+	triangle->GetPointIds()->SetId ( 1, 1 );
+	triangle->GetPointIds()->SetId ( 2, 2 );
+
+	vtkSmartPointer<vtkCellArray> triangles =
+		vtkSmartPointer<vtkCellArray>::New();
+	triangles->InsertNextCell ( triangle );
+
+	// Create a polydata object
+	vtkSmartPointer<vtkPolyData> trianglePolyData =
+		vtkSmartPointer<vtkPolyData>::New();
+
+	// Add the geometry and topology to the polydata
+	trianglePolyData->SetPoints ( pts );
+	trianglePolyData->SetPolys ( triangles );
+
+	// Create mapper and actor
+	vtkSmartPointer<vtkPolyDataMapper> mapper =
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+#if VTK_MAJOR_VERSION <= 5
+	mapper->SetInput(trianglePolyData);
+	//mapper->SetInput(appendFilter->GetOutput());
+#else
+	mapper->SetInputData(trianglePolyData);
+#endif
+	vtkSmartPointer<vtkActor> actor =
+		vtkSmartPointer<vtkActor>::New();
+	actor->SetMapper(mapper);
+	actor->GetProperty()->SetEdgeVisibility(true);
+	actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
+	actor->GetProperty()->SetColor(triLabelColors[vectorTagTriangles[triIndex].index].red()/255.0,
+		triLabelColors[vectorTagTriangles[triIndex].index].green()/255.0,
+		triLabelColors[vectorTagTriangles[triIndex].index].blue()/255.0);
+	vtkSmartPointer<vtkProperty> backPro = 
+		vtkSmartPointer<vtkProperty>::New();
+	backPro->SetColor(backCol);
+	actor->SetBackfaceProperty(backPro);
+
+	//update undo history triangle actor
+	for(int i = 0; i < vectorActions.size(); i++)
+	{
+		if(vectorActions[i].action == CREATETRI || vectorActions[i].action == DELETETRI)
+			if(vectorActions[i].triangleInfo.seq1 == vectorTagTriangles[triIndex].seq1 &&
+				vectorActions[i].triangleInfo.seq2 == vectorTagTriangles[triIndex].seq2 &&
+				vectorActions[i].triangleInfo.seq3 == vectorTagTriangles[triIndex].seq3)
+			{
+				vectorActions[i].triangleInfo.triActor = actor;
+				break;
+			}
+	}
+	vectorTagTriangles[triIndex].triActor = actor;
+	this->GetDefaultRenderer()->AddActor(actor);	
+
+	return true;
 }
 
 bool isKeyNeeded(std::string key)
@@ -133,7 +466,8 @@ bool isKeyNeeded(std::string key)
 		key.compare("d") == 0 || key.compare("D") == 0 ||
 		key.compare("v") == 0 || key.compare("V") == 0 ||
 		key.compare("h") == 0 || key.compare("H") == 0 ||
-		key.compare("m") == 0 || key.compare("M") == 0 )
+		key.compare("m") == 0 || key.compare("M") == 0 ||
+		key.compare("o") == 0 || key.compare("O") == 0)
 	{
 		return true;
 	}
@@ -196,6 +530,10 @@ void MouseInteractorAdd::OnKeyPress()
 		else if(key.compare("l") == 0 || key.compare("L") == 0){
 			operationFlag = CHANGETRILABEL;
 			emit operationChanged(CHANGETRILABEL);
+		}
+		else if(key.compare("o") == 0 || key.compare("O") == 0){
+			operationFlag = MOVEPT;
+			emit operationChanged(MOVEPT);
 		}
 		else if(key.compare("h") == 0 || key.compare("H") == 0)
 		{
@@ -841,9 +1179,7 @@ TagPoint MouseInteractorAdd::AddPoint(double* pos)
 
 
 	//	if(labelData[pointSeq] == 0.0){
-		std::cout << "Pick position (final position) is: "
-			<< finalPos[0] << " " << finalPos[1]
-		<< " " << finalPos[2] << std::endl;
+		std::cout << "Pick position (final position) is: "<< finalPos[0] << " " << finalPos[1]<< " " << finalPos[2] << std::endl;
 
 		for(int i = 0; i < vectorTagPoints.size(); i++)
 		{
@@ -907,6 +1243,8 @@ TagPoint MouseInteractorAdd::AddPoint(double* pos)
 	nullPts.actor = NULL;
 	return nullPts;
 }
+
+
 
 vtkSmartPointer<vtkActor> MouseInteractorAdd::DrawTriangle(int id1, int id2, int id3, QColor triCol)
 {
@@ -1259,13 +1597,24 @@ void MouseInteractorAdd::deleteEdge(int seq)
 void MouseInteractorAdd::reset()
 {
 	drawTriMode = false;
-	for(int i = 0; i < triPtIds.size(); i++){
+	for(int i = 0; i < triPtIds.size(); i++)
+	{
 		TagPoint at = vectorTagPoints[triPtIds[i]];
 		vectorTagPoints[triPtIds[i]].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
 			vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
 			vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
 	}
 	triPtIds.resize(0);
+	
+	if(movePtIndex != -1)
+	{
+		TagPoint at = vectorTagPoints[movePtIndex];
+		vectorTagPoints[movePtIndex].actor->GetProperty()->SetColor(vectorTagInfo[at.comboBoxIndex].tagColor[0] / 255.0,
+			vectorTagInfo[at.comboBoxIndex].tagColor[1] / 255.0, 
+			vectorTagInfo[at.comboBoxIndex].tagColor[2] / 255.0);
+		movePtIndex = -1;
+	}
+	
 }
 
 void MouseInteractorAdd::updateLabelPtNum()
@@ -1450,6 +1799,15 @@ void MouseInteractorAdd::DoAction(int action, int ptIndex)
 	vectorActions.push_back(ac);
 }
 
+void MouseInteractorAdd::DoAction(int action, int ptIndex, int ptOldSeq)
+{
+	TagAction ac;
+	ac.action = action;
+	ac.ptIndex = ptIndex;
+	ac.ptOldSeq = ptOldSeq;
+	vectorActions.push_back(ac);
+}
+
 void MouseInteractorAdd::UndoAction()
 {
 	int size = vectorActions.size() - 1;
@@ -1540,6 +1898,13 @@ void MouseInteractorAdd::UndoAction()
 					flag = true;					
 				}
 				vectorActions.erase(vectorActions.end() - 1);
+			}
+			else if(actionIndex == MOVEPT)
+			{
+				MovePoint(vectorActions[size].ptIndex, vectorActions[size].ptOldSeq);
+				movePtIndex = -1;
+				vectorActions.erase(vectorActions.end() - 1);
+				flag = true;
 			}
 			this->GetDefaultRenderer()->GetRenderWindow()->Render();
 			size = vectorActions.size() - 1;

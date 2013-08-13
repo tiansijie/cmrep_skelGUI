@@ -130,6 +130,7 @@ EventQtSlotConnect::EventQtSlotConnect()
   this->connect(this->FlipNormalToolButton, SIGNAL(clicked()), this, SLOT(slot_flipNormal()));
   this->connect(this->ViewToolButton, SIGNAL(clicked()), this, SLOT(slot_view()));
   this->connect(this->ChangeTriLabelButton, SIGNAL(clicked()), this, SLOT(slot_changeTriLabel()));
+  this->connect(this->MovePtToolButton, SIGNAL(clicked()), this, SLOT(slot_movePoint()));
 
 
   this->connect(mouseInteractor, SIGNAL(skelStateChanged(int)), this, SLOT(slot_skelStateChange(int)));
@@ -472,6 +473,7 @@ void EventQtSlotConnect::slot_tagSizeSlider(int value)
 
 void EventQtSlotConnect::setToolButton(int flag)
 {
+
 	this->AddPointToolButton->setEnabled(true);
 	this->DelPointToolButton->setEnabled(true);
 	this->CreateTriToolButton->setEnabled(true);
@@ -479,6 +481,7 @@ void EventQtSlotConnect::setToolButton(int flag)
 	this->ViewToolButton->setEnabled(true);
 	this->FlipNormalToolButton->setEnabled(true);
 	this->ChangeTriLabelButton->setEnabled(true);
+	this->MovePtToolButton->setEnabled(true);
 
 	if(flag == ADDPOINT)
 		this->AddPointToolButton->setEnabled(false);
@@ -494,6 +497,10 @@ void EventQtSlotConnect::setToolButton(int flag)
 		this->ViewToolButton->setEnabled(false);
 	else if(flag == CHANGETRILABEL)
 		this->ChangeTriLabelButton->setEnabled(false);
+	else if(flag == MOVEPT)
+		this->MovePtToolButton->setEnabled(false);
+
+	this->qvtkWidget->update();
 }
 
 void EventQtSlotConnect::slot_addPoint()
@@ -502,6 +509,7 @@ void EventQtSlotConnect::slot_addPoint()
 	this->OperationModelLabel->setText("Add Point");
 	setToolButton(ADDPOINT);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_deletePoint()
@@ -510,6 +518,7 @@ void EventQtSlotConnect::slot_deletePoint()
 	this->OperationModelLabel->setText("Delete Point");
 	setToolButton(DELETEPOINT);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_createTri()
@@ -518,6 +527,7 @@ void EventQtSlotConnect::slot_createTri()
 	this->OperationModelLabel->setText("Create Triangle");
 	setToolButton(CREATETRI);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_deleteTri()
@@ -526,6 +536,7 @@ void EventQtSlotConnect::slot_deleteTri()
 	this->OperationModelLabel->setText("Delete Triangle");
 	setToolButton(DELETETRI);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_flipNormal()
@@ -534,6 +545,7 @@ void EventQtSlotConnect::slot_flipNormal()
 	this->OperationModelLabel->setText("Flip Normal");
 	setToolButton(FLIPNORMAL);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_view()
@@ -542,6 +554,7 @@ void EventQtSlotConnect::slot_view()
 	this->OperationModelLabel->setText("View");
 	setToolButton(VIEW);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_changeTriLabel()
@@ -550,6 +563,16 @@ void EventQtSlotConnect::slot_changeTriLabel()
 	this->OperationModelLabel->setText("Change Triangle Label");
 	setToolButton(CHANGETRILABEL);
 	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
+}
+
+void EventQtSlotConnect::slot_movePoint()
+{
+	mouseInteractor->operationFlag = MOVEPT;
+	this->OperationModelLabel->setText("Move Point");
+	setToolButton(MOVEPT);
+	mouseInteractor->preKey = "";
+	mouseInteractor->reset();
 }
 
 void EventQtSlotConnect::slot_updateOperation(int state)
@@ -568,6 +591,8 @@ void EventQtSlotConnect::slot_updateOperation(int state)
 		this->OperationModelLabel->setText("View");
 	else if(state == CHANGETRILABEL)
 		this->OperationModelLabel->setText("Change Triangle Label");
+	else if(state == MOVEPT)
+		this->OperationModelLabel->setText("Move Point");
 	
 	setToolButton(state);
 }
@@ -604,7 +629,6 @@ void EventQtSlotConnect::slot_trilabelChanged(int index)
 
 void EventQtSlotConnect::executeCmrepVskel()
 {
-
 	std::vector <char *> parameters;
 	parameters.push_back("cmrep_vskel");
 	

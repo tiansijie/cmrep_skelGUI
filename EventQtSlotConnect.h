@@ -78,6 +78,7 @@ public slots:
 	void slot_flipNormal();
 	void slot_view();
 	void slot_changeTriLabel();
+	void slot_movePoint();
 
 	void slot_updateOperation(int);
 

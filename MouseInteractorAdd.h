@@ -83,6 +83,7 @@
 #define CHANGETRILABEL 6
 #define PICKPTTRI 7
 #define DESELECTPT 8
+#define MOVEPT 9
 
 #define SHOW 0
 #define HIDE 1
@@ -121,6 +122,10 @@ public:
 	bool isValidEdge(int id1, int id2);
 	void SetNextTriPt();
 	void SetNextTriPtHelper(int id1, int id2);
+	bool MovePoint(double pos[3]);
+	void MovePoint(int ptIndex, int oldSeq);
+	bool MoveTriangle(double pos[3], int triIndex, int num, int newSeq);
+	void SelectMovePt(double pos[3]);
 
 	void copyEdgeBtoA(int a, int b);
 	int deleteEdgeHelper(int id1, int id2, int seq);
@@ -135,6 +140,7 @@ public:
 	void AutoTriangulation();
 	
 	virtual void OnLeftButtonDown();
+	virtual void OnMiddleButtonDown();
 	void OnKeyRelease();
 	void OnKeyPress();
 
@@ -190,6 +196,7 @@ private:
 	void DoAction(int action, TagPoint pointInfo, int ptIndex);//for point interaction
 	void DoAction(int action, TagTriangle triangleInfo);//for triangle interaction
 	void DoAction(int action, int ptIndex);
+	void DoAction(int action, int ptIndex, int ptOldSeq);
 	void UndoAction();
 	void RedoAction();	
 
@@ -197,6 +204,7 @@ private:
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
 	std::vector<TagAction> vectorActions;		
 	bool isCtrlPress;
+	int movePtIndex;
 
 	std::vector<std::vector<TagTriangle> > oldTagTriagnles;
 	std::vector<std::vector<TagPoint> > oldTagPoints;

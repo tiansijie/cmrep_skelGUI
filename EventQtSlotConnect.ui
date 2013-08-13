@@ -73,7 +73,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="enabled">
@@ -316,21 +316,6 @@ Parameter n_bins is the number of bins in each dimension. A good value for n_bin
            <string>Tools</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
-            <widget class="QToolButton" name="AddPointToolButton">
-             <property name="font">
-              <font>
-               <underline>false</underline>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Add Tag Points(ctrl)</string>
-             </property>
-             <property name="text">
-              <string>(A)dd Point</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QToolButton" name="DelPointToolButton">
              <property name="toolTip">
@@ -351,13 +336,18 @@ Parameter n_bins is the number of bins in each dimension. A good value for n_bin
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QToolButton" name="DelTriToolButton">
+           <item row="0" column="0">
+            <widget class="QToolButton" name="AddPointToolButton">
+             <property name="font">
+              <font>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete triangle(d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>Add Tag Points(ctrl)</string>
              </property>
              <property name="text">
-              <string>(D)elete Triangle</string>
+              <string>(A)dd Point</string>
              </property>
             </widget>
            </item>
@@ -378,6 +368,16 @@ Parameter n_bins is the number of bins in each dimension. A good value for n_bin
              </property>
             </widget>
            </item>
+           <item row="1" column="1">
+            <widget class="QToolButton" name="DelTriToolButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete triangle(d)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>(D)elete Triangle</string>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="0" colspan="2">
             <widget class="QGroupBox" name="groupBox_3">
              <property name="title">
@@ -395,6 +395,13 @@ Parameter n_bins is the number of bins in each dimension. A good value for n_bin
                </widget>
               </item>
              </layout>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <widget class="QToolButton" name="MovePtToolButton">
+             <property name="text">
+              <string>Pick Point to M(o)ve</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -519,7 +526,7 @@ Parameter n_bins is the number of bins in each dimension. A good value for n_bin
           <property name="title">
            <string>Decimation</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0,0,0,0,0,0" columnstretch="1,2,1">
+          <layout class="QGridLayout" name="gridLayout_7" rowstretch="0,0,0" columnstretch="1,2,1">
            <item row="1" column="2">
             <widget class="QLineEdit" name="FeatureAngleLineEdit">
              <property name="text">

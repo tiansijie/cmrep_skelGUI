@@ -55,6 +55,7 @@ struct TagAction
 	TagPoint pointInfo;
 	TagTriangle triangleInfo;
 	int ptIndex;
+	int ptOldSeq;
 };
 
 #endif
