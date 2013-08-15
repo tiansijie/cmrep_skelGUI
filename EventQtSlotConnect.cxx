@@ -93,8 +93,10 @@ EventQtSlotConnect::EventQtSlotConnect()
   createMenus();
 
   pointColor[0] = 1; pointColor[1] = 0; pointColor[2] = 0;
-
+  //Progress bar
   this->connect(&this->FutureWatcher, SIGNAL(finished()), this, SLOT(slot_finished()));
+
+  //Excute teh cmrepskel
   this->connect(this->cmrepVskel, SIGNAL(clicked()), this, SLOT(executeCmrepVskel()));
 
   //Mesh interaction
@@ -179,6 +181,8 @@ EventQtSlotConnect::~EventQtSlotConnect()
 	saveSettings();
 }
 
+
+//Call the add tag dialog
 void EventQtSlotConnect::slot_addTag(){
 
 	AddTagDialog addDialog;
@@ -206,6 +210,7 @@ void EventQtSlotConnect::slot_addTag(){
 			ti.tagType = 4;
 		ti.tagIndex = addDialog.tagIndex;
 
+		//Store the tag information
 		Global::vectorTagInfo.push_back(ti);
 
 		QPixmap pix(22,22);
@@ -471,6 +476,8 @@ void EventQtSlotConnect::slot_tagSizeSlider(int value)
 	this->qvtkWidget->update();
 }
 
+
+//Enable and disable tool button
 void EventQtSlotConnect::setToolButton(int flag)
 {
 
@@ -609,12 +616,13 @@ void EventQtSlotConnect::slot_skelTransparentChanged(int value)
 	vtkActorCollection* actorcollection = render->GetActors();
 	actorcollection->InitTraversal();
 	vtkActor* actor = actorcollection->GetNextActor();
-	
-	double trans = value / 100.0;
-	if(trans == 0.98 || trans == 0.99)
-		trans = 1.0;
-	actor->GetProperty()->SetOpacity(trans);
-	this->qvtkWidget->update();
+	if(actor != NULL){
+		double trans = value / 100.0;
+		if(trans == 0.98 || trans == 0.99)
+			trans = 1.0;
+		actor->GetProperty()->SetOpacity(trans);
+		this->qvtkWidget->update();
+	}
 }
 
 void EventQtSlotConnect::slot_trilabelChanged(int index)	
@@ -747,13 +755,6 @@ void EventQtSlotConnect::executeCmrepVskel()
 	strcpy(command[2], outputNameSkel.c_str());
 	parameters.push_back(command[2]);
 
-
-	/*std::cout<<"parameter"<<std::endl;
-	for(int i = 0; i < parameters.size(); i++)
-		std::cout<<parameters[i]<<std::endl;*/
-	//this->cmrep_progressBar->setMaximum(0);
-	//this->cmrep_progressBar->setMinimum(0);
-	//this->cmrep_progressBar->show();
 	QFuture<void> future = QtConcurrent::run(&this->v, &VoronoiSkeletonTool::execute, parameters.size(), parameters);
 	this->FutureWatcher.setFuture(future);
 	//v.execute(parameters.size(), parameters);
@@ -761,7 +762,8 @@ void EventQtSlotConnect::executeCmrepVskel()
 	VTKfilename = outputNameSkel;
 }
 
-void EventQtSlotConnect::createActions(){
+void EventQtSlotConnect::createActions()
+{
 	openAct = new QAction(tr("&Open..."), this);
 	openAct->setShortcut(tr("Ctrl+O"));
 	connect(openAct, SIGNAL(triggered()), this, SLOT(slot_open()));
@@ -771,7 +773,8 @@ void EventQtSlotConnect::createActions(){
 	connect(saveAct, SIGNAL(triggered()), this, SLOT(slot_save()));
 }
 
-void EventQtSlotConnect::createMenus(){
+void EventQtSlotConnect::createMenus()
+{
 	fileMenu = new QMenu(tr("&File"), this);
 	fileMenu->addAction(openAct);
 	fileMenu->addAction(saveAct);
@@ -809,9 +812,6 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		tri.id3 = triDBL->GetValue(i+13);
 		tri.seq3 = triDBL->GetValue(i+14);
 		tri.index = triDBL->GetValue(i+15);
-		/*tri.triColor[0] = triLabelColors[tri.index-1].red()/255.0;
-		tri.triColor[1] = triLabelColors[tri.index-1].green()/255.0;
-		tri.triColor[2] = triLabelColors[tri.index-1].blue()/255.0;*/
 
 		for(int j = 0; j < 3; j++){
 			double t1,t2,t3;
@@ -1023,8 +1023,6 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	renderer->ResetCamera();
 
 	//Set the custom style to use for interaction.
-	
-	//style->qtObject = this;
 	mouseInteractor->SetDefaultRenderer(renderer);
 	mouseInteractor->labelTriNumber = this->TriangleNumber;
 	mouseInteractor->labelPtNumber = this->PointNumber;
@@ -1557,6 +1555,7 @@ void EventQtSlotConnect::saveSettings()
 	settings.setValue("path", pText);
 }
 
+//Triangle label initialization
 void EventQtSlotConnect::iniTriLabel()
 {
 	for(int i = 0; i < 10; i++)

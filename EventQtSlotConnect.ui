@@ -364,7 +364,7 @@ Parameter n_bins is the number of bins in each dimension. A good value for n_bin
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flip normal of triangle(b)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>(F)lip Normal</string>
+              <string>Flip (N)ormal</string>
              </property>
             </widget>
            </item>

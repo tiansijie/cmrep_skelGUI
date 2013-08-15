@@ -103,15 +103,13 @@ public:
 	MouseInteractor();
 
 	double Distance(double p1[3], double p2[3]);
-	void SetSelectedTriColor();
 	int ConstrainEdge(int type1, int type2);
 	int PairNumber(int a, int b);
 	int DrawTriangle();
 	bool DrawTriangle(TagTriangle);
-	vtkSmartPointer<vtkActor>  DrawTriangle(int, int, int, QColor);
 	TagTriangle DeleteTriangle(double*);
 	bool DeleteTriangle(TagTriangle);
-	vtkActor* PickActorFromMesh(double pos[3]);
+	vtkActor* PickActorFromPoints(double pos[3]);
 	vtkActor* PickActorFromTriangle(double pos[3]);
 	bool FlipNormal(double*);
 	TagPoint AddPoint(double*);
@@ -153,6 +151,7 @@ public:
 	vtkActor *selectedTriangle;
 	vtkActor *prePolyLineActor;
 
+	//Display the number points and triangles
 	QLabel *labelPtNumber;
 	QLabel *labelTriNumber;
 
@@ -166,12 +165,14 @@ public:
 	int actionCounter;
 	QColor triLabelColors[10];
 
+
+	//Using reference to store all the global value
 	std::vector<TagInfo> &vectorTagInfo;
 	std::vector<TagTriangle> &vectorTagTriangles;
 	std::vector<TagPoint> &vectorTagPoints;
 	std::vector<TagEdge> &vectorTagEdges;
 
-	//store all the label info, 0 represent no tag on this point
+	//Store all the label info, 0 represent no tag on this point
 	std::vector<double> &labelData;
 	std::vector<vtkActor*> &triNormalActors;
 	bool &isSkeleton;
@@ -185,7 +186,7 @@ public:
 	bool &decimateMode;
 
 
-
+//Several signal to emit the state changed
 signals:
 	void operationChanged(int);
 	void skelStateChanged(int);
@@ -195,18 +196,27 @@ private:
 	
 
 	void DoAction(int action);
-	void DoAction(int action, double pos[3], int triIndex = -1);//flip normal and change triangle label;
-	void DoAction(int action, TagPoint pointInfo, int ptIndex);//for point interaction
-	void DoAction(int action, TagTriangle triangleInfo);//for triangle interaction
+	//Flip normal and change triangle label;
+	void DoAction(int action, double pos[3], int triIndex = -1);
+	//For point interaction(add point, delete point)
+	void DoAction(int action, TagPoint pointInfo, int ptIndex);
+	//For triangle interaction(draw triangle, delete triangle)
+	void DoAction(int action, TagTriangle triangleInfo);
+	//
 	void DoAction(int action, int ptIndex);
+	//For moving point interaction
 	void DoAction(int action, int ptIndex, int ptOldSeq);
+
 	void UndoAction();
-	void RedoAction();	
 
 	bool drawTriMode;
 	vtkSmartPointer<vtkPolyDataNormals> normalGenerator;
+	
+	//Store each operation, use for undo function
 	std::vector<TagAction> vectorActions;		
+
 	bool isCtrlPress;
+	//Record moving point index
 	int movePtIndex;
 };
 #endif
