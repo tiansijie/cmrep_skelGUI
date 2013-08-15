@@ -147,7 +147,7 @@ void MouseInteractor::SelectMovePt(double pos[3])
 		actorPos = vectorTagPoints[i].actor->GetCenter();
 		double deltaDis = Distance(pos, actorPos);
 		if(deltaDis <= tagRadius){
-			//Reset the color of previus selected point
+			//Reset the color of previous selected point
 			if(movePtIndex != -1)
 			{
 				TagPoint at = vectorTagPoints[movePtIndex];

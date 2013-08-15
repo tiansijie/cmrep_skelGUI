@@ -43,8 +43,8 @@ struct TagEdge
 {
 	int ptId1;
 	int ptId2;
-	int constrain;
-	int numEdge;
+	int constrain;// store the constraint of these two points
+	int numEdge;//store how many edge it have
 	int seq;//use of deletion
 };
 
