@@ -72,8 +72,9 @@
 #include <QtGui>
 #include <QObject>
 
-#include "constants.h"
+#include "global.h"
 
+//To record different actions
 #define VIEW 0
 #define ADDPOINT 1
 #define DELETEPOINT 2
@@ -88,16 +89,18 @@
 #define SHOW 0
 #define HIDE 1
 
+using namespace std;
+
 
 // Handle mouse events
-class MouseInteractorAdd : public QObject, public vtkInteractorStyleTrackballCamera
+class MouseInteractor : public QObject, public vtkInteractorStyleTrackballCamera
 {
 	Q_OBJECT
 public:
-	static MouseInteractorAdd* New();
-	vtkTypeMacro(MouseInteractorAdd, vtkInteractorStyleTrackballCamera);
+	static MouseInteractor* New();
+	vtkTypeMacro(MouseInteractor, vtkInteractorStyleTrackballCamera);
 
-	MouseInteractorAdd();
+	MouseInteractor();
 
 	double Distance(double p1[3], double p2[3]);
 	void SetSelectedTriColor();
@@ -142,9 +145,7 @@ public:
 	virtual void OnLeftButtonDown();
 	virtual void OnMiddleButtonDown();
 	void OnKeyRelease();
-	void OnKeyPress();
-
-	
+	void OnKeyPress();	
 
 	std::vector<int>deletePointIds;
 	std::vector<int>triPtIds;
@@ -162,35 +163,37 @@ public:
 	int meshState;
 	int currentTriIndex;
 
-
-	static std::vector<TagInfo> vectorTagInfo;
-	static std::vector<TagTriangle> vectorTagTriangles;
-	static std::vector<TagPoint> vectorTagPoints;
-	static std::vector<std::vector<TagPoint> > vectorClassifyPoints;
-	static std::vector<TagEdge> vectorTagEdges;
-
-	//store all the label info, 0 represent no tag on this point
-	static std::vector<double> labelData;
-	static std::vector<vtkActor*> triNormalActors;
-	static bool isSkeleton;
-	static int selectedTag;
-	static double targetReduction;
-	static double featureAngle;
-	static double tagRadius;
-
-	static double triCol[3];
-	static double backCol[3];
-
-	static bool decimateMode;
-
 	int actionCounter;
 	QColor triLabelColors[10];
+
+	std::vector<TagInfo> &vectorTagInfo;
+	std::vector<TagTriangle> &vectorTagTriangles;
+	std::vector<TagPoint> &vectorTagPoints;
+	std::vector<TagEdge> &vectorTagEdges;
+
+	//store all the label info, 0 represent no tag on this point
+	std::vector<double> &labelData;
+	std::vector<vtkActor*> &triNormalActors;
+	bool &isSkeleton;
+	int &selectedTag;
+	double &targetReduction;
+	double &featureAngle;
+	double &tagRadius;
+	
+	double backCol[3];
+
+	bool &decimateMode;
+
+
+
 signals:
 	void operationChanged(int);
 	void skelStateChanged(int);
 	void meshStateChanged(int);
 
 private:
+	
+
 	void DoAction(int action);
 	void DoAction(int action, double pos[3], int triIndex = -1);//flip normal and change triangle label;
 	void DoAction(int action, TagPoint pointInfo, int ptIndex);//for point interaction
@@ -205,9 +208,5 @@ private:
 	std::vector<TagAction> vectorActions;		
 	bool isCtrlPress;
 	int movePtIndex;
-
-	std::vector<std::vector<TagTriangle> > oldTagTriagnles;
-	std::vector<std::vector<TagPoint> > oldTagPoints;
-	std::vector<std::vector<TagEdge> > oldTagEdges;
 };
 #endif

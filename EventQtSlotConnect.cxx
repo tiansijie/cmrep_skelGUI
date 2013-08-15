@@ -67,7 +67,7 @@ EventQtSlotConnect::EventQtSlotConnect()
 
   this->Connections = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
-  mouseInteractor = vtkSmartPointer<MouseInteractorAdd>::New();
+  mouseInteractor = vtkSmartPointer<MouseInteractor>::New();
 
   iniTriLabel();
 
@@ -206,7 +206,7 @@ void EventQtSlotConnect::slot_addTag(){
 			ti.tagType = 4;
 		ti.tagIndex = addDialog.tagIndex;
 
-		MouseInteractorAdd::vectorTagInfo.push_back(ti);
+		Global::vectorTagInfo.push_back(ti);
 
 		QPixmap pix(22,22);
 		QString displayText = QString::number(ti.tagIndex) + " " + tagText;
@@ -217,11 +217,11 @@ void EventQtSlotConnect::slot_addTag(){
 
 void EventQtSlotConnect::slot_delTag()
 {
-	if(MouseInteractorAdd::vectorTagPoints.size() != 0){
+	if(Global::vectorTagPoints.size() != 0){
 		int curIndex = this->comboBoxTagPoint->currentIndex();
-		for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
+		for(int i = 0; i < Global::vectorTagPoints.size(); i++)
 		{
-			if(curIndex == MouseInteractorAdd::vectorTagPoints[i].comboBoxIndex)
+			if(curIndex == Global::vectorTagPoints[i].comboBoxIndex)
 			{
 				QMessageBox messageBox;
 				messageBox.critical(0,"Error","You need to delete these points in skeleton before deletion");
@@ -233,10 +233,10 @@ void EventQtSlotConnect::slot_delTag()
 			"Yes", "Cancel",
 			0, 1 ) ) {
 		case 0:
-			MouseInteractorAdd::vectorTagInfo.erase(MouseInteractorAdd::vectorTagInfo.begin() + curIndex);
+			Global::vectorTagInfo.erase(Global::vectorTagInfo.begin() + curIndex);
 			this->comboBoxTagPoint->removeItem(curIndex);
 			//new index
-			MouseInteractorAdd::selectedTag = this->comboBoxTagPoint->currentIndex();
+			Global::selectedTag = this->comboBoxTagPoint->currentIndex();
 			break;
 		case 1:
 		default:
@@ -247,11 +247,11 @@ void EventQtSlotConnect::slot_delTag()
 
 void EventQtSlotConnect::slot_editTag()
 {
-	if(MouseInteractorAdd::vectorTagInfo.size()>0)
+	if(Global::vectorTagInfo.size()>0)
 	{
 		AddTagDialog addDialog;
 
-		TagInfo tio = MouseInteractorAdd::vectorTagInfo[comboBoxTagPoint->currentIndex()];
+		TagInfo tio = Global::vectorTagInfo[comboBoxTagPoint->currentIndex()];
 
 		addDialog.lineEdit->setText(QString::fromStdString(tio.tagName));
 		addDialog.color = tio.qc;
@@ -293,16 +293,16 @@ void EventQtSlotConnect::slot_editTag()
 				ti.tagType = 4;
 			ti.tagIndex = addDialog.tagIndex;
 
-			MouseInteractorAdd::vectorTagInfo[this->comboBoxTagPoint->currentIndex()] = ti;
+			Global::vectorTagInfo[this->comboBoxTagPoint->currentIndex()] = ti;
 
 			//update the tag point on skeleton
-			for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
+			for(int i = 0; i < Global::vectorTagPoints.size(); i++)
 			{
-				if(MouseInteractorAdd::vectorTagPoints[i].comboBoxIndex == this->comboBoxTagPoint->currentIndex())
+				if(Global::vectorTagPoints[i].comboBoxIndex == this->comboBoxTagPoint->currentIndex())
 				{
-					MouseInteractorAdd::vectorTagPoints[i].typeIndex = ti.tagType;
-					MouseInteractorAdd::vectorTagPoints[i].typeName = ti.tagName;
-					MouseInteractorAdd::vectorTagPoints[i].actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
+					Global::vectorTagPoints[i].typeIndex = ti.tagType;
+					Global::vectorTagPoints[i].typeName = ti.tagName;
+					Global::vectorTagPoints[i].actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
 				}
 			}
 
@@ -382,18 +382,18 @@ void EventQtSlotConnect::slot_meshStateChange(int state){
 	{
 		this->checkBoxHideMesh->setChecked(false);
 		mouseInteractor->meshState = SHOW;
-		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+		for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
 		{
-			MouseInteractorAdd::vectorTagTriangles[i].triActor->VisibilityOn();
+			Global::vectorTagTriangles[i].triActor->VisibilityOn();
 		}
 	}
 	else
 	{
 		this->checkBoxHideMesh->setChecked(true);
 		mouseInteractor->meshState = HIDE;
-		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+		for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
 		{
-			MouseInteractorAdd::vectorTagTriangles[i].triActor->VisibilityOff();
+			Global::vectorTagTriangles[i].triActor->VisibilityOff();
 		}
 	}
 	this->qvtkWidget->GetRenderWindow()->Render();
@@ -401,7 +401,7 @@ void EventQtSlotConnect::slot_meshStateChange(int state){
 
 void EventQtSlotConnect::slot_comboxChanged(int state)
 {
-	MouseInteractorAdd::selectedTag = this->comboBoxTagPoint->currentIndex();
+	Global::selectedTag = this->comboBoxTagPoint->currentIndex();
 }
 
 void EventQtSlotConnect::slot_gridTypeChanged(int state)
@@ -458,10 +458,10 @@ void EventQtSlotConnect::slot_decimateButton()
 void EventQtSlotConnect::slot_tagSizeSlider(int value)
 {	
 	double tsize = value / 10.0;
-	MouseInteractorAdd::tagRadius = tsize;
-	for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
+	Global::tagRadius = tsize;
+	for(int i = 0; i < Global::vectorTagPoints.size(); i++)
 	{
-		vtkActor* tagPt = MouseInteractorAdd::vectorTagPoints[i].actor;
+		vtkActor* tagPt = Global::vectorTagPoints[i].actor;
 		vtkSmartPointer<vtkAlgorithm> algorithm =
 			tagPt->GetMapper()->GetInputConnection(0, 0)->GetProducer();
 		vtkSmartPointer<vtkSphereSource> srcReference =
@@ -620,9 +620,9 @@ void EventQtSlotConnect::slot_skelTransparentChanged(int value)
 void EventQtSlotConnect::slot_trilabelChanged(int index)	
 {
 	int curIndex = this->TriLabelComboBox->currentIndex();
-	MouseInteractorAdd::triCol[0] = triLabelColors[curIndex].red() / 255.0;
-	MouseInteractorAdd::triCol[1] = triLabelColors[curIndex].green() / 255.0;
-	MouseInteractorAdd::triCol[2] = triLabelColors[curIndex].blue() / 255.0;
+	Global::triCol[0] = triLabelColors[curIndex].red() / 255.0;
+	Global::triCol[1] = triLabelColors[curIndex].green() / 255.0;
+	Global::triCol[2] = triLabelColors[curIndex].blue() / 255.0;
 
 	mouseInteractor->currentTriIndex = curIndex;
 }
@@ -784,10 +784,10 @@ QComboBox* EventQtSlotConnect::getTagComboBox(){
 
 void EventQtSlotConnect::readCustomDataLabel(vtkFloatArray* labelDBL)
 {
-	MouseInteractorAdd::labelData.clear();
+	Global::labelData.clear();
 	for(int i = 0; i < labelDBL->GetSize(); i++)
 	{
-		MouseInteractorAdd::labelData.push_back(labelDBL->GetValue(i));
+		Global::labelData.push_back(labelDBL->GetValue(i));
 	}
 }
 
@@ -857,7 +857,7 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		actor->GetProperty()->SetEdgeColor(0.0,0.0,0.0);
 		vtkSmartPointer<vtkProperty> backPro = 
 			vtkSmartPointer<vtkProperty>::New();
-		backPro->SetColor(MouseInteractorAdd::backCol);
+		backPro->SetColor(Global::backCol);
 		actor->SetBackfaceProperty(backPro);
 		
 
@@ -865,7 +865,7 @@ void EventQtSlotConnect::readCustomDataTri(vtkFloatArray* triDBL)
 		tri.centerPos[1] = actor->GetCenter()[1];
 		tri.centerPos[2] = actor->GetCenter()[2];
 		tri.triActor = actor;
-		MouseInteractorAdd::vectorTagTriangles.push_back(tri);
+		Global::vectorTagTriangles.push_back(tri);
 		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actor);
 	}
 }
@@ -881,7 +881,7 @@ void EventQtSlotConnect::readCustomDataEdge(vtkFloatArray* edgeDBL)
 		edge.numEdge = edgeDBL->GetValue(i+3);
 		edge.constrain = edgeDBL->GetValue(i+4);
 
-		MouseInteractorAdd::vectorTagEdges.push_back(edge);
+		Global::vectorTagEdges.push_back(edge);
 	}
 }
 
@@ -897,7 +897,7 @@ void EventQtSlotConnect::readCustomDataTag(vtkFloatArray* tagDBL, vtkStringArray
 		info.tagColor[2] = tagDBL->GetValue(i+4);
 		info.qc = QColor(info.tagColor[0], info.tagColor[1], info.tagColor[2]);
 		info.tagName = tagStr->GetValue(j).c_str();
-		MouseInteractorAdd::vectorTagInfo.push_back(info);
+		Global::vectorTagInfo.push_back(info);
 
 		QPixmap pix(22,22);
 		QString displayText = QString::number(info.tagIndex) + QString::fromStdString(" ") + (tagStr->GetValue(j));
@@ -931,14 +931,14 @@ void EventQtSlotConnect::readCustomDataPoints(vtkFloatArray* ptsDBL)
 		mapper->SetInputConnection(sphereSource->GetOutputPort());
 
 		//QComboBox* cbTagPoint =  qtObject->getTagComboBox();
-		TagInfo ti = MouseInteractorAdd::vectorTagInfo[tagPt.comboBoxIndex];
+		TagInfo ti = Global::vectorTagInfo[tagPt.comboBoxIndex];
 		vtkSmartPointer<vtkActor> actor =
 			vtkSmartPointer<vtkActor>::New();
 		actor->SetMapper(mapper);
 		actor->GetProperty()->SetColor(ti.tagColor[0] / 255.0, ti.tagColor[1] / 255.0, ti.tagColor[2] / 255.0);
 
 		tagPt.actor = actor;
-		MouseInteractorAdd::vectorTagPoints.push_back(tagPt);
+		Global::vectorTagPoints.push_back(tagPt);
 		this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->AddActor(actor);
 	}
 }
@@ -984,14 +984,14 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	//see if skeleton vtk
 	vtkDataArray* skelVtk = polydata->GetPointData()->GetArray("Radius");
 	if(skelVtk == NULL)
-		MouseInteractorAdd::isSkeleton = false;
+		Global::isSkeleton = false;
 	else
-		MouseInteractorAdd::isSkeleton = true;
+		Global::isSkeleton = true;
 
-	MouseInteractorAdd::labelData.clear();
-	MouseInteractorAdd::labelData.resize(polydata->GetPoints()->GetNumberOfPoints());
-	for(int i = 0; i < MouseInteractorAdd::labelData.size(); i++)
-		MouseInteractorAdd::labelData[i] = 0.0;
+	Global::labelData.clear();
+	Global::labelData.resize(polydata->GetPoints()->GetNumberOfPoints());
+	for(int i = 0; i < Global::labelData.size(); i++)
+		Global::labelData[i] = 0.0;
 
 	// Create a mapper
 	vtkSmartPointer<vtkPolyDataMapper> mapper =
@@ -1030,13 +1030,12 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	mouseInteractor->labelPtNumber = this->PointNumber;
 	
 	//reset everything
-	MouseInteractorAdd::vectorTagPoints.clear();
-	MouseInteractorAdd::vectorClassifyPoints.clear();
-	MouseInteractorAdd::vectorTagTriangles.clear();
-	MouseInteractorAdd::vectorTagEdges.clear();
-	MouseInteractorAdd::vectorTagInfo.clear();
-	MouseInteractorAdd::triNormalActors.clear();
-	MouseInteractorAdd::selectedTag = 0;
+	Global::vectorTagPoints.clear();
+	Global::vectorTagTriangles.clear();
+	Global::vectorTagEdges.clear();
+	Global::vectorTagInfo.clear();
+	Global::triNormalActors.clear();
+	Global::selectedTag = 0;
 	this->comboBoxTagPoint->clear();
 	this->checkBoxHideMesh->setChecked(false);
 	this->checkBoxHideSkel->setChecked(false);
@@ -1071,8 +1070,8 @@ void EventQtSlotConnect::readVTK(std::string filename){
 	{
 		readCustomData(polydata);
 	}
-	this->PointNumber->setText(QString::number(MouseInteractorAdd::vectorTagPoints.size()));
-	this->TriangleNumber->setText(QString::number(MouseInteractorAdd::vectorTagTriangles.size()));
+	this->PointNumber->setText(QString::number(Global::vectorTagPoints.size()));
+	this->TriangleNumber->setText(QString::number(Global::vectorTagTriangles.size()));
 
 	this->ViewToolButton->setEnabled(false);
 }
@@ -1119,67 +1118,67 @@ void EventQtSlotConnect::saveVTKFile(QString fileName)
 	vtkSmartPointer<vtkFloatArray> fltArray1 = 
 		vtkSmartPointer<vtkFloatArray>::New();
 	fltArray1->SetName("Label");
-	for(int i = 0; i < MouseInteractorAdd::labelData.size(); i++)
-		fltArray1->InsertNextValue(MouseInteractorAdd::labelData[i]);
-	if(MouseInteractorAdd::labelData.size() !=0 )
+	for(int i = 0; i < Global::labelData.size(); i++)
+		fltArray1->InsertNextValue(Global::labelData[i]);
+	if(Global::labelData.size() !=0 )
 		//finalPolyData->GetFieldData()->AddArray(fltArray1);
 		field->AddArray(fltArray1);
 
 	vtkSmartPointer<vtkFloatArray> fltArray2 = 
 		vtkSmartPointer<vtkFloatArray>::New();
 	fltArray2->SetName("TagTriangles");
-	for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+	for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
 	{
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[0]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[1]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p1[2]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id1);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq1);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[0]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[1]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p2[2]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id2);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq2);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[0]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[1]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].p3[2]);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].id3);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq3);
-		fltArray2->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].index);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p1[0]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p1[1]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p1[2]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].id1);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].seq1);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p2[0]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p2[1]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p2[2]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].id2);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].seq2);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p3[0]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p3[1]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].p3[2]);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].id3);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].seq3);
+		fltArray2->InsertNextValue(Global::vectorTagTriangles[i].index);
 	}
-	if(MouseInteractorAdd::vectorTagTriangles.size() != 0)
+	if(Global::vectorTagTriangles.size() != 0)
 		//finalPolyData->GetFieldData()->AddArray(fltArray2);
 		field->AddArray(fltArray2);
 
 	vtkSmartPointer<vtkFloatArray> fltArray3 = 
 		vtkSmartPointer<vtkFloatArray>::New();
 	fltArray3->SetName("TagEdges");
-	for(int i = 0; i < MouseInteractorAdd::vectorTagEdges.size(); i++)
+	for(int i = 0; i < Global::vectorTagEdges.size(); i++)
 	{
-		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].ptId1);
-		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].ptId2);
-		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].seq);
-		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].numEdge);
-		fltArray3->InsertNextValue(MouseInteractorAdd::vectorTagEdges[i].constrain);
+		fltArray3->InsertNextValue(Global::vectorTagEdges[i].ptId1);
+		fltArray3->InsertNextValue(Global::vectorTagEdges[i].ptId2);
+		fltArray3->InsertNextValue(Global::vectorTagEdges[i].seq);
+		fltArray3->InsertNextValue(Global::vectorTagEdges[i].numEdge);
+		fltArray3->InsertNextValue(Global::vectorTagEdges[i].constrain);
 	}
-	if(MouseInteractorAdd::vectorTagEdges.size() != 0)
+	if(Global::vectorTagEdges.size() != 0)
 		//finalPolyData->GetFieldData()->AddArray(fltArray3);
 		field->AddArray(fltArray3);
 
 	vtkSmartPointer<vtkFloatArray> fltArray4 = 
 		vtkSmartPointer<vtkFloatArray>::New();
 	fltArray4->SetName("TagPoints");
-	for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
+	for(int i = 0; i < Global::vectorTagPoints.size(); i++)
 	{
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[0]);
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[1]);
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].pos[2]);
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].radius);
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].seq);
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].typeIndex);
-		fltArray4->InsertNextValue(MouseInteractorAdd::vectorTagPoints[i].comboBoxIndex);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].pos[0]);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].pos[1]);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].pos[2]);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].radius);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].seq);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].typeIndex);
+		fltArray4->InsertNextValue(Global::vectorTagPoints[i].comboBoxIndex);
 	}
-	if(MouseInteractorAdd::vectorTagPoints.size() != 0)
+	if(Global::vectorTagPoints.size() != 0)
 		//finalPolyData->GetFieldData()->AddArray(fltArray4);
 		field->AddArray(fltArray4);
 
@@ -1191,17 +1190,17 @@ void EventQtSlotConnect::saveVTKFile(QString fileName)
 		vtkSmartPointer<vtkStringArray>::New();
 	strArray1->SetName("TagName");
 
-	for(int i = 0; i < MouseInteractorAdd::vectorTagInfo.size(); i++)
+	for(int i = 0; i < Global::vectorTagInfo.size(); i++)
 	{
-		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagType);
-		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagIndex);
-		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[0]);
-		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[1]);
-		fltArray5->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagColor[2]);
+		fltArray5->InsertNextValue(Global::vectorTagInfo[i].tagType);
+		fltArray5->InsertNextValue(Global::vectorTagInfo[i].tagIndex);
+		fltArray5->InsertNextValue(Global::vectorTagInfo[i].tagColor[0]);
+		fltArray5->InsertNextValue(Global::vectorTagInfo[i].tagColor[1]);
+		fltArray5->InsertNextValue(Global::vectorTagInfo[i].tagColor[2]);
 
-		strArray1->InsertNextValue(MouseInteractorAdd::vectorTagInfo[i].tagName.c_str());
+		strArray1->InsertNextValue(Global::vectorTagInfo[i].tagName.c_str());
 	}
-	if(MouseInteractorAdd::vectorTagInfo.size() != 0)
+	if(Global::vectorTagInfo.size() != 0)
 	{
 		field->AddArray(fltArray5);
 		field->AddArray(strArray1);
@@ -1211,11 +1210,11 @@ void EventQtSlotConnect::saveVTKFile(QString fileName)
 	vtkSmartPointer<vtkIntArray> intArray1 = 
 		vtkSmartPointer<vtkIntArray>::New();
 	intArray1->SetName("TriSeq");
-	for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+	for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
 	{
-		intArray1->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq1);
-		intArray1->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq2);
-		intArray1->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].seq3);
+		intArray1->InsertNextValue(Global::vectorTagTriangles[i].seq1);
+		intArray1->InsertNextValue(Global::vectorTagTriangles[i].seq2);
+		intArray1->InsertNextValue(Global::vectorTagTriangles[i].seq3);
 	}
 	//finalPolyData->GetFieldData()->AddArray(intArray1);
 	field->AddArray(intArray1);
@@ -1228,7 +1227,7 @@ void EventQtSlotConnect::saveVTKFile(QString fileName)
 
 void EventQtSlotConnect::saveParaViewFile(QString fileName)
 {
-	if(MouseInteractorAdd::vectorTagTriangles.size() > 0)
+	if(Global::vectorTagTriangles.size() > 0)
 	{
 		//////////////save another file for ParaView////////////////////
 		vtkSmartPointer<vtkGenericDataObjectWriter> writerParaView = 
@@ -1247,11 +1246,11 @@ void EventQtSlotConnect::saveParaViewFile(QString fileName)
 		vtkSmartPointer<vtkAppendPolyData> appendFilter =
 			vtkSmartPointer<vtkAppendPolyData>::New();
 
-		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+		for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
 		{
 			vtkSmartPointer<vtkActorCollection> actorCollection =
 				vtkSmartPointer<vtkActorCollection>::New();
-			MouseInteractorAdd::vectorTagTriangles[i].triActor->GetActors(actorCollection);		
+			Global::vectorTagTriangles[i].triActor->GetActors(actorCollection);		
 			vtkPolyData* polyData = vtkPolyData::SafeDownCast(actorCollection->GetLastActor()->GetMapper()->GetInput());
 			appendFilter->AddInput(polyData);
 		}
@@ -1267,14 +1266,14 @@ void EventQtSlotConnect::saveParaViewFile(QString fileName)
 
 		for(int i = 0; i < cleanPoly->GetOutput()->GetNumberOfPoints(); i++)
 		{
-			for(int j = 0; j < MouseInteractorAdd::vectorTagPoints.size(); j++)
+			for(int j = 0; j < Global::vectorTagPoints.size(); j++)
 			{
-				if(MouseInteractorAdd::vectorTagPoints[j].pos[0] == cleanPoly->GetOutput()->GetPoint(i)[0] &&
-					MouseInteractorAdd::vectorTagPoints[j].pos[1] == cleanPoly->GetOutput()->GetPoint(i)[1] &&
-					MouseInteractorAdd::vectorTagPoints[j].pos[2] == cleanPoly->GetOutput()->GetPoint(i)[2])
+				if(Global::vectorTagPoints[j].pos[0] == cleanPoly->GetOutput()->GetPoint(i)[0] &&
+					Global::vectorTagPoints[j].pos[1] == cleanPoly->GetOutput()->GetPoint(i)[1] &&
+					Global::vectorTagPoints[j].pos[2] == cleanPoly->GetOutput()->GetPoint(i)[2])
 				{
-					labelData.push_back(MouseInteractorAdd::vectorTagPoints[j].typeIndex);
-					radiusData.push_back(MouseInteractorAdd::vectorTagPoints[j].radius);
+					labelData.push_back(Global::vectorTagPoints[j].typeIndex);
+					radiusData.push_back(Global::vectorTagPoints[j].radius);
 				}
 			}
 		}
@@ -1294,8 +1293,8 @@ void EventQtSlotConnect::saveParaViewFile(QString fileName)
 		vtkSmartPointer<vtkFloatArray> fltArray8 =
 			vtkSmartPointer<vtkFloatArray>::New();
 		fltArray8->SetName("TriLabel");
-		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
-			fltArray8->InsertNextValue(MouseInteractorAdd::vectorTagTriangles[i].index);
+		for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
+			fltArray8->InsertNextValue(Global::vectorTagTriangles[i].index);
 
 		cleanPoly->GetOutput()->GetPointData()->AddArray(fltArray6);
 		cleanPoly->GetOutput()->GetPointData()->AddArray(fltArray7);
@@ -1385,9 +1384,9 @@ void EventQtSlotConnect::saveCmrepFile(QString fileName)
 	cmrepFile<<"Grid.Model.nLabels = ";
 	std::vector<bool>trackNumLabel;
 	trackNumLabel.resize(10);
-	for(int i = 0; i < MouseInteractorAdd::vectorTagInfo.size(); i ++)
+	for(int i = 0; i < Global::vectorTagInfo.size(); i ++)
 	{
-		trackNumLabel[MouseInteractorAdd::vectorTagInfo[i].tagIndex] = true;
+		trackNumLabel[Global::vectorTagInfo[i].tagIndex] = true;
 	}
 
 	int numCount = 0;
@@ -1404,18 +1403,18 @@ void EventQtSlotConnect::Decimate()
 {
 	if(this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer() != NULL)
 	{
-		MouseInteractorAdd::decimateMode = true;
+		Global::decimateMode = true;
 
 		//clear all triangle
-		for(int i = 0; i < MouseInteractorAdd::vectorTagTriangles.size(); i++)
+		for(int i = 0; i < Global::vectorTagTriangles.size(); i++)
 		{
-			this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveActor(MouseInteractorAdd::vectorTagTriangles[i].triActor);
+			this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveActor(Global::vectorTagTriangles[i].triActor);
 		}
-		MouseInteractorAdd::vectorTagTriangles.clear();
-		for(int i = 0; i < MouseInteractorAdd::vectorTagPoints.size(); i++)
-			this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveActor(MouseInteractorAdd::vectorTagPoints[i].actor);
-		MouseInteractorAdd::vectorTagPoints.clear();
-		MouseInteractorAdd::vectorTagEdges.clear();
+		Global::vectorTagTriangles.clear();
+		for(int i = 0; i < Global::vectorTagPoints.size(); i++)
+			this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->RemoveActor(Global::vectorTagPoints[i].actor);
+		Global::vectorTagPoints.clear();
+		Global::vectorTagEdges.clear();
 
 		//find the first actor
 		vtkSmartPointer<vtkActorCollection> actors = this->qvtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActors();
@@ -1539,7 +1538,7 @@ void EventQtSlotConnect::Decimate()
 			tri.seq1 = seq1;//ptsTri[0];
 			tri.seq2 = seq2;//ptsTri[1];
 			tri.seq3 = seq3;//ptsTri[2];
-			MouseInteractorAdd::vectorTagTriangles.push_back(tri);
+			Global::vectorTagTriangles.push_back(tri);
 		}
 	}
 }
@@ -1568,9 +1567,9 @@ void EventQtSlotConnect::iniTriLabel()
 		triLabelColors[i] = qc;
 		mouseInteractor->triLabelColors[i] = qc;
 		if(i == 0){
-			MouseInteractorAdd::triCol[0] = qc.red() / 255.0;
-			MouseInteractorAdd::triCol[1] = qc.green() / 255.0;
-			MouseInteractorAdd::triCol[2] = qc.blue() / 255.0;
+			Global::triCol[0] = qc.red() / 255.0;
+			Global::triCol[1] = qc.green() / 255.0;
+			Global::triCol[2] = qc.blue() / 255.0;
 			mouseInteractor->currentTriIndex = i;
 		}
 		pix.fill(qc);

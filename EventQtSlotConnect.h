@@ -4,8 +4,7 @@
 #include "ui_EventQtSlotConnect.h"
 #include "VoronoiSkeletonTool.h"
 #include "AddTagDialog.h"
-#include "MouseInteractorAdd.h"
-//#include "constants.h"
+#include "MouseInteractor.h"
 
 #include <QMainWindow>
 #include <vtkSmartPointer.h>
@@ -113,7 +112,7 @@ private:
 	double targetReduction;
 	double featureAngle;
 
-	vtkSmartPointer<MouseInteractorAdd> mouseInteractor;
+	vtkSmartPointer<MouseInteractor> mouseInteractor;
 
 	int progressSignalCount;
 

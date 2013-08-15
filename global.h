@@ -1,7 +1,8 @@
-#ifndef _CONSTANTS_H_
-#define _CONSTANTS_H_
+#ifndef _GLOBAL_H_
+#define _GLOBAL_H_
 #include <QColor>
 #include <vtkActor.h>
+#include <vector>
 
 struct TagInfo
 {
@@ -56,6 +57,29 @@ struct TagAction
 	TagTriangle triangleInfo;
 	int ptIndex;
 	int ptOldSeq;
+};
+
+class Global
+{
+public:
+	static std::vector<TagInfo> vectorTagInfo;
+	static std::vector<TagTriangle> vectorTagTriangles;
+	static std::vector<TagPoint> vectorTagPoints;	
+	static std::vector<TagEdge> vectorTagEdges;
+
+	//store all the label info, 0 represent no tag on this point
+	static std::vector<double> labelData;
+	static std::vector<vtkActor*> triNormalActors;
+	static bool isSkeleton;
+	static int selectedTag;
+	static double targetReduction;
+	static double featureAngle;
+	static double tagRadius;
+
+	static double triCol[3];
+	static double backCol[3];
+
+	static bool decimateMode;
 };
 
 #endif
